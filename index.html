@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PES League - Most Wins Champion Edition</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        :root { --primary: #1a2a6c; --secondary: #b21f1f; --accent: #fdbb2d; --light: #f4f4f9; --dark-blue: #0f1a45; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); padding: 20px; color: #333; margin: 0; }
+        .main-wrapper { display: grid; grid-template-columns: 1fr 300px; gap: 20px; max-width: 1200px; margin: auto; }
+        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .sidebar { height: fit-content; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; }
+        .sidebar-card { background: var(--primary); color: white; padding: 20px; border-radius: 15px; }
+        .sidebar-card.all-time { background: var(--dark-blue); border: 1px solid var(--accent); }
+        .nav-months { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-months button { padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; }
+        .nav-months button.active { background: var(--accent); color: var(--primary); font-weight: bold; }
+        .champion-banner { text-align: center; font-size: 1.3rem; color: var(--secondary); font-weight: 900; margin-bottom: 20px; padding: 15px; border: 3px solid var(--accent); border-radius: 12px; background: #fffde6; line-height: 1.5; }
+        .date-section { margin-bottom: 40px; border-top: 5px solid var(--primary); padding-top: 20px; }
+        .date-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; }
+        .winner-row { background-color: #fff9c4 !important; font-weight: bold; }
+        .total-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+        .total-table th { color: #aaa; font-size: 0.7rem; border-bottom: 1px solid #444; }
+        .total-table td { border-bottom: 1px solid #333; padding: 10px 5px; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
+        .btn-logout { background: #666; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .player-selector { margin: 10px 0; padding: 15px; border: 2px dashed var(--primary); border-radius: 10px; background: #f0f4ff; }
+        .league-order-badge { background: var(--secondary); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-left: 10px; }
+        @media (max-width: 900px) { .main-wrapper { grid-template-columns: 1fr; } .sidebar { position: static; order: 2; } .container { order: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="container">
+        <div class="nav-months" id="monthNav"></div>
+        <div id="championArea" class="champion-banner">MENGHUBUNGKAN...</div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 onclick="cekAdmin()" style="cursor:default; font-size: 1.1rem; color: #ccc; user-select: none;">SUNDAY PES LEAGUE</h1>
+        </div>
+        <div id="mainContent"></div>
+        <div id="adminTools"></div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-card">
+            <h3 id="monthlyTitle" style="text-align: center; margin-top: 0; color: var(--accent); font-size: 1rem;">📊 TOTAL POIN</h3>
+            <table class="total-table">
+                <thead><tr><th>PLAYER</th><th>PTS</th></tr></thead>
+                <tbody id="totalPointsBody"></tbody>
+            </table>
+        </div>
+        <div class="sidebar-card all-time">
+            <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">🏆 ALL TIME POINT</h3>
+            <table class="total-table">
+                <thead><tr><th>PLAYER</th><th>PTS</th></tr></thead>
+                <tbody id="allTimePointsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAXi0FIoDjcR9HUWQ7NuAiOUsD68X8vibA",
+      authDomain: "liga-pes-b3bd0.firebaseapp.com",
+      databaseURL: "https://liga-pes-b3bd0-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "liga-pes-b3bd0",
+      storageBucket: "liga-pes-b3bd0.firebasestorage.app",
+      messagingSenderId: "673104038654",
+      appId: "1:673104038654:web:9da7efde3520577b05b3af",
+      measurementId: "G-2RP64MH07H"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const allPlayers = ["Ito", "Ipo", "Alfa", "Kobe"];
+    let currentMonth = localStorage.getItem('activeMonth') || "Mei"; 
+    let modeAdmin = false;
+    let sedangEdit = null;
+    let localData = {};
+
+    function cekAdmin() {
+        window.klik = (window.klik || 0) + 1;
+        if(window.klik >= 5) { modeAdmin = true; alert("Mode Admin Aktif!"); renderAdminTools(); ambilData(); }
+    }
+
+    function matikanAdmin() { modeAdmin = false; sedangEdit = null; document.getElementById('adminTools').innerHTML = ""; ambilData(); }
+
+    function renderAdminTools() {
+        if(modeAdmin) {
+            document.getElementById('adminTools').innerHTML = `
+                <div class="player-selector">
+                    <strong>Pilih Pemain & Tanggal:</strong><br>
+                    <div style="margin: 10px 0;">
+                        ${allPlayers.map(p => `<label style="margin-right:10px;"><input type="checkbox" class="p-check" value="${p}" checked> ${p}</label>`).join('')}
+                    </div>
+                    <select id="newLeagueDate" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                        ${Array.from({length: 31}, (_, i) => `<option value="${i+1}">Tanggal ${i+1}</option>`).join('')}
+                    </select>
+                    <button class="btn-add" onclick="tambahKlasemenBaru()">➕ BUAT LIGA</button>
+                </div>
+                <button class="btn-logout" onclick="matikanAdmin()">🔒 MATIKAN MODE ADMIN</button>
+            `;
+        }
+    }
+
+    function renderNav() {
+        document.getElementById('monthNav').innerHTML = months.map(m => 
+            `<button class="${m === currentMonth ? 'active' : ''}" onclick="gantiBulan('${m}')">${m}</button>`
+        ).join('');
+    }
+
+    function gantiBulan(m) {
+        currentMonth = m;
+        localStorage.setItem('activeMonth', m);
+        sedangEdit = null;
+        renderNav();
+        ambilData();
+    }
+
+    function ambilData() {
+        document.getElementById('monthlyTitle').innerText = "📊 TOTAL POIN " + currentMonth.toUpperCase();
+        db.ref('liga/' + currentMonth + '/matches').on('value', (snapshot) => {
+            if (sedangEdit) return;
+            localData = snapshot.val() || {};
+            renderUlang(localData);
+            updateStatus(localData);
+            updateAllTimePoints();
+        });
+    }
+
+    function getNamaHari(tglAngka) {
+        const tahun = new Date().getFullYear();
+        const bulanIndex = months.indexOf(currentMonth);
+        const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        return hari[new Date(tahun, bulanIndex, tglAngka).getDay()];
+    }
+
+    function renderUlang(matches) {
+        const content = document.getElementById('mainContent');
+        content.innerHTML = "";
+        
+        const sortedIds = Object.keys(matches).sort((a, b) => {
+            if (matches[a].tanggal !== matches[b].tanggal) return matches[a].tanggal - matches[b].tanggal;
+            return matches[a].timestamp - matches[b].timestamp;
+        });
+
+        if (sortedIds.length === 0) {
+            content.innerHTML = `<p style="text-align:center; color:#999; margin-top:30px;">Belum ada liga di bulan ${currentMonth}.</p>`;
+            return;
+        }
+
+        let dateCounters = {};
+
+        sortedIds.forEach(id => {
+            const m = matches[id];
+            const statusEdit = (sedangEdit === id);
+            
+            if (!dateCounters[m.tanggal]) dateCounters[m.tanggal] = 1;
+            else dateCounters[m.tanggal]++;
+            const urutanLiga = dateCounters[m.tanggal];
+
+            let displayStandings = [...m.standings];
+            displayStandings.sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                return (a.manualRank || 99) - (b.manualRank || 99);
+            });
+
+            const pemenang = displayStandings[0].pts > 0 ? displayStandings[0].name : "-";
+
+            content.innerHTML += `
+                <div class="date-section">
+                    <div class="date-header">
+                        ${statusEdit ? 
+                            `<select id="editTgl">${Array.from({length: 31}, (_, i) => `<option value="${i+1}" ${m.tanggal == i+1 ? 'selected' : ''}>Tgl ${i+1}</option>`).join('')}</select>` : 
+                            `<h2>📅 ${getNamaHari(m.tanggal)}, ${m.tanggal} ${currentMonth} <span class="league-order-badge">LIGA ${urutanLiga}</span></h2>`
+                        }
+                        <div>
+                            <span style="background:var(--accent); padding:5px 12px; border-radius:15px; font-weight:bold; font-size:0.8rem;">🏆 Juara: ${pemenang}</span>
+                            ${modeAdmin && !statusEdit ? `<button onclick="hapusKlasemen('${id}')" style="margin-left:5px; border:none; background:none; cursor:pointer;">🗑️</button>` : ''}
+                            ${modeAdmin ? `<button class="${statusEdit?'btn-save':'btn-edit'}" onclick="${statusEdit?`simpanData('${id}')`:`editData('${id}')`}" style="margin-left:5px;">${statusEdit?'Simpan':'Edit'}</button>` : ''}
+                        </div>
+                    </div>
+                    <table>
+                        <thead><tr><th>Player</th><th>W</th><th>D</th><th>L</th><th>PTS</th>${statusEdit?'<th>Posisi (Jika Seri)</th>':''}</tr></thead>
+                        <tbody>
+                            ${displayStandings.map((p, i) => {
+                                const isJuara = (i === 0 && p.pts > 0);
+                                return `<tr class="${isJuara ? 'winner-row' : ''}">
+                                    <td style="text-align:left; padding-left:15px;"><strong>${p.name}</strong> ${isJuara?'👑':''}</td>
+                                    <td>${statusEdit?`<input type="number" class="w-in" data-name="${p.name}" value="${p.w}" style="width:40px;">`:p.w}</td>
+                                    <td>${statusEdit?`<input type="number" class="d-in" data-name="${p.name}" value="${p.d}" style="width:40px;">`:p.d}</td>
+                                    <td>${statusEdit?`<input type="number" class="l-in" data-name="${p.name}" value="${p.l}" style="width:40px;">`:p.l}</td>
+                                    <td><strong>${p.pts}</strong></td>
+                                    ${statusEdit ? `<td>
+                                        <select class="rank-in" data-name="${p.name}">
+                                            <option value="1" ${p.manualRank==1?'selected':''}>1</option>
+                                            <option value="2" ${p.manualRank==2?'selected':''}>2</option>
+                                            <option value="3" ${p.manualRank==3?'selected':''}>3</option>
+                                            <option value="4" ${p.manualRank==4?'selected':''}>4</option>
+                                        </select>
+                                    </td>` : ''}
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        });
+    }
+
+    function editData(id) { sedangEdit = id; renderUlang(localData); }
+
+    function simpanData(id) {
+        const newTgl = document.getElementById('editTgl').value;
+        const rowsW = document.querySelectorAll('.w-in');
+        const rowsD = document.querySelectorAll('.d-in');
+        const rowsL = document.querySelectorAll('.l-in');
+        const rowsR = document.querySelectorAll('.rank-in');
+        
+        const standings = Array.from(rowsW).map((el, i) => {
+            const name = el.getAttribute('data-name');
+            const w = parseInt(el.value) || 0;
+            const d = parseInt(rowsD[i].value) || 0;
+            const l = parseInt(rowsL[i].value) || 0;
+            const manualRank = parseInt(rowsR[i].value);
+            return { name, w, d, l, pts: (w * 3) + d, manualRank };
+        });
+
+        db.ref(`liga/${currentMonth}/matches/${id}`).update({
+            tanggal: parseInt(newTgl),
+            standings: standings
+        }).then(() => { sedangEdit = null; ambilData(); });
+    }
+
+    function tambahKlasemenBaru() {
+        const selected = Array.from(document.querySelectorAll('.p-check:checked')).map(cb => cb.value);
+        const tgl = document.getElementById('newLeagueDate').value;
+        if(selected.length < 2) return alert("Pilih minimal 2 pemain!");
+        
+        const newMatchRef = db.ref(`liga/${currentMonth}/matches`).push();
+        newMatchRef.set({
+            tanggal: parseInt(tgl),
+            timestamp: Date.now(),
+            standings: selected.map((n, index) => ({ name: n, w: 0, d: 0, l: 0, pts: 0, manualRank: index + 1 }))
+        }).then(() => renderAdminTools());
+    }
+
+    function hapusKlasemen(id) { if(confirm("Hapus liga ini?")) db.ref(`liga/${currentMonth}/matches/${id}`).remove(); }
+
+    function updateStatus(matches) {
+        let pts = { "Ito": 0, "Ipo": 0, "Alfa": 0, "Kobe": 0 };
+        let trophyCount = { "Ito": 0, "Ipo": 0, "Alfa": 0, "Kobe": 0 };
+        
+        // Hitung total poin dan jumlah gelar Juara 1
+        Object.values(matches).forEach(m => {
+            let s = [...m.standings].sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                return (a.manualRank || 99) - (b.manualRank || 99);
+            });
+            
+            // Tambah poin per orang
+            m.standings.forEach(p => pts[p.name] += p.pts);
+            
+            // Catat pemenang liga (hanya jika ada poin)
+            if (s[0].pts > 0) {
+                trophyCount[s[0].name]++;
+            }
+        });
+
+        // Tampilkan Tabel Poin Sidebar
+        const sortedPts = Object.entries(pts).sort((a,b) => b[1] - a[1]);
+        document.getElementById('totalPointsBody').innerHTML = sortedPts.map(([n, p], i) => 
+            `<tr><td>${i==0 && p>0?'👑':''} ${n}</td><td style="font-weight:bold;">${p}</td></tr>`
+        ).join('');
+
+        // LOGIKA CHAMPION: Siapa yang trofi Juara 1 paling banyak?
+        const sortedTrophies = Object.entries(trophyCount).sort((a, b) => b[1] - a[1]);
+        const maxTrophies = sortedTrophies[0][1];
+        
+        const championArea = document.getElementById('championArea');
+        if (maxTrophies > 0) {
+            // Cari semua orang yang punya trophy sebanyak maxTrophies (bisa lebih dari 1 orang)
+            const winners = sortedTrophies.filter(t => t[1] === maxTrophies).map(t => `${t[0]} (${t[1]}x 🏆)`);
+            championArea.innerHTML = `🌟 CHAMPION ${currentMonth.toUpperCase()} 🌟<br>${winners.join(" & ")}`;
+        } else {
+            championArea.innerHTML = `Belum ada juara di bulan ${currentMonth}`;
+        }
+    }
+
+    function updateAllTimePoints() {
+        db.ref('liga').once('value', snapshot => {
+            let pts = { "Ito": 0, "Ipo": 0, "Alfa": 0, "Kobe": 0 };
+            const monthsData = snapshot.val() || {};
+            Object.values(monthsData).forEach(m => {
+                if(m.matches) Object.values(m.matches).forEach(match => match.standings.forEach(p => pts[p.name] += p.pts));
+            });
+            const sorted = Object.entries(pts).sort((a,b) => b[1] - a[1]);
+            document.getElementById('allTimePointsBody').innerHTML = sorted.map(([n, p], i) => 
+                `<tr><td>${i==0 && p>0?'🏆':''} ${n}</td><td style="font-weight:bold;">${p}</td></tr>`
+            ).join('');
+        });
+    }
+
+    renderNav(); ambilData();
+</script>
+</body>
+</html>
