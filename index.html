@@ -3,33 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PES League - Most Wins Champion Edition</title>
+    <title>PES League - Wins Header & Global Toxx Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #1a2a6c; --secondary: #b21f1f; --accent: #fdbb2d; --light: #f4f4f9; --dark-blue: #0f1a45; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); padding: 20px; color: #333; margin: 0; }
-        .main-wrapper { display: grid; grid-template-columns: 1fr 300px; gap: 20px; max-width: 1200px; margin: auto; }
-        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .sidebar { height: fit-content; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .sidebar-card { background: var(--primary); color: white; padding: 20px; border-radius: 15px; }
+        :root { --primary: #1a2a6c; --secondary: #b21f1f; --accent: #fdbb2d; --light: #f4f4f9; --dark-blue: #0f1a45; --purple: #6a0dad; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(145deg, #270668 0%, #5d15a3 40%, #270668 100%);
+            background-attachment: fixed;
+            padding: 20px; 
+            color: #333; 
+            margin: 0; 
+            min-height: 100vh;
+        }
+        .main-wrapper { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1300px; margin: auto; }
+        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); overflow-x: auto; }
+        
+        /* Sidebar */
+        .sidebar { height: fit-content; max-height: calc(100vh - 40px); overflow-y: auto; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; padding-right: 5px; }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+        
+        .sidebar-card { background: var(--primary); color: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .sidebar-card.all-time { background: var(--dark-blue); border: 1px solid var(--accent); }
         .nav-months { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
-        .nav-months button { padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; }
-        .nav-months button.active { background: var(--accent); color: var(--primary); font-weight: bold; }
-        .champion-banner { text-align: center; font-size: 1.3rem; color: var(--secondary); font-weight: 900; margin-bottom: 20px; padding: 15px; border: 3px solid var(--accent); border-radius: 12px; background: #fffde6; line-height: 1.5; }
+        .nav-months button { padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; transition: 0.2s; }
+        .nav-months button.active { background: var(--accent); color: var(--primary); font-weight: bold; transform: scale(1.05); }
+        .champion-banner { text-align: center; font-size: 1.3rem; color: var(--secondary); font-weight: 900; margin-bottom: 20px; padding: 15px; border: 3px solid var(--accent); border-radius: 12px; background: #fffde6; line-height: 1.5; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
         .date-section { margin-bottom: 40px; border-top: 5px solid var(--primary); padding-top: 20px; }
-        .date-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; }
+        .date-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        
+        .standings-title { font-size: 1.1rem; font-weight: 900; color: #444; margin-bottom: 10px; border-left: 5px solid var(--purple); padding-left: 10px; letter-spacing: 1px; }
+
+        .main-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 600px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .main-table th { background-color: var(--purple); color: white; padding: 12px 8px; text-align: center; font-size: 0.95rem; }
+        .main-table td { padding: 8px; text-align: center; border-bottom: 1px solid #eee; font-size: 0.95rem; }
         .winner-row { background-color: #fff9c4 !important; font-weight: bold; }
-        .total-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-        .total-table th { color: #aaa; font-size: 0.7rem; border-bottom: 1px solid #444; }
-        .total-table td { border-bottom: 1px solid #333; padding: 10px 5px; }
+        
+        .total-table { width: 100%; margin-top: 10px; border-collapse: collapse; min-width: 100%; }
+        .total-table th { color: #aaa; font-size: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; }
+        .total-table td { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px 5px; }
+        
         .btn-add { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
         .btn-logout { background: #666; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; }
-        .player-selector { margin: 10px 0; padding: 15px; border: 2px dashed var(--primary); border-radius: 10px; background: #f0f4ff; }
+        .player-selector { margin: 10px 0; padding: 15px; border: 2px dashed var(--primary); border-radius: 10px; background: #f0f4ff; color: #333; }
         .league-order-badge { background: var(--secondary); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-left: 10px; }
+        
+        input[type="number"] { width: 35px; text-align: center; padding: 3px; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .col-pts { font-size: 1.15rem; font-weight: 900; color: var(--primary); border-left: 1px solid #eee; border-right: 1px solid #eee; }
+
         @media (max-width: 900px) { .main-wrapper { grid-template-columns: 1fr; } .sidebar { position: static; order: 2; } .container { order: 1; } }
     </style>
 </head>
@@ -40,7 +65,7 @@
         <div class="nav-months" id="monthNav"></div>
         <div id="championArea" class="champion-banner">MENGHUBUNGKAN...</div>
         <div style="text-align: center; margin-bottom: 20px;">
-            <h1 onclick="cekAdmin()" style="cursor:default; font-size: 1.1rem; color: #ccc; user-select: none;">SUNDAY PES LEAGUE</h1>
+            <h1 onclick="cekAdmin()" style="cursor:default; font-size: 1.5rem; color: #ffffff; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); user-select: none; margin-top: 0;">SUNDAY PES LEAGUE</h1>
         </div>
         <div id="mainContent"></div>
         <div id="adminTools"></div>
@@ -50,17 +75,57 @@
         <div class="sidebar-card">
             <h3 id="monthlyTitle" style="text-align: center; margin-top: 0; color: var(--accent); font-size: 1rem;">📊 TOTAL POIN</h3>
             <table class="total-table">
-                <thead><tr><th>PLAYER</th><th>PTS</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
                 <tbody id="totalPointsBody"></tbody>
             </table>
         </div>
+        
         <div class="sidebar-card all-time">
-            <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">🏆 ALL TIME POINT</h3>
+            <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">🏆 ALL TIME POINTS</h3>
             <table class="total-table">
-                <thead><tr><th>PLAYER</th><th>PTS</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
                 <tbody id="allTimePointsBody"></tbody>
             </table>
         </div>
+
+        <div class="sidebar-card all-time">
+            <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">⚽ TOP SCORES</h3>
+            <table class="total-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th>
+                    </tr>
+                </thead>
+                <tbody id="topScoresBody"></tbody>
+            </table>
+        </div>
+
+        <div class="sidebar-card all-time">
+            <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">🎯 TOP ASSISTS</h3>
+            <table class="total-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th> </tr>
+                </thead>
+                <tbody id="topAssistsBody"></tbody>
+            </table>
+            <div id="adminStatsTool"></div>
+        </div>
+
     </div>
 </div>
 
@@ -80,18 +145,105 @@
     const db = firebase.database();
 
     const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const allPlayers = ["Ito", "Ipo", "Alfa", "Kobe"];
+    const allPlayers = ["Toxx", "Ipo", "Alfa", "Kobe"];
     let currentMonth = localStorage.getItem('activeMonth') || "Mei"; 
     let modeAdmin = false;
-    let sedangEdit = null;
+    let editingMatchId = null;
     let localData = {};
+    
+    let statsData = {};
+    let sedangEditStats = false;
+
+    function filterName(name) {
+        return name === "Ito" ? "Toxx" : name;
+    }
+
+    db.ref('liga/allTimeStats').on('value', (snapshot) => {
+        let rawStats = snapshot.val() || {};
+        statsData = {};
+        
+        allPlayers.forEach(p => statsData[p] = { score: 0, assist: 0 });
+
+        Object.keys(rawStats).forEach(key => {
+            let cleanKey = filterName(key);
+            if (!statsData[cleanKey]) statsData[cleanKey] = { score: 0, assist: 0 };
+            statsData[cleanKey].score += rawStats[key].score || 0;
+            statsData[cleanKey].assist += rawStats[key].assist || 0;
+        });
+
+        renderStats();
+    });
 
     function cekAdmin() {
         window.klik = (window.klik || 0) + 1;
-        if(window.klik >= 5) { modeAdmin = true; alert("Mode Admin Aktif!"); renderAdminTools(); ambilData(); }
+        if(window.klik >= 5) { 
+            modeAdmin = true; 
+            alert("Mode Admin Aktif!"); 
+            renderAdminTools(); 
+            ambilData(); 
+            renderStats();
+        }
     }
 
-    function matikanAdmin() { modeAdmin = false; sedangEdit = null; document.getElementById('adminTools').innerHTML = ""; ambilData(); }
+    function matikanAdmin() { 
+        modeAdmin = false; 
+        editingMatchId = null; 
+        sedangEditStats = false; 
+        document.getElementById('adminTools').innerHTML = ""; 
+        ambilData(); 
+        renderStats();
+    }
+
+    function renderStats() {
+        if(sedangEditStats) return;
+        
+        const players = Object.keys(statsData);
+        
+        const sortedScores = [...players].sort((a,b) => statsData[b].score - statsData[a].score);
+        document.getElementById('topScoresBody').innerHTML = sortedScores.map((n, i) => 
+            `<tr><td style="text-align:left;">${i==0 && statsData[n].score>0?'🥇':''} ${n}</td><td style="font-weight:bold;">${statsData[n].score}x</td></tr>`
+        ).join('');
+
+        const sortedAssists = [...players].sort((a,b) => statsData[b].assist - statsData[a].assist);
+        document.getElementById('topAssistsBody').innerHTML = sortedAssists.map((n, i) => 
+            `<tr><td style="text-align:left;">${i==0 && statsData[n].assist>0?'🥇':''} ${n}</td><td style="font-weight:bold;">${statsData[n].assist}x</td></tr>`
+        ).join('');
+
+        if(modeAdmin) {
+            document.getElementById('adminStatsTool').innerHTML = `<button onclick="editStats()" style="width:100%; margin-top:15px; padding:10px; border-radius:8px; border:none; background:#fdbb2d; font-weight:bold; cursor:pointer; color:#1a2a6c;">✏️ Edit Manual Stats</button>`;
+        } else {
+            document.getElementById('adminStatsTool').innerHTML = '';
+        }
+    }
+
+    function editStats() {
+        sedangEditStats = true;
+        const players = Object.keys(statsData);
+        
+        document.getElementById('topScoresBody').innerHTML = players.map(n => 
+            `<tr><td style="text-align:left;">${n}</td><td><input type="number" id="edit-score-${n}" value="${statsData[n].score}" style="width:45px; text-align:center; padding:3px; border-radius:4px; border:1px solid #ccc;"></td></tr>`
+        ).join('');
+
+        document.getElementById('topAssistsBody').innerHTML = players.map(n => 
+            `<tr><td style="text-align:left;">${n}</td><td><input type="number" id="edit-assist-${n}" value="${statsData[n].assist}" style="width:45px; text-align:center; padding:3px; border-radius:4px; border:1px solid #ccc;"></td></tr>`
+        ).join('');
+
+        document.getElementById('adminStatsTool').innerHTML = `<button onclick="simpanStats()" style="width:100%; margin-top:15px; padding:10px; border-radius:8px; border:none; background:#4CAF50; color:white; font-weight:bold; cursor:pointer;">💾 Simpan Stats</button>`;
+    }
+
+    function simpanStats() {
+        const players = Object.keys(statsData);
+        let newData = {};
+        players.forEach(n => {
+            newData[n] = {
+                score: parseInt(document.getElementById(`edit-score-${n}`).value) || 0,
+                assist: parseInt(document.getElementById(`edit-assist-${n}`).value) || 0
+            };
+        });
+        db.ref('liga/allTimeStats').set(newData).then(() => {
+            sedangEditStats = false;
+        });
+    }
 
     function renderAdminTools() {
         if(modeAdmin) {
@@ -120,7 +272,7 @@
     function gantiBulan(m) {
         currentMonth = m;
         localStorage.setItem('activeMonth', m);
-        sedangEdit = null;
+        editingMatchId = null;
         renderNav();
         ambilData();
     }
@@ -128,7 +280,7 @@
     function ambilData() {
         document.getElementById('monthlyTitle').innerText = "📊 TOTAL POIN " + currentMonth.toUpperCase();
         db.ref('liga/' + currentMonth + '/matches').on('value', (snapshot) => {
-            if (sedangEdit) return;
+            if (editingMatchId) return;
             localData = snapshot.val() || {};
             renderUlang(localData);
             updateStatus(localData);
@@ -153,7 +305,7 @@
         });
 
         if (sortedIds.length === 0) {
-            content.innerHTML = `<p style="text-align:center; color:#999; margin-top:30px;">Belum ada liga di bulan ${currentMonth}.</p>`;
+            content.innerHTML = `<p style="text-align:center; color:white; margin-top:30px;">Belum ada liga di bulan ${currentMonth}.</p>`;
             return;
         }
 
@@ -161,14 +313,22 @@
 
         sortedIds.forEach(id => {
             const m = matches[id];
-            const statusEdit = (sedangEdit === id);
+            const statusEdit = (editingMatchId === id);
             
             if (!dateCounters[m.tanggal]) dateCounters[m.tanggal] = 1;
             else dateCounters[m.tanggal]++;
             const urutanLiga = dateCounters[m.tanggal];
 
             let displayStandings = [...m.standings];
+            
+            displayStandings.forEach(p => p.name = filterName(p.name));
+            let cleanManualJuara = filterName(m.manualJuara);
+
             displayStandings.sort((a, b) => {
+                if (cleanManualJuara) {
+                    if (a.name === cleanManualJuara) return -1;
+                    if (b.name === cleanManualJuara) return 1;
+                }
                 if (b.pts !== a.pts) return b.pts - a.pts;
                 return (a.manualRank || 99) - (b.manualRank || 99);
             });
@@ -188,19 +348,39 @@
                             ${modeAdmin ? `<button class="${statusEdit?'btn-save':'btn-edit'}" onclick="${statusEdit?`simpanData('${id}')`:`editData('${id}')`}" style="margin-left:5px;">${statusEdit?'Simpan':'Edit'}</button>` : ''}
                         </div>
                     </div>
-                    <table>
-                        <thead><tr><th>Player</th><th>W</th><th>D</th><th>L</th><th>PTS</th>${statusEdit?'<th>Posisi (Jika Seri)</th>':''}</tr></thead>
+                    
+                    <div class="standings-title">STANDINGS</div>
+                    
+                    <table class="main-table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Points</th>
+                                <th>W</th><th>D</th><th>L</th>
+                                <th>F</th><th>A</th><th>GD</th>
+                                ${statusEdit?'<th>Posisi (Seri)</th>':''}
+                            </tr>
+                        </thead>
                         <tbody>
                             ${displayStandings.map((p, i) => {
                                 const isJuara = (i === 0 && p.pts > 0);
+                                const valF = p.f || 0;
+                                const valA = p.a || 0;
+                                const valGD = p.gd || 0;
+                                
                                 return `<tr class="${isJuara ? 'winner-row' : ''}">
-                                    <td style="text-align:left; padding-left:15px;"><strong>${p.name}</strong> ${isJuara?'👑':''}</td>
-                                    <td>${statusEdit?`<input type="number" class="w-in" data-name="${p.name}" value="${p.w}" style="width:40px;">`:p.w}</td>
-                                    <td>${statusEdit?`<input type="number" class="d-in" data-name="${p.name}" value="${p.d}" style="width:40px;">`:p.d}</td>
-                                    <td>${statusEdit?`<input type="number" class="l-in" data-name="${p.name}" value="${p.l}" style="width:40px;">`:p.l}</td>
-                                    <td><strong>${p.pts}</strong></td>
+                                    <td style="text-align:left; padding-left:10px;"><strong>${p.name}</strong> ${isJuara?'👑':''}</td>
+                                    <td class="col-pts">${p.pts}</td>
+                                    <td>${statusEdit?`<input type="number" class="w-in" data-name="${p.name}" value="${p.w}">`:p.w}</td>
+                                    <td>${statusEdit?`<input type="number" class="d-in" data-name="${p.name}" value="${p.d}">`:p.d}</td>
+                                    <td>${statusEdit?`<input type="number" class="l-in" data-name="${p.name}" value="${p.l}">`:p.l}</td>
+                                    <td>${statusEdit?`<input type="number" class="f-in" data-name="${p.name}" value="${valF}">`:valF}</td>
+                                    <td>${statusEdit?`<input type="number" class="a-in" data-name="${p.name}" value="${valA}">`:valA}</td>
+                                    <td style="font-weight: bold; color: ${valGD > 0 ? 'green' : (valGD < 0 ? 'red' : 'black')};">
+                                        ${valGD > 0 ? '+' : ''}${valGD}
+                                    </td>
                                     ${statusEdit ? `<td>
-                                        <select class="rank-in" data-name="${p.name}">
+                                        <select class="rank-in" data-name="${p.name}" style="padding: 3px;">
                                             <option value="1" ${p.manualRank==1?'selected':''}>1</option>
                                             <option value="2" ${p.manualRank==2?'selected':''}>2</option>
                                             <option value="3" ${p.manualRank==3?'selected':''}>3</option>
@@ -215,13 +395,15 @@
         });
     }
 
-    function editData(id) { sedangEdit = id; renderUlang(localData); }
+    function editData(id) { editingMatchId = id; renderUlang(localData); }
 
     function simpanData(id) {
         const newTgl = document.getElementById('editTgl').value;
         const rowsW = document.querySelectorAll('.w-in');
         const rowsD = document.querySelectorAll('.d-in');
         const rowsL = document.querySelectorAll('.l-in');
+        const rowsF = document.querySelectorAll('.f-in');
+        const rowsA = document.querySelectorAll('.a-in');
         const rowsR = document.querySelectorAll('.rank-in');
         
         const standings = Array.from(rowsW).map((el, i) => {
@@ -229,14 +411,18 @@
             const w = parseInt(el.value) || 0;
             const d = parseInt(rowsD[i].value) || 0;
             const l = parseInt(rowsL[i].value) || 0;
+            const f = parseInt(rowsF[i].value) || 0;
+            const a = parseInt(rowsA[i].value) || 0;
+            const gd = f - a;
             const manualRank = parseInt(rowsR[i].value);
-            return { name, w, d, l, pts: (w * 3) + d, manualRank };
+            return { name, w, d, l, f, a, gd, pts: (w * 3) + d, manualRank };
         });
 
         db.ref(`liga/${currentMonth}/matches/${id}`).update({
             tanggal: parseInt(newTgl),
-            standings: standings
-        }).then(() => { sedangEdit = null; ambilData(); });
+            standings: standings,
+            manualJuara: null
+        }).then(() => { editingMatchId = null; ambilData(); });
     }
 
     function tambahKlasemenBaru() {
@@ -248,45 +434,59 @@
         newMatchRef.set({
             tanggal: parseInt(tgl),
             timestamp: Date.now(),
-            standings: selected.map((n, index) => ({ name: n, w: 0, d: 0, l: 0, pts: 0, manualRank: index + 1 }))
+            standings: selected.map((n, index) => ({ name: n, w: 0, d: 0, l: 0, f: 0, a: 0, gd: 0, pts: 0, manualRank: index + 1 }))
         }).then(() => renderAdminTools());
     }
 
     function hapusKlasemen(id) { if(confirm("Hapus liga ini?")) db.ref(`liga/${currentMonth}/matches/${id}`).remove(); }
 
     function updateStatus(matches) {
-        let pts = { "Ito": 0, "Ipo": 0, "Alfa": 0, "Kobe": 0 };
-        let trophyCount = { "Ito": 0, "Ipo": 0, "Alfa": 0, "Kobe": 0 };
+        let pts = {};
+        let trophyCount = {};
         
-        // Hitung total poin dan jumlah gelar Juara 1
+        allPlayers.forEach(p => { pts[p] = 0; trophyCount[p] = 0; });
+        
         Object.values(matches).forEach(m => {
             let s = [...m.standings].sort((a, b) => {
+                let nameA = filterName(a.name);
+                let nameB = filterName(b.name);
+                let cleanManualJuara = filterName(m.manualJuara);
+                if (cleanManualJuara) {
+                    if (nameA === cleanManualJuara) return -1;
+                    if (nameB === cleanManualJuara) return 1;
+                }
                 if (b.pts !== a.pts) return b.pts - a.pts;
                 return (a.manualRank || 99) - (b.manualRank || 99);
             });
             
-            // Tambah poin per orang
-            m.standings.forEach(p => pts[p.name] += p.pts);
+            m.standings.forEach(p => {
+                let cleanName = filterName(p.name);
+                if (pts[cleanName] === undefined) pts[cleanName] = 0;
+                pts[cleanName] += p.pts;
+            });
             
-            // Catat pemenang liga (hanya jika ada poin)
-            if (s[0].pts > 0) {
-                trophyCount[s[0].name]++;
+            if (s[0] && s[0].pts > 0) {
+                let winnerName = filterName(s[0].name);
+                if (trophyCount[winnerName] === undefined) trophyCount[winnerName] = 0;
+                trophyCount[winnerName]++;
             }
         });
 
-        // Tampilkan Tabel Poin Sidebar
         const sortedPts = Object.entries(pts).sort((a,b) => b[1] - a[1]);
+        
         document.getElementById('totalPointsBody').innerHTML = sortedPts.map(([n, p], i) => 
-            `<tr><td>${i==0 && p>0?'👑':''} ${n}</td><td style="font-weight:bold;">${p}</td></tr>`
+            `<tr>
+                <td style="text-align: left;">${i==0 && p>0?'👑':''} ${n}</td>
+                <td>${trophyCount[n] || 0}x 🏆</td>
+                <td style="font-weight:bold;">${p}</td>
+            </tr>`
         ).join('');
 
-        // LOGIKA CHAMPION: Siapa yang trofi Juara 1 paling banyak?
         const sortedTrophies = Object.entries(trophyCount).sort((a, b) => b[1] - a[1]);
         const maxTrophies = sortedTrophies[0][1];
         
         const championArea = document.getElementById('championArea');
         if (maxTrophies > 0) {
-            // Cari semua orang yang punya trophy sebanyak maxTrophies (bisa lebih dari 1 orang)
             const winners = sortedTrophies.filter(t => t[1] === maxTrophies).map(t => `${t[0]} (${t[1]}x 🏆)`);
             championArea.innerHTML = `🌟 CHAMPION ${currentMonth.toUpperCase()} 🌟<br>${winners.join(" & ")}`;
         } else {
@@ -296,14 +496,50 @@
 
     function updateAllTimePoints() {
         db.ref('liga').once('value', snapshot => {
-            let pts = { "Ito": 0, "Ipo": 0, "Alfa": 0, "Kobe": 0 };
+            let pts = {};
+            let trophyAllTime = {};
+            
+            allPlayers.forEach(p => { pts[p] = 0; trophyAllTime[p] = 0; });
             const monthsData = snapshot.val() || {};
+            
             Object.values(monthsData).forEach(m => {
-                if(m.matches) Object.values(m.matches).forEach(match => match.standings.forEach(p => pts[p.name] += p.pts));
+                if(m.matches) {
+                    Object.values(m.matches).forEach(match => {
+                        let s = [...match.standings].sort((a, b) => {
+                            let nameA = filterName(a.name);
+                            let nameB = filterName(b.name);
+                            let cleanManualJuara = filterName(match.manualJuara);
+                            if (cleanManualJuara) {
+                                if (nameA === cleanManualJuara) return -1;
+                                if (nameB === cleanManualJuara) return 1;
+                            }
+                            if (b.pts !== a.pts) return b.pts - a.pts;
+                            return (a.manualRank || 99) - (b.manualRank || 99);
+                        });
+                        
+                        match.standings.forEach(p => {
+                            let cleanName = filterName(p.name);
+                            if (pts[cleanName] === undefined) pts[cleanName] = 0;
+                            pts[cleanName] += p.pts;
+                        });
+                        
+                        if (s[0] && s[0].pts > 0) {
+                            let winnerName = filterName(s[0].name);
+                            if (trophyAllTime[winnerName] === undefined) trophyAllTime[winnerName] = 0;
+                            trophyAllTime[winnerName]++;
+                        }
+                    });
+                }
             });
+            
             const sorted = Object.entries(pts).sort((a,b) => b[1] - a[1]);
+            
             document.getElementById('allTimePointsBody').innerHTML = sorted.map(([n, p], i) => 
-                `<tr><td>${i==0 && p>0?'🏆':''} ${n}</td><td style="font-weight:bold;">${p}</td></tr>`
+                `<tr>
+                    <td style="text-align: left;">${i==0 && p>0?'👑':''} ${n}</td>
+                    <td>${trophyAllTime[n] || 0}x 🏆</td>
+                    <td style="font-weight:bold;">${p}</td>
+                </tr>`
             ).join('');
         });
     }
