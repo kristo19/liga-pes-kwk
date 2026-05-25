@@ -207,7 +207,7 @@
     let currentMonth = localStorage.getItem('activeMonth') || "Mei"; 
     
     let currentMode = null; 
-    let dbPath = 'liga'; // Berubah sesuai mode yang dipilih
+    let dbPath = 'liga';
     let matchesRef = null;
     let statsRef = null;
 
@@ -218,6 +218,19 @@
     let sedangEditStats = false;
     
     let activePlayersInMode = new Set(); 
+
+    // ============================================================
+    // BUGFIX: Fungsi getNamaHari yang hilang — ini penyebab utama
+    // klasemen tidak muncul setelah liga dibuat
+    // ============================================================
+    function getNamaHari(tanggal) {
+        const bulanIndex = months.indexOf(currentMonth);
+        if (bulanIndex === -1) return "Minggu"; // fallback jika bulan tidak dikenali
+        const tahun = new Date().getFullYear();
+        const date = new Date(tahun, bulanIndex, tanggal);
+        const hariList = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        return hariList[date.getDay()];
+    }
 
     function filterName(name) { return name === "Ito" ? "Toxx" : (name || "Unknown"); }
 
@@ -240,7 +253,6 @@
     }
 
     function terapkanMode() {
-        // PEMISAHAN DATABASE TOTAL
         dbPath = currentMode === '3' ? 'liga3' : 'liga';
         document.getElementById('currentModeBadge').innerText = `🔥 Mode ${currentMode} Player Aktif`;
         
@@ -364,7 +376,6 @@
         }
     }
 
-    // UPDATE FUNGSI TAMBAH LIGA DENGAN ERROR CATCHER
     function tambahKlasemenBaru() {
         const selected = Array.from(document.querySelectorAll('.p-check:checked')).map(cb => cb.value);
         const tgl = document.getElementById('newLeagueDate').value;
