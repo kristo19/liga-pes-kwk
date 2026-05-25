@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PES League - Wins Header & Global Toxx Edition</title>
+    <title>PES League - Dual Mode Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
@@ -17,10 +17,31 @@
             margin: 0; 
             min-height: 100vh;
         }
+        
+        /* Modal Pilih Mode */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 26, 69, 0.95); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 20px;
+            text-align: center; max-width: 400px; width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-content h2 { color: var(--purple); margin-top: 0; }
+        .mode-buttons { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+        .btn-mode {
+            padding: 15px; font-size: 1.1rem; font-weight: bold;
+            border: none; border-radius: 10px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-mode.mode-3 { background: var(--accent); color: var(--primary); }
+        .btn-mode.mode-4 { background: var(--primary); color: white; }
+        .btn-mode:hover { transform: scale(1.05); }
+
         .main-wrapper { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1300px; margin: auto; }
         .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); overflow-x: auto; }
         
-        /* Sidebar */
         .sidebar { height: fit-content; max-height: calc(100vh - 40px); overflow-y: auto; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; padding-right: 5px; }
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
@@ -60,13 +81,31 @@
 </head>
 <body>
 
+<div id="modeModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h2>🎮 Pilih Format Liga 🎮</h2>
+        <p>Mau main berapa orang hari ini?</p>
+        <div class="mode-buttons">
+            <button class="btn-mode mode-3" onclick="setMode('3')">👥 Mode 3 Orang</button>
+            <button class="btn-mode mode-4" onclick="setMode('4')">👥 Mode 4 Orang</button>
+        </div>
+    </div>
+</div>
+
 <div class="main-wrapper">
     <div class="container">
         <div class="nav-months" id="monthNav"></div>
         <div id="championArea" class="champion-banner">MENGHUBUNGKAN...</div>
+        
         <div style="text-align: center; margin-bottom: 20px;">
             <h1 onclick="cekAdmin()" style="cursor:default; font-size: 1.5rem; color: #ffffff; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); user-select: none; margin-top: 0;">SUNDAY PES LEAGUE</h1>
+            
+            <div style="margin-top: -10px; margin-bottom: 20px;">
+                <span id="currentModeBadge" style="background: var(--accent); color: var(--primary); padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">Mode 4 Orang</span>
+                <button onclick="bukaModalMode()" style="background: rgba(255,255,255,0.2); border: 1px solid #fff; color: white; border-radius: 15px; padding: 4px 10px; margin-left: 10px; cursor: pointer; transition: 0.2s;">Ganti Mode</button>
+            </div>
         </div>
+        
         <div id="mainContent"></div>
         <div id="adminTools"></div>
     </div>
@@ -119,7 +158,8 @@
                 <thead>
                     <tr>
                         <th style="text-align: left;">PLAYER</th>
-                        <th>Wins</th> </tr>
+                        <th>Wins</th>
+                    </tr>
                 </thead>
                 <tbody id="topAssistsBody"></tbody>
             </table>
@@ -147,38 +187,79 @@
     const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     const allPlayers = ["Toxx", "Ipo", "Alfa", "Kobe"];
     let currentMonth = localStorage.getItem('activeMonth') || "Mei"; 
+    
+    // Konfigurasi Mode
+    let currentMode = localStorage.getItem('pesMode'); // '3' atau '4'
+    let dbPath = 'liga'; 
+    let matchesRef = null;
+    let statsRef = null;
+
     let modeAdmin = false;
     let editingMatchId = null;
     let localData = {};
-    
     let statsData = {};
     let sedangEditStats = false;
+
+    // Inisialisasi Aplikasi & Mode
+    if (!currentMode) {
+        bukaModalMode();
+    } else {
+        terapkanMode(currentMode);
+    }
+
+    function bukaModalMode() {
+        document.getElementById('modeModal').style.display = 'flex';
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        localStorage.setItem('pesMode', mode);
+        document.getElementById('modeModal').style.display = 'none';
+        terapkanMode(mode);
+    }
+
+    function terapkanMode(mode) {
+        // Mode 4 pakai path 'liga' (agar data lama terbaca), Mode 3 pakai 'liga3'
+        dbPath = mode === '3' ? 'liga3' : 'liga';
+        document.getElementById('currentModeBadge').innerText = `🔥 Mode ${mode} Orang`;
+        
+        editingMatchId = null;
+        sedangEditStats = false;
+        
+        renderNav();
+        ambilData();
+        listenStats();
+    }
 
     function filterName(name) {
         return name === "Ito" ? "Toxx" : name;
     }
 
-    db.ref('liga/allTimeStats').on('value', (snapshot) => {
-        let rawStats = snapshot.val() || {};
-        statsData = {};
-        
-        allPlayers.forEach(p => statsData[p] = { score: 0, assist: 0 });
+    function listenStats() {
+        if (statsRef) statsRef.off();
+        statsRef = db.ref(dbPath + '/allTimeStats');
+        statsRef.on('value', (snapshot) => {
+            let rawStats = snapshot.val() || {};
+            statsData = {};
+            
+            allPlayers.forEach(p => statsData[p] = { score: 0, assist: 0 });
 
-        Object.keys(rawStats).forEach(key => {
-            let cleanKey = filterName(key);
-            if (!statsData[cleanKey]) statsData[cleanKey] = { score: 0, assist: 0 };
-            statsData[cleanKey].score += rawStats[key].score || 0;
-            statsData[cleanKey].assist += rawStats[key].assist || 0;
+            Object.keys(rawStats).forEach(key => {
+                let cleanKey = filterName(key);
+                if (!statsData[cleanKey]) statsData[cleanKey] = { score: 0, assist: 0 };
+                statsData[cleanKey].score += rawStats[key].score || 0;
+                statsData[cleanKey].assist += rawStats[key].assist || 0;
+            });
+
+            renderStats();
         });
-
-        renderStats();
-    });
+    }
 
     function cekAdmin() {
         window.klik = (window.klik || 0) + 1;
         if(window.klik >= 5) { 
             modeAdmin = true; 
-            alert("Mode Admin Aktif!"); 
+            alert(`Mode Admin Aktif! (Database: ${dbPath})`); 
             renderAdminTools(); 
             ambilData(); 
             renderStats();
@@ -240,7 +321,7 @@
                 assist: parseInt(document.getElementById(`edit-assist-${n}`).value) || 0
             };
         });
-        db.ref('liga/allTimeStats').set(newData).then(() => {
+        db.ref(dbPath + '/allTimeStats').set(newData).then(() => {
             sedangEditStats = false;
         });
     }
@@ -249,7 +330,7 @@
         if(modeAdmin) {
             document.getElementById('adminTools').innerHTML = `
                 <div class="player-selector">
-                    <strong>Pilih Pemain & Tanggal:</strong><br>
+                    <strong>Pilih Pemain & Tanggal (Wajib ${currentMode} Pemain):</strong><br>
                     <div style="margin: 10px 0;">
                         ${allPlayers.map(p => `<label style="margin-right:10px;"><input type="checkbox" class="p-check" value="${p}" checked> ${p}</label>`).join('')}
                     </div>
@@ -279,7 +360,11 @@
 
     function ambilData() {
         document.getElementById('monthlyTitle').innerText = "📊 TOTAL POIN " + currentMonth.toUpperCase();
-        db.ref('liga/' + currentMonth + '/matches').on('value', (snapshot) => {
+        
+        if (matchesRef) matchesRef.off();
+        matchesRef = db.ref(dbPath + '/' + currentMonth + '/matches');
+        
+        matchesRef.on('value', (snapshot) => {
             if (editingMatchId) return;
             localData = snapshot.val() || {};
             renderUlang(localData);
@@ -305,7 +390,7 @@
         });
 
         if (sortedIds.length === 0) {
-            content.innerHTML = `<p style="text-align:center; color:white; margin-top:30px;">Belum ada liga di bulan ${currentMonth}.</p>`;
+            content.innerHTML = `<p style="text-align:center; color:white; margin-top:30px;">Belum ada liga di bulan ${currentMonth} untuk Mode ${currentMode} Orang.</p>`;
             return;
         }
 
@@ -418,7 +503,7 @@
             return { name, w, d, l, f, a, gd, pts: (w * 3) + d, manualRank };
         });
 
-        db.ref(`liga/${currentMonth}/matches/${id}`).update({
+        db.ref(dbPath + '/' + currentMonth + '/matches/' + id).update({
             tanggal: parseInt(newTgl),
             standings: standings,
             manualJuara: null
@@ -428,9 +513,14 @@
     function tambahKlasemenBaru() {
         const selected = Array.from(document.querySelectorAll('.p-check:checked')).map(cb => cb.value);
         const tgl = document.getElementById('newLeagueDate').value;
-        if(selected.length < 2) return alert("Pilih minimal 2 pemain!");
         
-        const newMatchRef = db.ref(`liga/${currentMonth}/matches`).push();
+        // VALIDASI MODE 3 ORANG / 4 ORANG
+        const targetCount = parseInt(currentMode);
+        if(selected.length !== targetCount) {
+            return alert(`Mode ${currentMode} Orang Aktif: Anda harus memilih tepat ${targetCount} pemain!`);
+        }
+        
+        const newMatchRef = db.ref(dbPath + '/' + currentMonth + '/matches').push();
         newMatchRef.set({
             tanggal: parseInt(tgl),
             timestamp: Date.now(),
@@ -438,7 +528,7 @@
         }).then(() => renderAdminTools());
     }
 
-    function hapusKlasemen(id) { if(confirm("Hapus liga ini?")) db.ref(`liga/${currentMonth}/matches/${id}`).remove(); }
+    function hapusKlasemen(id) { if(confirm("Hapus liga ini?")) db.ref(dbPath + '/' + currentMonth + '/matches/' + id).remove(); }
 
     function updateStatus(matches) {
         let pts = {};
@@ -495,7 +585,7 @@
     }
 
     function updateAllTimePoints() {
-        db.ref('liga').once('value', snapshot => {
+        db.ref(dbPath).once('value', snapshot => {
             let pts = {};
             let trophyAllTime = {};
             
@@ -543,8 +633,6 @@
             ).join('');
         });
     }
-
-    renderNav(); ambilData();
 </script>
 </body>
 </html>
