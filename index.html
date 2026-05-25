@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PES League - Dynamic Database Separation</title>
+    <title>PES League - Dual Mode Entry Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
@@ -17,6 +17,7 @@
             min-height: 100vh;
         }
         
+        /* LAYAR PEMBUKA (LANDING PAGE) */
         .landing-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(145deg, #270668 0%, #5d15a3 40%, #270668 100%);
@@ -42,6 +43,7 @@
         .mode-card h2 { margin: 0; font-size: 2.5rem; }
         .mode-card span { display: block; font-size: 1rem; margin-top: 10px; font-weight: bold; opacity: 0.9; }
 
+        /* KONTEN UTAMA (Disembunyikan pada awalnya) */
         .main-wrapper { 
             display: none; 
             grid-template-columns: 1fr 340px; gap: 20px; max-width: 1300px; margin: auto; padding: 20px; 
@@ -138,7 +140,13 @@
         <div class="sidebar-card">
             <h3 id="monthlyTitle" style="text-align: center; margin-top: 0; color: var(--accent); font-size: 1rem;">📊 TOTAL POIN</h3>
             <table class="total-table">
-                <thead><tr><th style="text-align: left;">PLAYER</th><th>Wins</th><th>Points</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
                 <tbody id="totalPointsBody"></tbody>
             </table>
         </div>
@@ -146,7 +154,13 @@
         <div class="sidebar-card all-time">
             <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">🏆 ALL TIME POINTS</h3>
             <table class="total-table">
-                <thead><tr><th style="text-align: left;">PLAYER</th><th>Wins</th><th>Points</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
                 <tbody id="allTimePointsBody"></tbody>
             </table>
         </div>
@@ -154,7 +168,12 @@
         <div class="sidebar-card all-time">
             <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">⚽ TOP SCORES</h3>
             <table class="total-table">
-                <thead><tr><th style="text-align: left;">PLAYER</th><th>Wins</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th>
+                    </tr>
+                </thead>
                 <tbody id="topScoresBody"></tbody>
             </table>
         </div>
@@ -162,7 +181,12 @@
         <div class="sidebar-card all-time">
             <h3 style="text-align: center; margin-top: 0; color: white; font-size: 1rem;">🎯 TOP ASSISTS</h3>
             <table class="total-table">
-                <thead><tr><th style="text-align: left;">PLAYER</th><th>Wins</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">PLAYER</th>
+                        <th>Wins</th>
+                    </tr>
+                </thead>
                 <tbody id="topAssistsBody"></tbody>
             </table>
             <div id="adminStatsTool"></div>
@@ -201,9 +225,9 @@
     let statsData = {};
     let sedangEditStats = false;
     
-    // Set untuk mendeteksi siapa saja yang pernah main di mode ini
     let activePlayersInMode = new Set(); 
 
+    // FILTER NAMA ITO -> TOXX
     function filterName(name) { return name === "Ito" ? "Toxx" : name; }
 
     function setMode(mode) {
@@ -225,7 +249,7 @@
     }
 
     function terapkanMode(mode) {
-        dbPath = mode === '3' ? 'liga3' : 'liga'; // Database Benar-benar Terpisah
+        dbPath = mode === '3' ? 'liga3' : 'liga';
         document.getElementById('currentModeBadge').innerText = `🔥 Mode ${mode} Player Aktif`;
         editingMatchId = null;
         sedangEditStats = false;
@@ -274,14 +298,12 @@
     function renderStats() {
         if(sedangEditStats) return;
         
-        // Hanya memunculkan pemain yang aktif (pernah main) atau memiliki skor di mode ini
         let playersToRender = new Set([...Array.from(activePlayersInMode)]);
         Object.keys(statsData).forEach(p => {
             if (statsData[p].score > 0 || statsData[p].assist > 0) playersToRender.add(p);
         });
         
-        // Jika mode admin aktif, tampilkan semua 4 pemain agar mudah di-edit
-        const displayList = modeAdmin ? allPlayers : Array.from(playersToRender);
+        const displayList = modeAdmin ? allPlayers : (playersToRender.size > 0 ? Array.from(playersToRender) : allPlayers);
         
         const sortedScores = [...displayList].sort((a,b) => statsData[b].score - statsData[a].score);
         document.getElementById('topScoresBody').innerHTML = sortedScores.map((n, i) => 
@@ -302,7 +324,6 @@
 
     function editStats() {
         sedangEditStats = true;
-        // Edit semua player yang tersedia
         document.getElementById('topScoresBody').innerHTML = allPlayers.map(n => 
             `<tr><td style="text-align:left;">${n}</td><td><input type="number" id="edit-score-${n}" value="${statsData[n].score}" style="width:45px; text-align:center; padding:3px; border-radius:4px; border:1px solid #ccc;"></td></tr>`
         ).join('');
@@ -365,7 +386,7 @@
             if (editingMatchId) return;
             localData = snapshot.val() || {};
             renderUlang(localData);
-            updateAllTimePointsAndStatus(localData); // Jalankan ini agar sinkron
+            updateAllTimePointsAndStatus(localData); 
         });
     }
 
@@ -501,7 +522,7 @@
         
         const targetCount = parseInt(currentMode);
         if(selected.length !== targetCount) {
-            return alert(`Error: Anda sedang di Mode ${currentMode} Player. Silakan centang tepat ${targetCount} nama pemain!`);
+            return alert(`Mode ${currentMode} Player Aktif: Silakan centang tepat ${targetCount} nama pemain!`);
         }
         
         const newMatchRef = db.ref(dbPath + '/' + currentMonth + '/matches').push();
@@ -518,7 +539,7 @@
         db.ref(dbPath).once('value', snapshot => {
             let ptsAll = {}; let trophyAllTime = {};
             let ptsMonth = {}; let trophyMonth = {};
-            activePlayersInMode = new Set(); // Reset set
+            activePlayersInMode = new Set(); 
             
             const monthsData = snapshot.val() || {};
             
@@ -537,7 +558,7 @@
                         
                         match.standings.forEach(p => {
                             let cleanName = filterName(p.name);
-                            activePlayersInMode.add(cleanName); // Rekam pemain yang aktif di mode ini
+                            activePlayersInMode.add(cleanName); 
                             if (ptsAll[cleanName] === undefined) ptsAll[cleanName] = 0;
                             ptsAll[cleanName] += p.pts;
                         });
@@ -551,7 +572,6 @@
                 }
             });
             
-            // Hitung untuk bulan ini (untuk tabel Total Poin Bulanan)
             Object.values(monthlyMatches).forEach(m => {
                 let s = [...m.standings].sort((a, b) => {
                     let cleanManualJuara = filterName(m.manualJuara);
@@ -576,19 +596,24 @@
                 }
             });
 
-            // Render ALL TIME
-            const sortedAll = Object.entries(ptsAll).sort((a,b) => b[1] - a[1]);
+            const displayList = modeAdmin ? allPlayers : Array.from(activePlayersInMode);
+            
+            let finalAllData = {}; let finalMonthData = {};
+            displayList.forEach(p => { 
+                finalAllData[p] = ptsAll[p] || 0; 
+                finalMonthData[p] = ptsMonth[p] || 0;
+            });
+
+            const sortedAll = Object.entries(finalAllData).sort((a,b) => b[1] - a[1]);
             document.getElementById('allTimePointsBody').innerHTML = sortedAll.map(([n, p], i) => 
                 `<tr><td style="text-align: left;">${i==0 && p>0?'👑':''} ${n}</td><td>${trophyAllTime[n] || 0}x 🏆</td><td style="font-weight:bold;">${p}</td></tr>`
             ).join('');
 
-            // Render MONTHLY
-            const sortedMonth = Object.entries(ptsMonth).sort((a,b) => b[1] - a[1]);
+            const sortedMonth = Object.entries(finalMonthData).sort((a,b) => b[1] - a[1]);
             document.getElementById('totalPointsBody').innerHTML = sortedMonth.map(([n, p], i) => 
                 `<tr><td style="text-align: left;">${i==0 && p>0?'👑':''} ${n}</td><td>${trophyMonth[n] || 0}x 🏆</td><td style="font-weight:bold;">${p}</td></tr>`
             ).join('');
             
-            // Champion Banner (Bulanan)
             const sortedTrophiesMonth = Object.entries(trophyMonth).sort((a, b) => b[1] - a[1]);
             const championArea = document.getElementById('championArea');
             if (sortedTrophiesMonth.length > 0 && sortedTrophiesMonth[0][1] > 0) {
@@ -599,7 +624,7 @@
                 championArea.innerHTML = `Belum ada juara di bulan ${currentMonth}`;
             }
 
-            renderStats(); // Update Top Score & Assist berdasarkan activePlayersInMode
+            renderStats(); 
         });
     }
 
