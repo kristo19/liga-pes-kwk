@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PES League - Clean Reset & Dynamic Standings</title>
+    <title>PES League - Firebase Fixed Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
@@ -17,7 +17,6 @@
             min-height: 100vh;
         }
         
-        /* LAYAR PEMBUKA */
         .landing-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(145deg, #270668 0%, #5d15a3 40%, #270668 100%);
@@ -43,7 +42,6 @@
         .mode-card h2 { margin: 0; font-size: 2.5rem; }
         .mode-card span { display: block; font-size: 1rem; margin-top: 10px; font-weight: bold; opacity: 0.9; }
 
-        /* KONTEN UTAMA */
         .main-wrapper { 
             display: none; 
             grid-template-columns: 1fr 340px; gap: 20px; max-width: 1300px; margin: auto; padding: 20px; 
@@ -136,8 +134,10 @@
 
 <div id="mainWrapper" class="main-wrapper">
     <div class="container">
+        
         <div style="text-align: center; margin-bottom: 25px;">
             <h1 onclick="cekAdmin()" style="cursor:default; font-size: 1.5rem; color: #ffffff; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); user-select: none; margin-top: 0; background: var(--primary); padding: 10px; border-radius: 10px; display: inline-block;">SUNDAY PES LEAGUE</h1>
+            
             <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 10px;">
                 <span id="currentModeBadge" style="background: var(--accent); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">Mode Aktif</span>
                 <button onclick="kembaliKeMenuAwal()" class="btn-switch-mode">🔄 Ganti Mode</button>
@@ -207,7 +207,7 @@
     let currentMonth = localStorage.getItem('activeMonth') || "Mei"; 
     
     let currentMode = null; 
-    let dbPath = 'liga'; // Akan berubah otomatis (liga untuk 4, liga3 untuk 3)
+    let dbPath = 'liga'; // Berubah sesuai mode yang dipilih
     let matchesRef = null;
     let statsRef = null;
 
@@ -240,7 +240,7 @@
     }
 
     function terapkanMode() {
-        // PEMISAHAN DATABASE TOTAL BERDASARKAN MODE
+        // PEMISAHAN DATABASE TOTAL
         dbPath = currentMode === '3' ? 'liga3' : 'liga';
         document.getElementById('currentModeBadge').innerText = `🔥 Mode ${currentMode} Player Aktif`;
         
@@ -364,6 +364,30 @@
         }
     }
 
+    // UPDATE FUNGSI TAMBAH LIGA DENGAN ERROR CATCHER
+    function tambahKlasemenBaru() {
+        const selected = Array.from(document.querySelectorAll('.p-check:checked')).map(cb => cb.value);
+        const tgl = document.getElementById('newLeagueDate').value;
+        
+        const targetCount = parseInt(currentMode);
+        if(selected.length !== targetCount) {
+            return alert(`Mode ${currentMode} Player Aktif: Silakan centang TEPAT ${targetCount} nama pemain!`);
+        }
+        
+        const newMatchRef = db.ref(dbPath + '/' + currentMonth + '/matches').push();
+        newMatchRef.set({
+            tanggal: parseInt(tgl),
+            timestamp: Date.now(),
+            standings: selected.map((n, index) => ({ name: n, w: 0, d: 0, l: 0, f: 0, a: 0, gd: 0, pts: 0, manualRank: index + 1 }))
+        }).then(() => {
+            renderAdminTools();
+            alert("✅ Liga berhasil dibuat!");
+        }).catch((error) => {
+            console.error(error);
+            alert("❌ Gagal membuat liga! Pastikan Firebase Rules kamu sudah diganti menjadi true. Error: " + error.message);
+        });
+    }
+
     function renderNav() {
         let html = months.map(m => 
             `<button class="${m === currentMonth ? 'active' : ''}" onclick="gantiBulan('${m}')">${m}</button>`
@@ -403,7 +427,6 @@
         });
     }
 
-    // RENDER KLASEMEN EPL STYLE MENGIKUTI DBPATH AKTIF
     function renderEPLStyleAllTimeStanding() {
         db.ref(dbPath).once('value', (snapshot) => {
             let modeStats = {};
@@ -417,7 +440,6 @@
             months.forEach(m => {
                 if (rootData[m] && rootData[m].matches) {
                     Object.values(rootData[m].matches).forEach(match => {
-                        // ANTI CRASH: Cek struktur datanya aman atau tidak
                         if (match && match.standings && Array.isArray(match.standings)) {
                             allMatches.push(match);
                         }
@@ -458,11 +480,10 @@
                 return b.gf - a.gf;
             });
 
-            // Sembunyikan pemain yang tidak memiliki rekor main di mode ini
             sortedData = sortedData.filter(p => p.pl > 0);
 
             if (sortedData.length === 0) {
-                document.getElementById('mainContent').innerHTML = `<p style="text-align:center; color:white; margin-top:30px; font-size:1.2rem; background:rgba(0,0,0,0.3); padding:20px; border-radius:10px;">Belum ada riwayat pertandingan untuk Mode ${currentMode} Player. Silakan input liga baru.</p>`;
+                document.getElementById('mainContent').innerHTML = `<p style="text-align:center; color:white; margin-top:30px; font-size:1.2rem; background:rgba(0,0,0,0.3); padding:20px; border-radius:10px;">Belum ada riwayat pertandingan untuk Mode ${currentMode} Player.</p>`;
                 return;
             }
 
@@ -630,23 +651,6 @@
         db.ref(dbPath + '/' + currentMonth + '/matches/' + id).update({
             tanggal: parseInt(newTgl), standings: standings, manualJuara: null
         }).then(() => { editingMatchId = null; ambilData(); });
-    }
-
-    function tambahKlasemenBaru() {
-        const selected = Array.from(document.querySelectorAll('.p-check:checked')).map(cb => cb.value);
-        const tgl = document.getElementById('newLeagueDate').value;
-        
-        const targetCount = parseInt(currentMode);
-        if(selected.length !== targetCount) {
-            return alert(`Peringatan: Kamu memilih Mode ${currentMode} Player. Silakan centang tepat ${targetCount} nama pemain!`);
-        }
-        
-        const newMatchRef = db.ref(dbPath + '/' + currentMonth + '/matches').push();
-        newMatchRef.set({
-            tanggal: parseInt(tgl),
-            timestamp: Date.now(),
-            standings: selected.map((n, index) => ({ name: n, w: 0, d: 0, l: 0, f: 0, a: 0, gd: 0, pts: 0, manualRank: index + 1 }))
-        }).then(() => renderAdminTools());
     }
 
     function hapusKlasemen(id) { if(confirm("Hapus liga ini?")) db.ref(dbPath + '/' + currentMonth + '/matches/' + id).remove(); }
