@@ -152,35 +152,126 @@
         .fc-l { background: var(--loss); }
 
         /* INFO PLAYER (KLIKABLE) */
-        .clickable-name { 
+        .clickable-name {
             cursor: pointer; color: var(--purple); font-weight: 800; font-size: 0.95rem;
-            border-bottom: 1.5px dashed var(--purple); transition: 0.2s; 
+            border-bottom: 1.5px dashed var(--purple); transition: 0.2s;
         }
         .clickable-name:hover { color: var(--pink); border-bottom-color: var(--pink); }
 
-        /* MODAL POP-UP INFO PLAYER */
-        .info-modal { 
-            display: none; position: fixed; inset: 0; background: rgba(15, 26, 69, 0.9); 
-            z-index: 99999; justify-content: center; align-items: center; padding: 20px; 
-            opacity: 0; transition: opacity 0.3s; 
+        /* ── MODAL INFO PLAYER (DESAIN BARU) ── */
+        .info-modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15, 5, 30, 0.85);
+            z-index: 99999; justify-content: center; align-items: center; padding: 20px;
+            backdrop-filter: blur(6px);
         }
-        .info-modal.on { display: flex; opacity: 1; }
-        .info-modal-box { 
-            background: white; width: 100%; max-width: 400px; border-radius: 16px; 
-            padding: 24px; position: relative; transform: translateY(20px); 
-            transition: transform 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+        .info-modal.on { display: flex; }
+
+        .info-modal-box {
+            background: white; width: 100%; max-width: 480px; border-radius: 20px;
+            overflow: hidden; position: relative;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+            animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .info-modal.on .info-modal-box { transform: translateY(0); }
-        .info-close { 
-            position: absolute; top: 16px; right: 16px; background: #f0f0f0; border: none; 
-            width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; 
-            color: #333; display: flex; justify-content: center; align-items: center; transition: 0.2s; 
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .info-close:hover { background: var(--pink); color: white; }
-        .info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--purple); margin-bottom: 16px; margin-top: 0; }
-        .info-textarea { width: 100%; height: 150px; padding: 12px; border-radius: 8px; border: 2px solid var(--border); font-family: 'Barlow', sans-serif; font-size: 0.95rem; resize: vertical; margin-bottom: 16px; outline: none; }
-        .info-textarea:focus { border-color: var(--purple); }
-        .info-content { font-size: 1rem; color: #333; line-height: 1.6; white-space: pre-wrap; background: #f4f4f9; padding: 16px; border-radius: 8px; border: 1px solid #eee; margin-top: 8px; }
+
+        .info-modal-header {
+            background: linear-gradient(135deg, var(--purple) 0%, #6a0dad 100%);
+            padding: 22px 24px 18px; color: white; position: relative;
+        }
+        .info-modal-header h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.8rem; font-weight: 900; letter-spacing: 1px; margin: 0;
+        }
+        .info-modal-header p {
+            font-size: 0.78rem; opacity: 0.65; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .info-close {
+            position: absolute; top: 14px; right: 14px;
+            background: rgba(255,255,255,0.15); border: none;
+            width: 32px; height: 32px; border-radius: 50%;
+            font-size: 1.1rem; cursor: pointer; color: white;
+            display: flex; justify-content: center; align-items: center; transition: 0.2s;
+        }
+        .info-close:hover { background: var(--pink); }
+
+        .info-modal-body { padding: 20px 24px 24px; max-height: 65vh; overflow-y: auto; }
+
+        /* Kartu tiap liga di modal */
+        .league-card {
+            border: 1.5px solid var(--border); border-radius: 12px;
+            margin-bottom: 12px; overflow: hidden;
+        }
+        .league-card:last-child { margin-bottom: 0; }
+        .league-card-head {
+            background: #f7f0ff; padding: 10px 14px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .league-card-head .lc-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem; font-weight: 800; color: var(--purple);
+        }
+        .league-card-head .lc-badge {
+            background: var(--pink); color: white;
+            font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 8px;
+        }
+        .league-card-body { padding: 12px 14px; }
+
+        /* Nama klub besar */
+        .club-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.4rem; font-weight: 900; color: var(--purple);
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .club-name span { color: var(--sub); font-size: 0.9rem; font-weight: 600; }
+        .club-name .full-transfer-tag {
+            background: #fff3e0; color: #e65100;
+            font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+            border: 1px solid #ffcc80; font-family: 'Barlow', sans-serif;
+        }
+
+        /* Stat row */
+        .stat-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .stat-pill {
+            display: flex; flex-direction: column; align-items: center;
+            background: #f3eaff; border-radius: 10px; padding: 8px 14px; min-width: 54px;
+        }
+        .stat-pill .sp-val { font-size: 1.3rem; font-weight: 900; color: var(--purple); line-height: 1; }
+        .stat-pill .sp-val.win  { color: var(--win); }
+        .stat-pill .sp-val.draw { color: #888; }
+        .stat-pill .sp-val.loss { color: var(--loss); }
+        .stat-pill .sp-val.pct  { color: var(--pink); }
+        .stat-pill .sp-lbl { font-size: 0.6rem; font-weight: 700; color: var(--sub); text-transform: uppercase; margin-top: 2px; }
+
+        /* Win% bar */
+        .win-bar-wrap { margin-top: 8px; }
+        .win-bar-label { font-size: 0.7rem; font-weight: 700; color: var(--sub); margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .win-bar-bg { background: #f0e6ff; border-radius: 20px; height: 8px; overflow: hidden; }
+        .win-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--pink), #9b27af); transition: width 0.6s cubic-bezier(0.22,1,0.36,1); }
+
+        /* Admin edit area di dalam modal */
+        .admin-club-edit { margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ddd; }
+        .admin-club-edit label { font-size: 0.75rem; font-weight: 700; color: var(--sub); text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .admin-club-input {
+            width: 100%; padding: 9px 12px; border-radius: 8px;
+            border: 1.5px solid var(--border); font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem; outline: none; margin-bottom: 8px; color: var(--purple);
+        }
+        .admin-club-input:focus { border-color: var(--purple); }
+        .admin-club-check { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; cursor: pointer; }
+        .btn-save-club {
+            background: #00c853; color: white; border: none;
+            padding: 9px 20px; border-radius: 8px; font-family: 'Barlow', sans-serif;
+            font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .btn-save-club:hover { background: #009624; }
+
+        /* Empty match info */
+        .no-club { color: #bbb; font-size: 0.9rem; font-style: italic; padding: 8px 0; }
 
         /* MOBILE TABS */
         .mob-tabs { display: none; }
@@ -333,11 +424,15 @@
     </div>
 </div>
 
-<div id="infoModal" class="info-modal">
+<!-- ── MODAL INFO PLAYER ── -->
+<div id="infoModal" class="info-modal" onclick="tutupInfoModalOutside(event)">
     <div class="info-modal-box">
-        <button class="info-close" onclick="tutupInfoPlayer()">×</button>
-        <h2 id="infoModalTitle" class="info-title">Player Info</h2>
-        <div id="infoModalBody"></div>
+        <div class="info-modal-header">
+            <h2 id="infoModalTitle">Player Info</h2>
+            <p id="infoModalSubtitle"></p>
+            <button class="info-close" onclick="tutupInfoPlayer()">×</button>
+        </div>
+        <div class="info-modal-body" id="infoModalBody"></div>
     </div>
 </div>
 
@@ -359,7 +454,6 @@ const db = firebase.database();
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const ALL_PLAYERS = ["Toxx","Ipo","Alfa","Kobe"];
 
-// Anti-error Local Storage saat dibuka offline (file:///)
 let currentMonth = "Mei";
 try { currentMonth = localStorage.getItem('activeMonth') || "Mei"; } catch(e) {}
 
@@ -371,15 +465,18 @@ let modeAdmin    = false;
 let editingId    = null;
 let localData    = {};
 let statsData    = {};
-let playerInfoData = {}; // Data Tim Pemain
 let editingStats = false;
 let activeSet    = new Set();
+
+// Cache semua data match untuk digunakan modal
+let allMatchesCache = {};  // { matchId: { bulan, tanggal, ligaNum, standings, matchInfo } }
+let matchInfoData  = {};   // dari Firebase: { dbPath/matchInfo/matchId/playerName: { club, isFullTransfer } }
 
 // ── HELPERS ───────────────────────────────────────────────────
 const fix = (n) => n === "Ito" ? "Toxx" : (n || "Unknown");
 
-function getNamaHari(tanggal) {
-    const bi = MONTHS.indexOf(currentMonth);
+function getNamaHari(tanggal, bulan) {
+    const bi = MONTHS.indexOf(bulan || currentMonth);
     if (bi === -1) return "Minggu";
     const d = new Date(new Date().getFullYear(), bi, parseInt(tanggal));
     return ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"][d.getDay()];
@@ -402,6 +499,11 @@ function sortStandings(match) {
         return (a.manualRank||99)-(b.manualRank||99);
     });
     return s;
+}
+
+function winPct(w, pl) {
+    if (!pl || pl === 0) return 0;
+    return Math.round((w / pl) * 100);
 }
 
 // ── MODE & INIT ───────────────────────────────────────────────
@@ -430,7 +532,7 @@ function applyMode() {
     buildMonthSelect();
     loadData();
     listenStats();
-    listenPlayerInfo(); // Memuat data info player dari firebase
+    listenMatchInfo();
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
@@ -472,8 +574,30 @@ function loadData() {
     matchesRef.on('value', snap => {
         if (editingId) return;
         localData = snap.val() || {};
+        // Simpan ke cache untuk keperluan modal
+        const counters = {};
+        Object.keys(localData).sort((a,b)=>(localData[a].timestamp||0)-(localData[b].timestamp||0)).forEach(id => {
+            const m = localData[id];
+            if (!m) return;
+            counters[m.tanggal] = (counters[m.tanggal]||0) + 1;
+            allMatchesCache[id] = {
+                bulan: currentMonth,
+                tanggal: m.tanggal,
+                ligaNum: counters[m.tanggal],
+                standings: m.standings,
+                manualJuara: m.manualJuara
+            };
+        });
         renderMonthly(localData);
         updateSidebar(localData);
+    });
+}
+
+// ── LISTEN MATCH INFO (KLUB PER LIGA PER PEMAIN) ──────────────
+// Struktur di Firebase: {dbPath}/matchInfo/{matchId}/{playerName} = { club, isFullTransfer }
+function listenMatchInfo() {
+    db.ref(`${dbPath}/matchInfo`).on('value', snap => {
+        matchInfoData = snap.val() || {};
     });
 }
 
@@ -495,46 +619,266 @@ function listenStats() {
     });
 }
 
-// ── POP-UP INFO PLAYER (MENGGUNAKAN KLIKABLE NAMA) ────────────
-function listenPlayerInfo() {
-    db.ref(`${dbPath}/playerInfo`).on('value', snap => {
-        playerInfoData = snap.val() || {};
+// ── MODAL INFO PLAYER ─────────────────────────────────────────
+// mode = 'match' → klik dari klasemen bulan (1 liga spesifik)
+// mode = 'alltime' → klik dari all time (semua liga semua bulan)
+
+function bukaInfoPlayerMatch(nama, matchId) {
+    const mc = allMatchesCache[matchId];
+    if (!mc) return;
+    const mi = (matchInfoData[matchId] || {})[nama] || {};
+    const st = (mc.standings || []).find(p => fix(p.name) === nama) || {};
+
+    const w   = parseInt(st.w)  || 0;
+    const d   = parseInt(st.d)  || 0;
+    const l   = parseInt(st.l)  || 0;
+    const pl  = w + d + l;
+    const pct = winPct(w, pl);
+    const hari = getNamaHari(mc.tanggal, mc.bulan);
+
+    document.getElementById('infoModalTitle').innerText = nama;
+    document.getElementById('infoModalSubtitle').innerText = `📅 ${hari}, ${mc.tanggal} ${mc.bulan} — Liga ${mc.ligaNum}`;
+
+    let clubSection = buildClubDisplay(mi, w, d, l, pl, pct);
+    let adminSection = '';
+    if (modeAdmin) {
+        adminSection = buildAdminClubEdit(matchId, nama, mi);
+    }
+
+    document.getElementById('infoModalBody').innerHTML = `
+        <div class="league-card">
+            <div class="league-card-head">
+                <span class="lc-title">📋 Liga ${mc.ligaNum} — ${mc.bulan}</span>
+                <span class="lc-badge">Klik nama untuk edit</span>
+            </div>
+            <div class="league-card-body">
+                ${clubSection}
+                ${adminSection}
+            </div>
+        </div>
+    `;
+    document.getElementById('infoModal').classList.add('on');
+}
+
+function bukaInfoPlayerAllTime(nama) {
+    document.getElementById('infoModalTitle').innerText = nama;
+    document.getElementById('infoModalSubtitle').innerText = '🏆 Statistik per Klub — All Time';
+    document.getElementById('infoModalBody').innerHTML = `<div class="no-club" style="text-align:center;padding:20px;">⏳ Memuat data...</div>`;
+    document.getElementById('infoModal').classList.add('on');
+
+    db.ref(dbPath).once('value', snap => {
+        const root = snap.val() || {};
+
+        // clubStats: { "Real Madrid": { liga:0, w:0, d:0, l:0, pl:0, isFT:false }, ... }
+        const clubStats = {};
+        let grandTotalW=0, grandTotalD=0, grandTotalL=0, grandTotalPl=0, grandLiga=0;
+
+        MONTHS.forEach(bulan => {
+            if (!root[bulan] || !root[bulan].matches) return;
+            const matches = root[bulan].matches;
+            Object.keys(matches).forEach(id => {
+                const match = matches[id];
+                if (!match || !match.standings || !Array.isArray(match.standings)) return;
+                const st = match.standings.find(p => fix(p.name) === nama);
+                if (!st) return;
+
+                const mi    = (matchInfoData[id] || {})[nama] || {};
+                const club  = (mi.club || '').trim() || '(Tidak Diisi)';
+                const isFT  = mi.isFullTransfer || false;
+                const w     = parseInt(st.w) || 0;
+                const d     = parseInt(st.d) || 0;
+                const l     = parseInt(st.l) || 0;
+                const pl    = w + d + l;
+                const pts   = parseInt(st.pts) || (w*3+d);
+
+                if (!clubStats[club]) {
+                    clubStats[club] = { liga:0, w:0, d:0, l:0, pl:0, pts:0, isFT };
+                }
+                clubStats[club].liga += 1;
+                clubStats[club].w    += w;
+                clubStats[club].d    += d;
+                clubStats[club].l    += l;
+                clubStats[club].pl   += pl;
+                clubStats[club].pts  += pts;
+                // Tandai FT jika pernah ada yang FT dengan klub itu
+                if (isFT) clubStats[club].isFT = true;
+
+                grandTotalW  += w;
+                grandTotalD  += d;
+                grandTotalL  += l;
+                grandTotalPl += pl;
+                grandLiga    += 1;
+            });
+        });
+
+        const clubs = Object.keys(clubStats);
+
+        if (!clubs.length) {
+            document.getElementById('infoModalBody').innerHTML =
+                `<div class="no-club" style="text-align:center;padding:20px;">Belum ada data klub untuk ${nama}.</div>`;
+            return;
+        }
+
+        // Urutkan berdasarkan jumlah liga terbanyak, lalu winrate
+        clubs.sort((a,b) => {
+            if (clubStats[b].liga !== clubStats[a].liga) return clubStats[b].liga - clubStats[a].liga;
+            const wrA = clubStats[a].pl > 0 ? clubStats[a].w / clubStats[a].pl : 0;
+            const wrB = clubStats[b].pl > 0 ? clubStats[b].w / clubStats[b].pl : 0;
+            return wrB - wrA;
+        });
+
+        // Grand total summary
+        const grandPct  = winPct(grandTotalW, grandTotalPl);
+        const grandPts  = grandTotalW * 3 + grandTotalD;
+
+        let html = `
+            <div style="background:linear-gradient(135deg,#37003c,#6a0dad);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:white;">
+                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.7;margin-bottom:10px;">📊 Grand Total — ${grandLiga} Liga</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;">
+                        <div style="font-size:1.4rem;font-weight:900;color:#00ff85;">${grandTotalW}</div>
+                        <div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Win</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;">
+                        <div style="font-size:1.4rem;font-weight:900;color:#d0d0d0;">${grandTotalD}</div>
+                        <div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Draw</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;">
+                        <div style="font-size:1.4rem;font-weight:900;color:#ff6b6b;">${grandTotalL}</div>
+                        <div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Loss</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;">
+                        <div style="font-size:1.4rem;font-weight:900;color:white;">${grandTotalPl}</div>
+                        <div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Main</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(233,0,82,0.4);border-radius:8px;padding:8px 14px;min-width:50px;">
+                        <div style="font-size:1.4rem;font-weight:900;color:#fff;">${grandPct}%</div>
+                        <div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Win%</div>
+                    </div>
+                    <div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;">
+                        <div style="font-size:1.4rem;font-weight:900;color:#fdbb2d;">${grandPts}</div>
+                        <div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Pts</div>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size:0.68rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">⚽ Statistik per Klub (${clubs.length} klub)</div>`;
+
+        clubs.forEach((club, idx) => {
+            const cs  = clubStats[club];
+            const pct = winPct(cs.w, cs.pl);
+            const isUnknown = club === '(Tidak Diisi)';
+            const isBest = idx === 0 && !isUnknown;
+
+            html += `
+                <div class="league-card" style="margin-bottom:10px;">
+                    <div class="league-card-head" style="${isBest ? 'background:linear-gradient(90deg,#fff9c4,#fff3e0);' : ''}">
+                        <div>
+                            <span class="lc-title" style="${isUnknown ? 'color:#aaa;font-style:italic;' : ''}">
+                                ${isBest ? '🥇 ' : ''}⚽ ${escHtml(club)}
+                                ${cs.isFT ? '<span style="background:#fff3e0;color:#e65100;font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:5px;border:1px solid #ffcc80;margin-left:4px;font-family:Barlow,sans-serif;">FULL TRANSFER</span>' : ''}
+                            </span>
+                            <div style="font-size:0.68rem;color:var(--sub);margin-top:2px;">${cs.liga}x Liga dipakai</div>
+                        </div>
+                        <span class="lc-badge" style="background:${pct>=60?'var(--win)':pct>=40?'#888':'var(--loss)'};">${pct}% WR</span>
+                    </div>
+                    <div class="league-card-body">
+                        <div class="stat-pills">
+                            <div class="stat-pill"><span class="sp-val win">${cs.w}</span><span class="sp-lbl">Win</span></div>
+                            <div class="stat-pill"><span class="sp-val draw">${cs.d}</span><span class="sp-lbl">Draw</span></div>
+                            <div class="stat-pill"><span class="sp-val loss">${cs.l}</span><span class="sp-lbl">Loss</span></div>
+                            <div class="stat-pill"><span class="sp-val">${cs.pl}</span><span class="sp-lbl">Main</span></div>
+                            <div class="stat-pill"><span class="sp-val pct">${pct}%</span><span class="sp-lbl">Win%</span></div>
+                            <div class="stat-pill"><span class="sp-val" style="color:#fdbb2d;">${cs.pts}</span><span class="sp-lbl">Pts</span></div>
+                        </div>
+                        <div class="win-bar-wrap">
+                            <div class="win-bar-label">
+                                <span>Win Rate</span>
+                                <span>${cs.w}W · ${cs.d}D · ${cs.l}L dari ${cs.pl} pertandingan</span>
+                            </div>
+                            <div class="win-bar-bg">
+                                <div class="win-bar-fill" style="width:${pct}%;background:${pct>=60?'linear-gradient(90deg,var(--win),#00e676)':pct>=40?'linear-gradient(90deg,#888,#bbb)':'linear-gradient(90deg,var(--loss),#ff8a80)'};"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('infoModalBody').innerHTML = html;
     });
 }
 
-function bukaInfoPlayer(nama) {
-    const info = playerInfoData[nama] || "Belum ada data tim yang digunakan.";
-    const modal = document.getElementById('infoModal');
-    const title = document.getElementById('infoModalTitle');
-    const body = document.getElementById('infoModalBody');
-    
-    title.innerText = "Info Player: " + nama;
-    
-    if (modeAdmin) {
-        body.innerHTML = `
-            <div style="font-weight:700; margin-bottom:8px;">Edit Tim yang Digunakan:</div>
-            <textarea id="infoTextarea" class="info-textarea" placeholder="1. Manchester United 3x\n2. Full Transfer...">${info === "Belum ada data tim yang digunakan." ? "" : info}</textarea>
-            <button class="btn-save" style="width:100%; padding:10px; font-size:1rem;" onclick="simpanInfoPlayer('${nama}')">💾 Simpan Info</button>
-        `;
+// Builder: tampilan klub + stats
+function buildClubDisplay(mi, w, d, l, pl, pct) {
+    const club = mi.club || '';
+    const isFT = mi.isFullTransfer || false;
+
+    let clubHtml = '';
+    if (club) {
+        clubHtml = `
+            <div class="club-name">
+                ⚽ ${escHtml(club)}
+                ${isFT ? '<span class="full-transfer-tag">FULL TRANSFER</span>' : ''}
+            </div>`;
     } else {
-        body.innerHTML = `
-            <div style="font-weight:700; margin-bottom:8px; color:var(--purple);">Tim yang digunakan:</div>
-            <div class="info-content">${info}</div>
-        `;
+        clubHtml = `<div class="no-club">Klub belum diisi${modeAdmin ? ' — isi via tombol Edit di bawah' : ''}.</div>`;
     }
-    modal.classList.add('on');
+
+    return `
+        ${clubHtml}
+        <div class="stat-pills">
+            <div class="stat-pill"><span class="sp-val win">${w}</span><span class="sp-lbl">Win</span></div>
+            <div class="stat-pill"><span class="sp-val draw">${d}</span><span class="sp-lbl">Draw</span></div>
+            <div class="stat-pill"><span class="sp-val loss">${l}</span><span class="sp-lbl">Loss</span></div>
+            <div class="stat-pill"><span class="sp-val">${pl}</span><span class="sp-lbl">Main</span></div>
+            <div class="stat-pill"><span class="sp-val pct">${pct}%</span><span class="sp-lbl">Win%</span></div>
+        </div>
+        <div class="win-bar-wrap">
+            <div class="win-bar-label"><span>Win Rate</span><span>${pct}%</span></div>
+            <div class="win-bar-bg"><div class="win-bar-fill" style="width:${pct}%"></div></div>
+        </div>`;
+}
+
+// Builder: form edit admin di dalam modal
+function buildAdminClubEdit(matchId, nama, mi) {
+    const safeId  = matchId.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const curClub = escHtml(mi.club || '');
+    const isFT    = mi.isFullTransfer || false;
+    return `
+        <div class="admin-club-edit">
+            <label>✏️ Edit Klub (Admin)</label>
+            <input class="admin-club-input" id="clubInput_${safeId}_${nama}"
+                placeholder="contoh: Real Madrid" value="${curClub}">
+            <label class="admin-club-check">
+                <input type="checkbox" id="ftCheck_${safeId}_${nama}" ${isFT?'checked':''}>
+                Full Transfer
+            </label>
+            <button class="btn-save-club" onclick="simpanKlub('${matchId}','${nama}','${safeId}')">💾 Simpan Klub</button>
+        </div>`;
+}
+
+function simpanKlub(matchId, nama, safeId) {
+    const clubVal = (document.getElementById(`clubInput_${safeId}_${nama}`)?.value || '').trim();
+    const ftVal   = document.getElementById(`ftCheck_${safeId}_${nama}`)?.checked || false;
+    db.ref(`${dbPath}/matchInfo/${matchId}/${nama}`).set({ club: clubVal, isFullTransfer: ftVal })
+      .then(() => {
+          alert(`✅ Data klub ${nama} berhasil disimpan!`);
+          // Refresh matchInfoData local cache
+          if (!matchInfoData[matchId]) matchInfoData[matchId] = {};
+          matchInfoData[matchId][nama] = { club: clubVal, isFullTransfer: ftVal };
+      })
+      .catch(e => alert('❌ Gagal: ' + e.message));
 }
 
 function tutupInfoPlayer() {
     document.getElementById('infoModal').classList.remove('on');
 }
 
-function simpanInfoPlayer(nama) {
-    const text = document.getElementById('infoTextarea').value;
-    db.ref(`${dbPath}/playerInfo/${nama}`).set(text).then(() => {
-        alert('✅ Info tim berhasil disimpan!');
-        tutupInfoPlayer();
-    });
+function tutupInfoModalOutside(e) {
+    if (e.target === document.getElementById('infoModal')) tutupInfoPlayer();
+}
+
+function escHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 // ── ALL TIME STANDING ─────────────────────────────────────────
@@ -579,7 +923,8 @@ function renderAllTime() {
             document.getElementById('mainContent').innerHTML = `<div class="empty-state">Belum ada data untuk Mode ${currentMode} Player.</div>`;
             return;
         }
-        document.getElementById('mainContent').innerHTML = buildEplBlock(sorted, 'ALL TIME STANDING', true, false, [], true);
+        // All time: clickable name → bukaInfoPlayerAllTime
+        document.getElementById('mainContent').innerHTML = buildEplBlock(sorted, 'ALL TIME STANDING', true, false, [], true, null);
     });
 }
 
@@ -605,7 +950,7 @@ function renderMonthly(matches) {
         const isEdit  = editingId === id;
         const s       = sortStandings(m);
         const winner  = (s[0] && (s[0].pts||0) > 0) ? s[0].name : '-';
-        const hari    = getNamaHari(m.tanggal||1);
+        const hari    = getNamaHari(m.tanggal||1, currentMonth);
 
         const heading = isEdit
             ? `<select id="editTgl" style="padding:4px 8px;border-radius:6px;border:none;font-family:'Barlow',sans-serif;font-weight:700;">${Array.from({length:31},(_,i)=>`<option value="${i+1}" ${m.tanggal==i+1?'selected':''}>Tgl ${i+1}</option>`).join('')}</select>`
@@ -627,17 +972,29 @@ function renderMonthly(matches) {
             return { name: p.name, pos: i+1, pl: (p.w||0)+(p.d||0)+(p.l||0), w: p.w||0, d: p.d||0, l: p.l||0, gf: p.f||0, ga: p.a||0, gd, pts: p.pts||0, form: [], manualRank: p.manualRank, isWin: i===0&&(p.pts||0)>0 };
         });
 
-        html += buildEplBlock(rowData, null, false, isEdit, s, false);
+        // Mode = 'match', kirim matchId supaya modal tahu konteksnya
+        html += buildEplBlock(rowData, null, false, isEdit, s, false, id);
         html += `</div>`;
         el.innerHTML += html;
     });
 }
 
 // ── SHARED EPL TABLE BUILDER ──────────────────────────────────
-function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], showWinPct=false) {
+// matchId: null → alltime mode (klik → alltime modal), string → match mode
+function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], showWinPct=false, matchId=null) {
 
     const topN = Math.min(rowData.length, 3);
     const winPctThDesktop = showWinPct ? '<th>WINS%</th>' : '';
+
+    const makeNameHtml = (name, crown, isAllTime) => {
+        if (isAllTime) {
+            return `<span class="clickable-name" onclick="bukaInfoPlayerAllTime('${name}')" title="Klik untuk lihat semua rekap">${name}${crown}</span>`;
+        } else {
+            return `<span class="clickable-name" onclick="bukaInfoPlayerMatch('${name}','${matchId}')" title="Klik untuk info klub liga ini">${name}${crown}</span>`;
+        }
+    };
+
+    const isAllTime = (matchId === null);
 
     // DESKTOP TABLE ROWS
     const dRows = rowData.map((p,i) => {
@@ -647,10 +1004,8 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
         const winCls = p.isWin ? 'win-row' : '';
         const crown  = p.isWin ? ' 👑' : '';
         const formHtml = showForm ? `<td><div class="form-row">${formCircles(p.form)}</div></td>` : '';
-        const winPctCell = showWinPct ? `<td style="font-weight:700; color:var(--purple);">${p.pl > 0 ? ((p.w/p.pl)*100).toFixed(0) : 0}%</td>` : '';
-
-        // Terapkan Clickable Name pada baris desktop
-        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')" title="Klik untuk info Tim">${p.name}${crown}</span>`;
+        const winPctCell = showWinPct ? `<td style="font-weight:700; color:var(--purple);">${p.pl > 0 ? winPct(p.w,p.pl) : 0}%</td>` : '';
+        const pNameHtml = makeNameHtml(p.name, crown, isAllTime);
 
         let wCell, dCell, lCell, fCell, aCell;
         if (isEdit) {
@@ -686,8 +1041,8 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
     const mShort = rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
-        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')">${p.name}${crown}</span>`;
-        const winPctCellMob = showWinPct ? `<td style="font-weight:700; color:var(--purple);">${p.pl > 0 ? ((p.w/p.pl)*100).toFixed(0) : 0}%</td>` : '';
+        const pNameHtml = makeNameHtml(p.name, crown, isAllTime);
+        const winPctCellMob = showWinPct ? `<td style="font-weight:700;color:var(--purple);">${p.pl>0?winPct(p.w,p.pl):0}%</td>` : '';
         return `<tr class="${p.isWin?'win-row':''}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
             <td class="tl">${pNameHtml}</td>
@@ -701,8 +1056,8 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
     const mFull = rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
-        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')">${p.name}${crown}</span>`;
-        const winPctCellMob = showWinPct ? `<td style="font-weight:700; color:var(--purple);">${p.pl > 0 ? ((p.w/p.pl)*100).toFixed(0) : 0}%</td>` : '';
+        const pNameHtml = makeNameHtml(p.name, crown, isAllTime);
+        const winPctCellMob = showWinPct ? `<td style="font-weight:700;color:var(--purple);">${p.pl>0?winPct(p.w,p.pl):0}%</td>` : '';
         return `<tr class="${p.isWin?'win-row':''}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
             <td class="tl">${pNameHtml}</td>
@@ -718,7 +1073,7 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
     const mForm = showForm ? rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
-        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')">${p.name}${crown}</span>`;
+        const pNameHtml = makeNameHtml(p.name, crown, isAllTime);
         return `<tr class="${p.isWin?'win-row':''}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
             <td class="tl">${pNameHtml}</td>
@@ -898,18 +1253,18 @@ function editStats() {
         `<tr><td class="tl"><strong>${n}</strong></td><td><input type="number" id="ea-${n}" value="${gs(n).assist}" style="width:48px;padding:3px;border:1px solid #ccc;border-radius:4px;"></td></tr>`).join('');
     document.getElementById('sbFormBody').innerHTML = ALL_PLAYERS.map(n =>
         `<tr><td class="tl"><strong>${n}</strong></td><td><input type="text" id="ef-${n}" value="${gs(n).formText}" placeholder="WDL..." style="width:65px;padding:3px;border:1px solid #ccc;border-radius:4px;text-transform:uppercase;"></td></tr>`).join('');
-        
+
     document.getElementById('adminStatsTool').innerHTML = `<div style="padding:10px;"><button onclick="saveStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#00c853;color:white;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;">💾 Simpan Stats</button></div>`;
 }
 
 function saveStats() {
     const data = {};
-    ALL_PLAYERS.forEach(n => { 
-        data[n] = { 
-            score: parseInt(document.getElementById(`es-${n}`).value)||0, 
+    ALL_PLAYERS.forEach(n => {
+        data[n] = {
+            score: parseInt(document.getElementById(`es-${n}`).value)||0,
             assist: parseInt(document.getElementById(`ea-${n}`).value)||0,
             formText: (document.getElementById(`ef-${n}`).value||'').toUpperCase().replace(/[^WDL]/g, '')
-        }; 
+        };
     });
     db.ref(`${dbPath}/allTimeStats`).set(data).then(() => { editingStats = false; });
 }
@@ -917,7 +1272,7 @@ function saveStats() {
 // ── ADMIN ─────────────────────────────────────────────────────
 function cekAdmin() {
     window._kk = (window._kk||0)+1;
-    if (window._kk >= 5) { window._kk=0; modeAdmin=true; alert('🔓 Mode Admin Aktif!'); renderAdminArea(); renderStatsCards(); loadData(); }
+    if (window._kk >= 5) { window._kk=0; modeAdmin=true; alert('🔓 Mode Admin Aktif! Klik nama player di klasemen untuk mengisi data klub.'); renderAdminArea(); renderStatsCards(); loadData(); }
 }
 
 function matikanAdmin() {
@@ -935,11 +1290,12 @@ function renderAdminArea() {
     document.getElementById('adminArea').innerHTML = `
         <div class="admin-panel">
             <h3>⚙️ Buat Liga — ${currentMonth}</h3>
-            <p style="font-size:0.82rem;color:#666;margin-bottom:10px;">Centang tepat <strong>${currentMode} pemain</strong>:</p>
+            <p style="font-size:0.82rem;color:#666;margin-bottom:6px;">Centang tepat <strong>${currentMode} pemain</strong>:</p>
             <div class="p-checks">${ALL_PLAYERS.map(p=>`<label><input type="checkbox" class="p-check" value="${p}" checked> ${p}</label>`).join('')}</div>
             <select id="newDate" class="adm-select">${Array.from({length:31},(_,i)=>`<option value="${i+1}">Tanggal ${i+1}</option>`).join('')}</select>
             <button class="btn-adm btn-create" onclick="buatLiga()">➕ Buat Liga</button>
             <button class="btn-adm btn-off" onclick="matikanAdmin()">🔒 Matikan Admin</button>
+            <p style="font-size:0.75rem;color:#999;margin-top:10px;">💡 Untuk isi data klub per liga: klik nama player di tabel klasemen.</p>
         </div>`;
 }
 
