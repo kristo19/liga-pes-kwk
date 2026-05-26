@@ -489,13 +489,11 @@ function renderAllTime() {
             });
         });
 
-        // MASUKKAN FORM DARI INPUTAN MANUAL
         Object.keys(stats).forEach(n => {
             const cForm = statsData[n] && statsData[n].formText ? statsData[n].formText : "";
             stats[n].form = cForm.toUpperCase().replace(/[^WDL]/g, '').split('').slice(-5);
         });
 
-        // BUG FIXED: Map menggunakan 'name' bukan 'n'
         const sorted = Object.keys(stats).map(name => ({name, ...stats[name]}))
             .filter(p => p.pl > 0)
             .sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.gf-a.gf);
@@ -562,6 +560,7 @@ function renderMonthly(matches) {
 function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], showWinPct=false) {
 
     const topN = Math.min(rowData.length, 3);
+    const winPctThDesktop = showWinPct ? '<th>WINS%</th>' : '';
 
     // DESKTOP TABLE ROWS
     const dRows = rowData.map((p,i) => {
@@ -612,8 +611,7 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
         return `<tr class="${p.isWin?'win-row':''}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
             <td class="tl"><span class="player-name">${p.name}${crown}</span></td>
-            <td>${p.pl}</td><td>${p.w}</td>
-            <td class="${gdClass(p.gd)}">${gdStr(p.gd)}</td>
+            <td>${p.pl}</td><td>${p.w}</td><td>${p.d}</td><td>${p.l}</td>
             <td class="pts-big">${p.pts}</td>
             ${winPctCellMob}
         </tr>`;
@@ -649,7 +647,6 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
     const tid = 'tbl' + Math.random().toString(36).slice(2,7);
     const formThDesktop = showForm ? '<th>Form</th>' : '';
     const rankThDesktop = isEdit   ? '<th>Rank</th>' : '';
-    const winPctThDesktop = showWinPct ? '<th>Win%</th>' : '';
 
     return `
         <div class="tbl-wrap desktop-only">
@@ -672,7 +669,7 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
                 ${showForm ? `<button class="mob-tab-btn" onclick="swTab(this,'${tid}','form')">Form</button>` : ''}
             </div>
             <table class="mob-tbl on" id="${tid}-short">
-                <thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>GD</th><th>Pts</th>${winPctThDesktop}</tr></thead>
+                <thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>Pts</th>${winPctThDesktop}</tr></thead>
                 <tbody>${mShort}</tbody>
             </table>
             <table class="mob-tbl" id="${tid}-full">
@@ -774,7 +771,6 @@ function updateSidebar(monthlyMatches) {
             `<tr class="${i===0?'sb-r1':''}"><td class="tl">${i===0&&p>0?'👑 ':''}<strong>${n}</strong></td><td>${trophyAll[n]||0}x🏆</td><td class="sb-pts">${p}</td></tr>`
         ).join('');
 
-        // Champion banner
         const tList = Object.entries(trophyMonth).sort((a,b) => b[1]-a[1]);
         const banner = document.getElementById('champBanner');
         if (tList.length > 0 && tList[0][1] > 0) {
@@ -801,7 +797,6 @@ function renderStatsCards() {
     document.getElementById('sbAssistsBody').innerHTML = [...list].sort((a,b)=>gs(b).assist-gs(a).assist)
         .map((n,i) => `<tr><td class="tl">${i===0&&gs(n).assist>0?'🥇 ':''}<strong>${n}</strong></td><td style="font-weight:700;">${gs(n).assist}x</td></tr>`).join('');
 
-    // FORM LAGA PANEL
     document.getElementById('sbFormBody').innerHTML = [...list].map(n => {
         const fArr = (gs(n).formText||'').toUpperCase().replace(/[^WDL]/g, '').split('').slice(-5);
         return `<tr><td class="tl"><strong>${n}</strong></td><td><div class="form-row" style="justify-content:center;">${formCircles(fArr)}</div></td></tr>`;
