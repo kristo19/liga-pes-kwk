@@ -318,6 +318,7 @@
         .sb-head { background: var(--purple); color: white; padding: 11px 16px; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
         .sb-head.dark { background: #0f1a45; }
         .sb-head.stat { background: #2a0060; }
+        .sb-head.trophy { background: linear-gradient(135deg, #b8860b 0%, #daa520 100%); }
         .sb-tbl { width: 100%; border-collapse: collapse; }
         .sb-tbl thead th { font-size: 0.63rem; font-weight: 700; color: var(--sub); text-transform: uppercase; padding: 7px 12px; text-align: center; border-bottom: 1px solid var(--border); }
         .sb-tbl thead th.tl { text-align: left; }
@@ -327,7 +328,14 @@
         .sb-pts { font-weight: 900; color: var(--purple); }
         .sb-r1 td:first-child { border-left: 3px solid var(--pink); }
 
+        /* Trophy count cell */
+        .trophy-count { font-weight: 900; font-size: 1rem; color: #b8860b; }
+
         .empty-state { padding: 40px; text-align: center; color: #999; font-size: 0.95rem; }
+
+        /* Hide/show sidebar cards based on view mode */
+        .sb-monthly-only { display: block; }
+        .sb-alltime-only { display: block; }
 
         @media (max-width: 900px) {
             .main-layout { grid-template-columns: 1fr; }
@@ -384,20 +392,42 @@
         </div>
 
         <div class="sidebar">
-            <div class="sb-card">
+            <!-- TROPHY CARD: Monthly (hanya muncul saat view bulan) -->
+            <div class="sb-card sb-monthly-only" id="sbTrophyMonthCard">
+                <div class="sb-head trophy">🏆 Trophy — <span id="sbTrophyMonthTitle">Bulan Ini</span></div>
+                <table class="sb-tbl">
+                    <thead><tr><th class="tl">Player</th><th>🏆 Juara</th></tr></thead>
+                    <tbody id="sbTrophyMonthBody"></tbody>
+                </table>
+            </div>
+
+            <!-- TOTAL POIN BULAN (hanya muncul saat view bulan) -->
+            <div class="sb-card sb-monthly-only" id="sbMonthCard">
                 <div class="sb-head">📊 <span id="sbMonthTitle">Total Poin</span></div>
                 <table class="sb-tbl">
-                    <thead><tr><th class="tl">Player</th><th>Wins</th><th>Pts</th></tr></thead>
+                    <thead><tr><th class="tl">Player</th><th>Pts</th></tr></thead>
                     <tbody id="sbMonthBody"></tbody>
                 </table>
             </div>
-            <div class="sb-card">
-                <div class="sb-head dark">🏆 All Time Points</div>
+
+            <!-- TROPHY CARD: All Time (hanya muncul saat view ALL TIME) -->
+            <div class="sb-card sb-alltime-only" id="sbTrophyAllCard" style="display:none;">
+                <div class="sb-head trophy">🏆 Trophy — All Time</div>
                 <table class="sb-tbl">
-                    <thead><tr><th class="tl">Player</th><th>Wins</th><th>Pts</th></tr></thead>
+                    <thead><tr><th class="tl">Player</th><th>🏆 Juara</th></tr></thead>
+                    <tbody id="sbTrophyAllBody"></tbody>
+                </table>
+            </div>
+
+            <!-- ALL TIME POINTS (hanya muncul saat view ALL TIME) -->
+            <div class="sb-card sb-alltime-only" id="sbAllTimeCard" style="display:none;">
+                <div class="sb-head dark">📊 All Time Points</div>
+                <table class="sb-tbl">
+                    <thead><tr><th class="tl">Player</th><th>Pts</th></tr></thead>
                     <tbody id="sbAllTimeBody"></tbody>
                 </table>
             </div>
+
             <div class="sb-card">
                 <div class="sb-head stat">⚽ Top Scores</div>
                 <table class="sb-tbl">
@@ -469,8 +499,8 @@ let editingStats = false;
 let activeSet    = new Set();
 
 // Cache semua data match untuk digunakan modal
-let allMatchesCache = {};  // { matchId: { bulan, tanggal, ligaNum, standings, matchInfo } }
-let matchInfoData  = {};   // dari Firebase: { dbPath/matchInfo/matchId/playerName: { club, isFullTransfer } }
+let allMatchesCache = {};
+let matchInfoData  = {};
 
 // ── HELPERS ───────────────────────────────────────────────────
 const fix = (n) => n === "Ito" ? "Toxx" : (n || "Unknown");
@@ -504,6 +534,14 @@ function sortStandings(match) {
 function winPct(w, pl) {
     if (!pl || pl === 0) return 0;
     return Math.round((w / pl) * 100);
+}
+
+// ── TOGGLE SIDEBAR CARDS based on view ───────────────────────
+function toggleSidebarMode(isAllTime) {
+    const monthlyCards = document.querySelectorAll('.sb-monthly-only');
+    const alltimeCards = document.querySelectorAll('.sb-alltime-only');
+    monthlyCards.forEach(c => c.style.display = isAllTime ? 'none' : 'block');
+    alltimeCards.forEach(c => c.style.display = isAllTime ? 'block' : 'none');
 }
 
 // ── MODE & INIT ───────────────────────────────────────────────
@@ -562,19 +600,23 @@ function loadData() {
     if (currentMonth === 'ALL TIME STANDING') {
         document.getElementById('sbMonthTitle').innerText = 'All Time Standing';
         banner.classList.add('hidden');
+        toggleSidebarMode(true);
         if (matchesRef) matchesRef.off();
         renderAllTime();
+        // Still need all-time sidebar data
+        updateSidebarAllTime();
         return;
     }
     document.getElementById('sbMonthTitle').innerText = `Total Poin ${currentMonth}`;
+    document.getElementById('sbTrophyMonthTitle').innerText = currentMonth;
     banner.classList.remove('hidden');
     banner.innerHTML = '⏳ Memuat...';
+    toggleSidebarMode(false);
     if (matchesRef) matchesRef.off();
     matchesRef = db.ref(`${dbPath}/${currentMonth}/matches`);
     matchesRef.on('value', snap => {
         if (editingId) return;
         localData = snap.val() || {};
-        // Simpan ke cache untuk keperluan modal
         const counters = {};
         Object.keys(localData).sort((a,b)=>(localData[a].timestamp||0)-(localData[b].timestamp||0)).forEach(id => {
             const m = localData[id];
@@ -593,8 +635,7 @@ function loadData() {
     });
 }
 
-// ── LISTEN MATCH INFO (KLUB PER LIGA PER PEMAIN) ──────────────
-// Struktur di Firebase: {dbPath}/matchInfo/{matchId}/{playerName} = { club, isFullTransfer }
+// ── LISTEN MATCH INFO ─────────────────────────────────────────
 function listenMatchInfo() {
     db.ref(`${dbPath}/matchInfo`).on('value', snap => {
         matchInfoData = snap.val() || {};
@@ -620,9 +661,6 @@ function listenStats() {
 }
 
 // ── MODAL INFO PLAYER ─────────────────────────────────────────
-// mode = 'match' → klik dari klasemen bulan (1 liga spesifik)
-// mode = 'alltime' → klik dari all time (semua liga semua bulan)
-
 function bukaInfoPlayerMatch(nama, matchId) {
     const mc = allMatchesCache[matchId];
     if (!mc) return;
@@ -669,7 +707,6 @@ function bukaInfoPlayerAllTime(nama) {
     db.ref(dbPath).once('value', snap => {
         const root = snap.val() || {};
 
-        // clubStats: { "Real Madrid": { liga:0, w:0, d:0, l:0, pl:0, pts:0, juara:0, isFT:false }, ... }
         const clubStats = {};
         let grandTotalW=0, grandTotalD=0, grandTotalL=0, grandTotalPl=0, grandLiga=0, grandJuara=0;
 
@@ -694,7 +731,6 @@ function bukaInfoPlayerAllTime(nama) {
                 if (!clubStats[club]) {
                     clubStats[club] = { liga:0, w:0, d:0, l:0, pl:0, pts:0, juara:0, isFT };
                 }
-                // Cek apakah player ini juara di liga ini
                 const sorted = sortStandings(match);
                 const isJuara = sorted.length > 0 && fix(sorted[0].name) === nama && (sorted[0].pts||0) > 0;
 
@@ -705,7 +741,6 @@ function bukaInfoPlayerAllTime(nama) {
                 clubStats[club].pl    += pl;
                 clubStats[club].pts   += pts;
                 clubStats[club].juara += isJuara ? 1 : 0;
-                // Tandai FT jika pernah ada yang FT dengan klub itu
                 if (isFT) clubStats[club].isFT = true;
 
                 grandTotalW  += w;
@@ -725,7 +760,6 @@ function bukaInfoPlayerAllTime(nama) {
             return;
         }
 
-        // Urutkan berdasarkan jumlah liga terbanyak, lalu winrate
         clubs.sort((a,b) => {
             if (clubStats[b].liga !== clubStats[a].liga) return clubStats[b].liga - clubStats[a].liga;
             const wrA = clubStats[a].pl > 0 ? clubStats[a].w / clubStats[a].pl : 0;
@@ -733,7 +767,6 @@ function bukaInfoPlayerAllTime(nama) {
             return wrB - wrA;
         });
 
-        // Grand total summary
         const grandPct  = winPct(grandTotalW, grandTotalPl);
         const grandPts  = grandTotalW * 3 + grandTotalD;
 
@@ -821,7 +854,6 @@ function bukaInfoPlayerAllTime(nama) {
     });
 }
 
-// Builder: tampilan klub + stats
 function buildClubDisplay(mi, w, d, l, pl, pct) {
     const club = mi.club || '';
     const isFT = mi.isFullTransfer || false;
@@ -852,7 +884,6 @@ function buildClubDisplay(mi, w, d, l, pl, pct) {
         </div>`;
 }
 
-// Builder: form edit admin di dalam modal
 function buildAdminClubEdit(matchId, nama, mi) {
     const safeId  = matchId.replace(/[^a-zA-Z0-9_-]/g, '_');
     const curClub = escHtml(mi.club || '');
@@ -876,7 +907,6 @@ function simpanKlub(matchId, nama, safeId) {
     db.ref(`${dbPath}/matchInfo/${matchId}/${nama}`).set({ club: clubVal, isFullTransfer: ftVal })
       .then(() => {
           alert(`✅ Data klub ${nama} berhasil disimpan!`);
-          // Refresh matchInfoData local cache
           if (!matchInfoData[matchId]) matchInfoData[matchId] = {};
           matchInfoData[matchId][nama] = { club: clubVal, isFullTransfer: ftVal };
       })
@@ -937,7 +967,6 @@ function renderAllTime() {
             document.getElementById('mainContent').innerHTML = `<div class="empty-state">Belum ada data untuk Mode ${currentMode} Player.</div>`;
             return;
         }
-        // All time: clickable name → bukaInfoPlayerAllTime
         document.getElementById('mainContent').innerHTML = buildEplBlock(sorted, 'ALL TIME STANDING', true, false, [], true, null);
     });
 }
@@ -986,7 +1015,6 @@ function renderMonthly(matches) {
             return { name: p.name, pos: i+1, pl: (p.w||0)+(p.d||0)+(p.l||0), w: p.w||0, d: p.d||0, l: p.l||0, gf: p.f||0, ga: p.a||0, gd, pts: p.pts||0, form: [], manualRank: p.manualRank, isWin: i===0&&(p.pts||0)>0 };
         });
 
-        // Mode = 'match', kirim matchId supaya modal tahu konteksnya
         html += buildEplBlock(rowData, null, false, isEdit, s, false, id);
         html += `</div>`;
         el.innerHTML += html;
@@ -994,7 +1022,6 @@ function renderMonthly(matches) {
 }
 
 // ── SHARED EPL TABLE BUILDER ──────────────────────────────────
-// matchId: null → alltime mode (klik → alltime modal), string → match mode
 function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], showWinPct=false, matchId=null) {
 
     const topN = Math.min(rowData.length, 3);
@@ -1010,7 +1037,6 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
 
     const isAllTime = (matchId === null);
 
-    // DESKTOP TABLE ROWS
     const dRows = rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const posCls = i < topN ? 'top' : '';
@@ -1051,7 +1077,6 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
         </tr>`;
     }).join('');
 
-    // MOBILE SHORT ROWS
     const mShort = rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
@@ -1066,7 +1091,6 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
         </tr>`;
     }).join('');
 
-    // MOBILE FULL ROWS
     const mFull = rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
@@ -1083,7 +1107,6 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
         </tr>`;
     }).join('');
 
-    // MOBILE FORM ROWS
     const mForm = showForm ? rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
@@ -1212,14 +1235,16 @@ function updateSidebar(monthlyMatches) {
 
         const list = modeAdmin ? ALL_PLAYERS : Array.from(activeSet);
 
-        const sm = list.map(n => [n, ptsMonth[n]||0]).sort((a,b) => b[1]-a[1]);
-        document.getElementById('sbMonthBody').innerHTML = sm.map(([n,p],i) =>
-            `<tr class="${i===0?'sb-r1':''}"><td class="tl">${i===0&&p>0?'👑 ':''}<strong>${n}</strong></td><td>${trophyMonth[n]||0}x🏆</td><td class="sb-pts">${p}</td></tr>`
+        // Render trophy bulan
+        const trophyMonthSorted = list.map(n => [n, trophyMonth[n]||0]).sort((a,b) => b[1]-a[1]);
+        document.getElementById('sbTrophyMonthBody').innerHTML = trophyMonthSorted.map(([n,t],i) =>
+            `<tr class="${i===0&&t>0?'sb-r1':''}"><td class="tl">${i===0&&t>0?'👑 ':''}<strong>${n}</strong></td><td class="trophy-count">${t>0?t+'x 🏆':'—'}</td></tr>`
         ).join('');
 
-        const sa = list.map(n => [n, ptsAll[n]||0]).sort((a,b) => b[1]-a[1]);
-        document.getElementById('sbAllTimeBody').innerHTML = sa.map(([n,p],i) =>
-            `<tr class="${i===0?'sb-r1':''}"><td class="tl">${i===0&&p>0?'👑 ':''}<strong>${n}</strong></td><td>${trophyAll[n]||0}x🏆</td><td class="sb-pts">${p}</td></tr>`
+        // Render poin bulan (tanpa kolom wins)
+        const sm = list.map(n => [n, ptsMonth[n]||0]).sort((a,b) => b[1]-a[1]);
+        document.getElementById('sbMonthBody').innerHTML = sm.map(([n,p],i) =>
+            `<tr class="${i===0?'sb-r1':''}"><td class="tl">${i===0&&p>0?'👑 ':''}<strong>${n}</strong></td><td class="sb-pts">${p}</td></tr>`
         ).join('');
 
         const tList = Object.entries(trophyMonth).sort((a,b) => b[1]-a[1]);
@@ -1231,6 +1256,48 @@ function updateSidebar(monthlyMatches) {
         } else {
             banner.innerHTML = `Belum ada juara di bulan ${currentMonth}`;
         }
+
+        renderStatsCards();
+    });
+}
+
+// ── SIDEBAR ALL TIME ──────────────────────────────────────────
+function updateSidebarAllTime() {
+    db.ref(dbPath).once('value', snap => {
+        const root = snap.val() || {};
+        let ptsAll={}, trophyAll={};
+        activeSet = new Set();
+
+        Object.values(root).forEach(m => {
+            if (!m || !m.matches) return;
+            Object.values(m.matches).forEach(match => {
+                if (!match || !match.standings || !Array.isArray(match.standings)) return;
+                const s = sortStandings(match);
+                match.standings.forEach(p => {
+                    const n = fix(p.name);
+                    activeSet.add(n);
+                    ptsAll[n] = (ptsAll[n]||0) + (p.pts||0);
+                });
+                if (s[0] && (s[0].pts||0) > 0) {
+                    const wn = fix(s[0].name);
+                    trophyAll[wn] = (trophyAll[wn]||0)+1;
+                }
+            });
+        });
+
+        const list = modeAdmin ? ALL_PLAYERS : Array.from(activeSet);
+
+        // Render trophy all time
+        const trophyAllSorted = list.map(n => [n, trophyAll[n]||0]).sort((a,b) => b[1]-a[1]);
+        document.getElementById('sbTrophyAllBody').innerHTML = trophyAllSorted.map(([n,t],i) =>
+            `<tr class="${i===0&&t>0?'sb-r1':''}"><td class="tl">${i===0&&t>0?'👑 ':''}<strong>${n}</strong></td><td class="trophy-count">${t>0?t+'x 🏆':'—'}</td></tr>`
+        ).join('');
+
+        // Render all time points (tanpa kolom wins)
+        const sa = list.map(n => [n, ptsAll[n]||0]).sort((a,b) => b[1]-a[1]);
+        document.getElementById('sbAllTimeBody').innerHTML = sa.map(([n,p],i) =>
+            `<tr class="${i===0?'sb-r1':''}"><td class="tl">${i===0&&p>0?'👑 ':''}<strong>${n}</strong></td><td class="sb-pts">${p}</td></tr>`
+        ).join('');
 
         renderStatsCards();
     });
