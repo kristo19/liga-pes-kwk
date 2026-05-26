@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sunday PES League - Fixed Edition</title>
+    <title>Sunday PES League - Ultimate Sync & Info Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -96,8 +96,6 @@
 
         /* LAYOUT */
         .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
-
-        /* CONTENT PANEL */
         .content-panel { background: white; border-radius: 14px; overflow: hidden; }
 
         /* CHAMPION BANNER */
@@ -108,7 +106,6 @@
         }
         .champ-banner.hidden { display: none; }
 
-        /* MATCH SECTION HEADING */
         .section-head {
             background: var(--purple); color: white;
             padding: 11px 18px; font-family: 'Barlow Condensed', sans-serif;
@@ -139,13 +136,11 @@
         .pos-num { font-weight: 700; font-size: 0.85rem; color: var(--sub); width: 20px; text-align: center; }
         .pos-num.top { color: var(--purple); }
 
-        .player-name { font-weight: 700; font-size: 0.95rem; }
         .pts-big { font-weight: 900; font-size: 1.05rem; color: var(--purple); }
         .gd-pos { color: #00c853; font-weight: 700; }
         .gd-neg { color: #e52b2b; font-weight: 700; }
         .gd-zero { color: #333; }
 
-        /* WINNER ROW */
         .win-row { background: #fffde7 !important; }
         .win-row:hover { background: #fff9c4 !important; }
 
@@ -155,6 +150,37 @@
         .fc-w { background: var(--win); }
         .fc-d { background: var(--draw); }
         .fc-l { background: var(--loss); }
+
+        /* INFO PLAYER (KLIKABLE) */
+        .clickable-name { 
+            cursor: pointer; color: var(--purple); font-weight: 800; font-size: 0.95rem;
+            border-bottom: 1.5px dashed var(--purple); transition: 0.2s; 
+        }
+        .clickable-name:hover { color: var(--pink); border-bottom-color: var(--pink); }
+
+        /* MODAL POP-UP INFO PLAYER */
+        .info-modal { 
+            display: none; position: fixed; inset: 0; background: rgba(15, 26, 69, 0.9); 
+            z-index: 99999; justify-content: center; align-items: center; padding: 20px; 
+            opacity: 0; transition: opacity 0.3s; 
+        }
+        .info-modal.on { display: flex; opacity: 1; }
+        .info-modal-box { 
+            background: white; width: 100%; max-width: 400px; border-radius: 16px; 
+            padding: 24px; position: relative; transform: translateY(20px); 
+            transition: transform 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+        }
+        .info-modal.on .info-modal-box { transform: translateY(0); }
+        .info-close { 
+            position: absolute; top: 16px; right: 16px; background: #f0f0f0; border: none; 
+            width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; 
+            color: #333; display: flex; justify-content: center; align-items: center; transition: 0.2s; 
+        }
+        .info-close:hover { background: var(--pink); color: white; }
+        .info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--purple); margin-bottom: 16px; margin-top: 0; }
+        .info-textarea { width: 100%; height: 150px; padding: 12px; border-radius: 8px; border: 2px solid var(--border); font-family: 'Barlow', sans-serif; font-size: 0.95rem; resize: vertical; margin-bottom: 16px; outline: none; }
+        .info-textarea:focus { border-color: var(--purple); }
+        .info-content { font-size: 1rem; color: #333; line-height: 1.6; white-space: pre-wrap; background: #f4f4f9; padding: 16px; border-radius: 8px; border: 1px solid #eee; margin-top: 8px; }
 
         /* MOBILE TABS */
         .mob-tabs { display: none; }
@@ -175,7 +201,6 @@
         .mob-tbl tbody tr:last-child td { border-bottom: none; }
         .mob-tbl tbody tr:hover { background: var(--hover); }
 
-        /* MATCH SECTION SEPARATOR */
         .match-block { border-top: 1px solid var(--border); }
         .match-block:first-child { border-top: none; }
 
@@ -211,7 +236,6 @@
         .sb-pts { font-weight: 900; color: var(--purple); }
         .sb-r1 td:first-child { border-left: 3px solid var(--pink); }
 
-        /* EMPTY STATE */
         .empty-state { padding: 40px; text-align: center; color: #999; font-size: 0.95rem; }
 
         @media (max-width: 900px) {
@@ -297,7 +321,6 @@
                     <tbody id="sbAssistsBody"></tbody>
                 </table>
             </div>
-            
             <div class="sb-card">
                 <div class="sb-head stat">📈 Form 5 Laga</div>
                 <table class="sb-tbl">
@@ -305,9 +328,16 @@
                     <tbody id="sbFormBody"></tbody>
                 </table>
             </div>
-            
             <div id="adminStatsTool"></div>
         </div>
+    </div>
+</div>
+
+<div id="infoModal" class="info-modal">
+    <div class="info-modal-box">
+        <button class="info-close" onclick="tutupInfoPlayer()">×</button>
+        <h2 id="infoModalTitle" class="info-title">Player Info</h2>
+        <div id="infoModalBody"></div>
     </div>
 </div>
 
@@ -329,7 +359,10 @@ const db = firebase.database();
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const ALL_PLAYERS = ["Toxx","Ipo","Alfa","Kobe"];
 
-let currentMonth = localStorage.getItem('activeMonth') || "Mei";
+// Anti-error Local Storage saat dibuka offline (file:///)
+let currentMonth = "Mei";
+try { currentMonth = localStorage.getItem('activeMonth') || "Mei"; } catch(e) {}
+
 let currentMode  = null;
 let dbPath       = 'liga';
 let matchesRef   = null;
@@ -338,6 +371,7 @@ let modeAdmin    = false;
 let editingId    = null;
 let localData    = {};
 let statsData    = {};
+let playerInfoData = {}; // Data Tim Pemain
 let editingStats = false;
 let activeSet    = new Set();
 
@@ -396,6 +430,7 @@ function applyMode() {
     buildMonthSelect();
     loadData();
     listenStats();
+    listenPlayerInfo(); // Memuat data info player dari firebase
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
@@ -410,7 +445,7 @@ function buildMonthSelect() {
 function gantiBulan(m) {
     currentMonth = m;
     if (m !== 'ALL TIME STANDING') {
-        localStorage.setItem('activeMonth', m);
+        try { localStorage.setItem('activeMonth', m); } catch(e) {}
         document.getElementById('monthSelect').value = m;
     }
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
@@ -457,6 +492,48 @@ function listenStats() {
             statsData[ck].formText = raw[k].formText || "";
         });
         renderStatsCards();
+    });
+}
+
+// ── POP-UP INFO PLAYER (MENGGUNAKAN KLIKABLE NAMA) ────────────
+function listenPlayerInfo() {
+    db.ref(`${dbPath}/playerInfo`).on('value', snap => {
+        playerInfoData = snap.val() || {};
+    });
+}
+
+function bukaInfoPlayer(nama) {
+    const info = playerInfoData[nama] || "Belum ada data tim yang digunakan.";
+    const modal = document.getElementById('infoModal');
+    const title = document.getElementById('infoModalTitle');
+    const body = document.getElementById('infoModalBody');
+    
+    title.innerText = "Info Player: " + nama;
+    
+    if (modeAdmin) {
+        body.innerHTML = `
+            <div style="font-weight:700; margin-bottom:8px;">Edit Tim yang Digunakan:</div>
+            <textarea id="infoTextarea" class="info-textarea" placeholder="1. Manchester United 3x\n2. Full Transfer...">${info === "Belum ada data tim yang digunakan." ? "" : info}</textarea>
+            <button class="btn-save" style="width:100%; padding:10px; font-size:1rem;" onclick="simpanInfoPlayer('${nama}')">💾 Simpan Info</button>
+        `;
+    } else {
+        body.innerHTML = `
+            <div style="font-weight:700; margin-bottom:8px; color:var(--purple);">Tim yang digunakan:</div>
+            <div class="info-content">${info}</div>
+        `;
+    }
+    modal.classList.add('on');
+}
+
+function tutupInfoPlayer() {
+    document.getElementById('infoModal').classList.remove('on');
+}
+
+function simpanInfoPlayer(nama) {
+    const text = document.getElementById('infoTextarea').value;
+    db.ref(`${dbPath}/playerInfo/${nama}`).set(text).then(() => {
+        alert('✅ Info tim berhasil disimpan!');
+        tutupInfoPlayer();
     });
 }
 
@@ -569,9 +646,11 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
         const gd     = p.gd;
         const winCls = p.isWin ? 'win-row' : '';
         const crown  = p.isWin ? ' 👑' : '';
-        
         const formHtml = showForm ? `<td><div class="form-row">${formCircles(p.form)}</div></td>` : '';
         const winPctCell = showWinPct ? `<td style="font-weight:700; color:var(--purple);">${p.pl > 0 ? ((p.w/p.pl)*100).toFixed(0) : 0}%</td>` : '';
+
+        // Terapkan Clickable Name pada baris desktop
+        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')" title="Klik untuk info Tim">${p.name}${crown}</span>`;
 
         let wCell, dCell, lCell, fCell, aCell;
         if (isEdit) {
@@ -592,7 +671,7 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
 
         return `<tr class="${winCls}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${posCls}">${i+1}</span></div></td>
-            <td class="tl"><span class="player-name">${p.name}${crown}</span></td>
+            <td class="tl">${pNameHtml}</td>
             <td>${p.pl}</td>
             ${wCell}${dCell}${lCell}${fCell}${aCell}
             <td class="${gdClass(gd)}">${gdStr(gd)}</td>
@@ -607,10 +686,11 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
     const mShort = rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
+        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')">${p.name}${crown}</span>`;
         const winPctCellMob = showWinPct ? `<td style="font-weight:700; color:var(--purple);">${p.pl > 0 ? ((p.w/p.pl)*100).toFixed(0) : 0}%</td>` : '';
         return `<tr class="${p.isWin?'win-row':''}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
-            <td class="tl"><span class="player-name">${p.name}${crown}</span></td>
+            <td class="tl">${pNameHtml}</td>
             <td>${p.pl}</td><td>${p.w}</td><td>${p.d}</td><td>${p.l}</td>
             <td class="pts-big">${p.pts}</td>
             ${winPctCellMob}
@@ -621,10 +701,11 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
     const mFull = rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
+        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')">${p.name}${crown}</span>`;
         const winPctCellMob = showWinPct ? `<td style="font-weight:700; color:var(--purple);">${p.pl > 0 ? ((p.w/p.pl)*100).toFixed(0) : 0}%</td>` : '';
         return `<tr class="${p.isWin?'win-row':''}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
-            <td class="tl"><span class="player-name">${p.name}${crown}</span></td>
+            <td class="tl">${pNameHtml}</td>
             <td>${p.pl}</td><td>${p.w}</td><td>${p.d}</td><td>${p.l}</td>
             <td>${p.gf}</td><td>${p.ga}</td>
             <td class="${gdClass(p.gd)}">${gdStr(p.gd)}</td>
@@ -637,9 +718,10 @@ function buildEplBlock(rowData, title, showForm, isEdit=false, rawStandings=[], 
     const mForm = showForm ? rowData.map((p,i) => {
         const barCls = i < topN ? 'bar-top' : 'bar-mid';
         const crown  = p.isWin ? ' 👑' : '';
+        const pNameHtml = `<span class="clickable-name" onclick="bukaInfoPlayer('${p.name}')">${p.name}${crown}</span>`;
         return `<tr class="${p.isWin?'win-row':''}">
             <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
-            <td class="tl"><span class="player-name">${p.name}${crown}</span></td>
+            <td class="tl">${pNameHtml}</td>
             <td><div class="form-row" style="justify-content:flex-start;">${formCircles(p.form)}</div></td>
         </tr>`;
     }).join('') : '';
