@@ -19,6 +19,11 @@
             --win: #00c853;
             --draw: #b0b0b0;
             --loss: #e52b2b;
+            /* Full Transfer theme */
+            --ft-orange: #e65100;
+            --ft-orange-light: #ff6d00;
+            --ft-bg: #fff3e0;
+            --ft-border: #ffcc80;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -67,8 +72,81 @@
         .content-panel { background: white; border-radius: 14px; overflow: hidden; }
         .champ-banner { background: linear-gradient(135deg, var(--purple) 0%, #6a0dad 100%); color: white; text-align: center; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; }
         .champ-banner.hidden { display: none; }
-        .section-head { background: var(--purple); color: white; padding: 11px 18px; font-family: 'Barlow Condensed', sans-serif; font-size: 1.15rem; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .badge-liga { background: var(--pink); font-size: 0.68rem; padding: 2px 9px; border-radius: 10px; font-weight: 700; font-family: 'Barlow', sans-serif; }
+
+        /* ── SECTION HEAD — BASE ── */
+        .section-head {
+            color: white;
+            padding: 11px 18px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        /* ── SECTION HEAD — KLUB (default, ungu) ── */
+        .section-head.type-klub {
+            background: var(--purple);
+        }
+        /* ── SECTION HEAD — FULL TRANSFER (oranye) ── */
+        .section-head.type-ft {
+            background: linear-gradient(135deg, #bf360c 0%, #e64a19 50%, #ff6d00 100%);
+        }
+        /* ── SECTION HEAD — UNKNOWN (abu, belum ada info) ── */
+        .section-head.type-unknown {
+            background: linear-gradient(135deg, #4a4a5a 0%, #6c6c80 100%);
+        }
+
+        /* ── BADGE LIGA — BASE ── */
+        .badge-liga {
+            font-size: 0.68rem;
+            padding: 2px 9px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-family: 'Barlow', sans-serif;
+            letter-spacing: 0.3px;
+        }
+        /* Klub badge: pink */
+        .badge-liga.badge-klub {
+            background: var(--pink);
+            color: white;
+        }
+        /* Full Transfer badge: oranye terang */
+        .badge-liga.badge-ft {
+            background: #fff3e0;
+            color: #bf360c;
+            border: 1px solid #ffcc80;
+        }
+        /* Unknown badge */
+        .badge-liga.badge-unknown {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* ── FT ACCENT BAR di bawah section head ── */
+        .ft-accent-bar {
+            background: linear-gradient(90deg, #ff6d00, #ffab40, #ff6d00);
+            background-size: 200% 100%;
+            animation: ftShimmer 2s linear infinite;
+            height: 3px;
+        }
+        @keyframes ftShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── FT INFO ROW di dalam tabel ── */
+        .ft-info-row td {
+            background: linear-gradient(90deg, #fff8f0, #fff3e0);
+            padding: 6px 18px !important;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #e65100;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #ffcc80 !important;
+        }
 
         .tbl-wrap { overflow-x: auto; }
         .epl-tbl { width: 100%; border-collapse: collapse; min-width: 560px; }
@@ -80,19 +158,29 @@
         .epl-tbl tbody td { padding: 10px 10px; text-align: center; font-size: 0.9rem; color: #37003c; }
         .epl-tbl tbody td.tl { text-align: left; }
 
+        /* FT tabel row tint */
+        .epl-tbl.tbl-ft tbody tr:hover { background: #fff8f0; }
+        .mob-tbl.tbl-ft tbody tr:hover { background: #fff8f0; }
+
         .pos-wrap { display: flex; align-items: center; }
         .pos-bar { width: 4px; height: 34px; border-radius: 2px; margin-right: 8px; flex-shrink: 0; }
         .bar-top { background: var(--purple); }
+        .bar-top-ft { background: var(--ft-orange); }
         .bar-mid { background: #e0d0f0; }
+        .bar-mid-ft { background: #ffcc80; }
         .pos-num { font-weight: 700; font-size: 0.85rem; color: var(--sub); width: 20px; text-align: center; }
         .pos-num.top { color: var(--purple); }
+        .pos-num.top-ft { color: var(--ft-orange); }
 
         .pts-big { font-weight: 900; font-size: 1.05rem; color: var(--purple); }
+        .pts-big-ft { font-weight: 900; font-size: 1.05rem; color: var(--ft-orange); }
         .gd-pos { color: #00c853; font-weight: 700; }
         .gd-neg { color: #e52b2b; font-weight: 700; }
         .gd-zero { color: #333; }
         .win-row { background: #fffde7 !important; }
         .win-row:hover { background: #fff9c4 !important; }
+        .win-row-ft { background: #fff3e0 !important; }
+        .win-row-ft:hover { background: #ffe0b2 !important; }
 
         .form-row { display: flex; gap: 3px; justify-content: center; align-items: center; }
         .fc { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; color: white; flex-shrink: 0; }
@@ -102,6 +190,8 @@
 
         .clickable-name { cursor: pointer; color: var(--purple); font-weight: 800; font-size: 0.95rem; border-bottom: 1.5px dashed var(--purple); transition: 0.2s; }
         .clickable-name:hover { color: var(--pink); border-bottom-color: var(--pink); }
+        .clickable-name-ft { cursor: pointer; color: #bf360c; font-weight: 800; font-size: 0.95rem; border-bottom: 1.5px dashed #e65100; transition: 0.2s; }
+        .clickable-name-ft:hover { color: var(--ft-orange-light); border-bottom-color: var(--ft-orange-light); }
 
         /* MODAL INFO PLAYER */
         .info-modal { display: none; position: fixed; inset: 0; background: rgba(15, 5, 30, 0.85); z-index: 99999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
@@ -184,7 +274,7 @@
         .liga-type-btn { flex: 1; padding: 10px 8px; border-radius: 8px; border: 1.5px solid var(--border); background: white; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; color: var(--purple); text-align: center; font-family: 'Barlow', sans-serif; }
         .liga-type-btn:hover { border-color: var(--purple); }
         .liga-type-btn.aktif-klub { background: var(--purple); color: white; border-color: var(--purple); }
-        .liga-type-btn.aktif-ft { background: var(--pink); color: white; border-color: var(--pink); }
+        .liga-type-btn.aktif-ft { background: var(--ft-orange); color: white; border-color: var(--ft-orange); }
         .ft-notice-admin { display: none; background: #fff3e0; border: 1px solid #ffcc80; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; font-size: 0.8rem; color: #e65100; }
         .club-inputs-admin { display: none; background: #f7f0ff; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
         .club-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
@@ -397,8 +487,19 @@ const db   = firebase.database();
 const auth = firebase.auth();
 
 // ── CONSTANTS & STATE ─────────────────────────────────────────
-const MONTHS     = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const MONTHS      = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const ALL_PLAYERS = ["Toxx","Stive","Alfa","Kobe"];
+
+// ── ORDINAL LIGA NAMES ────────────────────────────────────────
+const LIGA_ORDINAL = [
+    "Pertama","Kedua","Ketiga","Keempat","Kelima",
+    "Keenam","Ketujuh","Kedelapan","Kesembilan","Kesepuluh",
+    "Kesebelas","Kedua Belas","Ketiga Belas","Keempat Belas","Kelima Belas",
+    "Keenam Belas","Ketujuh Belas","Kedelapan Belas","Kesembilan Belas","Kedua Puluh"
+];
+function ligaOrdinal(n) {
+    return LIGA_ORDINAL[(n - 1)] || `ke-${n}`;
+}
 
 let currentMonth = 'ALL TIME STANDING';
 let currentMode  = null;
@@ -411,21 +512,15 @@ let localData    = {};
 let statsData    = {};
 let editingStats = false;
 let activeSet    = new Set();
-let tipeLiga     = null; // 'klub' atau 'ft'
-let editFormArr  = {};   // state form 5 laga saat edit stats
+let tipeLiga     = null;
+let editFormArr  = {};
 
 let allMatchesCache = {};
 let matchInfoData   = {};
 
 // ── AUTH LISTENER ─────────────────────────────────────────────
 auth.onAuthStateChanged((user) => {
-    if (user) {
-        modeAdmin = true;
-    } else {
-        modeAdmin = false;
-        editingId = null;
-        editingStats = false;
-    }
+    if (user) { modeAdmin = true; } else { modeAdmin = false; editingId = null; editingStats = false; }
     renderAdminArea();
     renderStatsCards();
     loadData();
@@ -474,6 +569,20 @@ function toggleSidebarMode(isAllTime) {
     document.getElementById('sbMonthCard').style.display       = isAllTime ? 'none' : 'block';
     document.getElementById('sbTrophyAllCard').style.display   = isAllTime ? 'block' : 'none';
     document.getElementById('sbAllTimeCard').style.display     = isAllTime ? 'block' : 'none';
+}
+
+// ── DETEKSI TIPE LIGA dari matchInfoData ──────────────────────
+// Mengembalikan: 'ft' | 'klub' | 'unknown'
+function detectLigaType(matchId, playerNames) {
+    const info = matchInfoData[matchId];
+    if (!info) return 'unknown';
+    const players = playerNames || Object.keys(info);
+    if (!players.length) return 'unknown';
+    // Cek apakah semua player punya isFullTransfer flag
+    const ftFlags = players.map(n => (info[n] || {}).isFullTransfer);
+    if (ftFlags.every(f => f === true)) return 'ft';
+    if (ftFlags.every(f => f === false || f === undefined)) return 'klub';
+    return 'mixed'; // campuran — fallback ke 'klub'
 }
 
 // ── MODE & INIT ───────────────────────────────────────────────
@@ -567,7 +676,13 @@ function loadData() {
 }
 
 function listenMatchInfo() {
-    db.ref(`${dbPath}/matchInfo`).on('value', snap => { matchInfoData = snap.val() || {}; });
+    db.ref(`${dbPath}/matchInfo`).on('value', snap => {
+        matchInfoData = snap.val() || {};
+        // Re-render jika sudah ada data bulan
+        if (currentMonth !== 'ALL TIME STANDING' && localData && Object.keys(localData).length) {
+            renderMonthly(localData);
+        }
+    });
 }
 
 function listenStats() {
@@ -613,7 +728,7 @@ function renderAllTime() {
         const sorted = Object.keys(stats).map(name => ({name, ...stats[name]}))
             .filter(p => p.pl > 0).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
         if (!sorted.length) return document.getElementById('mainContent').innerHTML = `<div class="empty-state">Belum ada data untuk Mode ${currentMode} Player.</div>`;
-        document.getElementById('mainContent').innerHTML = buildEplBlock(sorted, true, false, [], true, null);
+        document.getElementById('mainContent').innerHTML = buildEplBlock(sorted, true, false, [], true, null, 'unknown');
     });
 }
 
@@ -623,26 +738,48 @@ function renderMonthly(matches) {
     el.innerHTML = '';
     if (!matches || !Object.keys(matches).length)
         return el.innerHTML = `<div class="empty-state">Belum ada klasemen di bulan <strong>${currentMonth}</strong> untuk Mode <strong>${currentMode} Player</strong>.</div>`;
+
     const ids = Object.keys(matches).sort((a, b) => (matches[a].timestamp || 0) - (matches[b].timestamp || 0));
     const counters = {};
+    let htmlAll = '';
+
     ids.forEach(id => {
         const m = matches[id];
         counters[m.tanggal] = (counters[m.tanggal] || 0) + 1;
-        const s = sortStandings(m), isEdit = editingId === id;
+        const ligaNum = counters[m.tanggal];
+        const s = sortStandings(m);
+        const isEdit = editingId === id;
+
+        // Deteksi tipe liga
+        const playerNames = (m.standings || []).map(p => fix(p.name));
+        const ligaType    = detectLigaType(id, playerNames); // 'ft' | 'klub' | 'unknown' | 'mixed'
+        const isFT        = ligaType === 'ft';
+
+        // CSS class untuk section-head berdasarkan tipe
+        const headCls   = isFT ? 'section-head type-ft' : (ligaType === 'unknown' ? 'section-head type-unknown' : 'section-head type-klub');
+        const badgeCls  = isFT ? 'badge-liga badge-ft'  : (ligaType === 'unknown' ? 'badge-liga badge-unknown' : 'badge-liga badge-klub');
+        const badgeIcon = isFT ? '🔀' : '⚽';
+        const ligaNama  = ligaOrdinal(ligaNum);
+
         const heading = isEdit
             ? `<select id="editTgl" style="padding:4px 8px;border-radius:6px;border:none;font-family:'Barlow',sans-serif;font-weight:700;">${Array.from({length:31},(_,i)=>`<option value="${i+1}" ${m.tanggal==i+1?'selected':''}>Tgl ${i+1}</option>`).join('')}</select>`
             : `📅 ${getNamaHari(m.tanggal||1, currentMonth)}, ${m.tanggal||1} ${currentMonth}`;
 
+        // Accent bar khusus FT
+        const accentBar = isFT ? `<div class="ft-accent-bar"></div>` : '';
+
         let html = `<div class="match-block" id="mb-${id}">
-            <div class="section-head">
+            <div class="${headCls}">
                 <span>${heading}</span>
-                <span class="badge-liga">Liga ${counters[m.tanggal]}</span>
+                <span class="${badgeCls}">${badgeIcon} Liga ${ligaNama}</span>
+                ${isFT ? `<span style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:8px;font-size:0.65rem;font-weight:700;letter-spacing:0.5px;">FULL TRANSFER</span>` : ''}
                 <span style="margin-left:auto;display:flex;align-items:center;gap:4px;">
                     <span style="background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">🏆 ${(s[0]&&(s[0].pts||0)>0)?s[0].name:'-'}</span>
                     ${modeAdmin && !isEdit ? `<button class="btn-del" onclick="hapus('${id}')">🗑️</button>` : ''}
                     ${modeAdmin ? `<button class="${isEdit?'btn-save':'btn-edit'}" onclick="${isEdit?`simpan('${id}')`:`edit('${id}')`}">${isEdit?'💾 Simpan':'✏️ Edit'}</button>` : ''}
                 </span>
-            </div>`;
+            </div>
+            ${accentBar}`;
 
         const rowData = s.map((p, i) => ({
             name: p.name, pos: i+1, pl: (p.w||0)+(p.d||0)+(p.l||0),
@@ -650,22 +787,46 @@ function renderMonthly(matches) {
             gd: p.gd||0, pts: p.pts||0, form: [], manualRank: p.manualRank,
             isWin: i===0 && (p.pts||0)>0
         }));
-        el.innerHTML += html + buildEplBlock(rowData, false, isEdit, s, false, id) + `</div>`;
+
+        htmlAll += html + buildEplBlock(rowData, false, isEdit, s, false, id, ligaType) + `</div>`;
     });
+
+    el.innerHTML = htmlAll;
 }
 
 // ── BUILD EPL TABLE ───────────────────────────────────────────
-function buildEplBlock(rowData, showForm, isEdit=false, rawStandings=[], showWinPct=false, matchId=null) {
-    const topN = Math.min(rowData.length, 3);
-    const winPctThDesktop = showWinPct ? '<th>WINS%</th>' : '';
+function buildEplBlock(rowData, showForm, isEdit=false, rawStandings=[], showWinPct=false, matchId=null, ligaType='unknown') {
+    const topN  = Math.min(rowData.length, 3);
+    const isFT  = ligaType === 'ft';
     const isAllTime = (matchId === null);
 
-    const makeNameHtml = (name, crown) => isAllTime
-        ? `<span class="clickable-name" onclick="bukaInfoPlayerAllTime('${name}')" title="Klik untuk lihat semua rekap">${name}${crown}</span>`
-        : `<span class="clickable-name" onclick="bukaInfoPlayerMatch('${name}','${matchId}')" title="Klik untuk info klub liga ini">${name}${crown}</span>`;
+    const winPctThDesktop = showWinPct ? '<th>WINS%</th>' : '';
+
+    // Warna aksen pos-bar dan pts tergantung tipe liga
+    const barTopCls = isFT ? 'bar-top-ft' : 'bar-top';
+    const barMidCls = isFT ? 'bar-mid-ft' : 'bar-mid';
+    const topNumCls = isFT ? 'top-ft' : 'top';
+    const ptsCls    = isFT ? 'pts-big-ft' : 'pts-big';
+    const tblFtCls  = isFT ? ' tbl-ft' : '';
+    const winRowCls = isFT ? 'win-row-ft' : 'win-row';
+
+    const makeNameHtml = (name, crown) => {
+        const nameCls = isFT ? 'clickable-name-ft' : 'clickable-name';
+        if (isAllTime)
+            return `<span class="${nameCls}" onclick="bukaInfoPlayerAllTime('${name}')" title="Klik untuk lihat semua rekap">${name}${crown}</span>`;
+        return `<span class="${nameCls}" onclick="bukaInfoPlayerMatch('${name}','${matchId}')" title="Klik untuk info klub liga ini">${name}${crown}</span>`;
+    };
+
+    // FT info row di dalam tabel (hanya untuk non-edit)
+    const ftInfoRowDesktop = (isFT && !isEdit)
+        ? `<tr class="ft-info-row"><td colspan="99">🔀 Liga ini menggunakan format <strong>Full Transfer</strong> — semua pemain bebas pilih klub manapun</td></tr>`
+        : '';
+    const ftInfoRowMob = (isFT && !isEdit)
+        ? `<tr class="ft-info-row"><td colspan="99">🔀 <strong>Full Transfer</strong></td></tr>`
+        : '';
 
     const dRows = rowData.map((p, i) => {
-        const barCls = i < topN ? 'bar-top' : 'bar-mid';
+        const barCls = i < topN ? barTopCls : barMidCls;
         const crown  = p.isWin ? ' 👑' : '';
         let wCell, dCell, lCell, fCell, aCell;
         if (isEdit) {
@@ -679,24 +840,25 @@ function buildEplBlock(rowData, showForm, isEdit=false, rawStandings=[], showWin
             wCell = `<td>${p.w}</td>`; dCell = `<td>${p.d}</td>`; lCell = `<td>${p.l}</td>`;
             fCell = `<td>${p.gf}</td>`; aCell = `<td>${p.ga}</td>`;
         }
-        return `<tr class="${p.isWin?'win-row':''}">
-            <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td>
+        return `<tr class="${p.isWin ? winRowCls : ''}">
+            <td><div class="pos-wrap"><div class="pos-bar ${barCls}"></div><span class="pos-num ${i<topN ? topNumCls : ''}">${i+1}</span></div></td>
             <td class="tl">${makeNameHtml(p.name, crown)}</td>
             <td>${p.pl}</td>${wCell}${dCell}${lCell}${fCell}${aCell}
             <td class="${gdClass(p.gd)}">${gdStr(p.gd)}</td>
-            ${isEdit ? `<td><input class="tbl-in tbl-in-pts pts-in" data-n="${p.name}" value="${p.pts}" readonly></td>` : `<td class="pts-big">${p.pts}</td>`}
-            ${showWinPct ? `<td style="font-weight:700;color:var(--purple);">${p.pl>0?winPct(p.w,p.pl):0}%</td>` : ''}
-            ${showForm  ? `<td><div class="form-row">${formCircles(p.form)}</div></td>` : ''}
-            ${isEdit    ? `<td><select class="tbl-in rank-in" data-n="${p.name}" style="width:48px;">${[1,2,3,4].map(n=>`<option value="${n}" ${(rawStandings[i]||{}).manualRank==n?'selected':''}>${n}</option>`).join('')}</select></td>` : ''}
+            ${isEdit ? `<td><input class="tbl-in tbl-in-pts pts-in" data-n="${p.name}" value="${p.pts}" readonly></td>` : `<td class="${ptsCls}">${p.pts}</td>`}
+            ${showWinPct ? `<td style="font-weight:700;color:${isFT?'var(--ft-orange)':'var(--purple)'};">${p.pl>0?winPct(p.w,p.pl):0}%</td>` : ''}
+            ${showForm   ? `<td><div class="form-row">${formCircles(p.form)}</div></td>` : ''}
+            ${isEdit     ? `<td><select class="tbl-in rank-in" data-n="${p.name}" style="width:48px;">${[1,2,3,4].map(n=>`<option value="${n}" ${(rawStandings[i]||{}).manualRank==n?'selected':''}>${n}</option>`).join('')}</select></td>` : ''}
         </tr>`;
     }).join('');
 
     const tid = 'tbl' + Math.random().toString(36).slice(2, 7);
+
     return `
         <div class="tbl-wrap desktop-only">
-            <table class="epl-tbl">
+            <table class="epl-tbl${tblFtCls}">
                 <thead><tr><th style="width:46px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>${winPctThDesktop}${showForm?'<th>Form</th>':''}${isEdit?'<th>Rank</th>':''}</tr></thead>
-                <tbody>${dRows}</tbody>
+                <tbody>${ftInfoRowDesktop}${dRows}</tbody>
             </table>
         </div>
         <div class="mob-tabs">
@@ -705,18 +867,18 @@ function buildEplBlock(rowData, showForm, isEdit=false, rawStandings=[], showWin
                 <button class="mob-tab-btn" onclick="swTab(this,'${tid}','full')">Full</button>
                 ${showForm ? `<button class="mob-tab-btn" onclick="swTab(this,'${tid}','form')">Form</button>` : ''}
             </div>
-            <table class="mob-tbl on" id="${tid}-short">
+            <table class="mob-tbl${tblFtCls} on" id="${tid}-short">
                 <thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>Pts</th>${winPctThDesktop}</tr></thead>
-                <tbody>${rowData.map((p,i)=>`<tr class="${p.isWin?'win-row':''}"><td><div class="pos-wrap"><div class="pos-bar ${i<topN?'bar-top':'bar-mid'}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td><td class="tl">${makeNameHtml(p.name,p.isWin?' 👑':'')}</td><td>${p.pl}</td><td>${p.w}</td><td>${p.d}</td><td>${p.l}</td><td class="pts-big">${p.pts}</td>${showWinPct?`<td style="font-weight:700;color:var(--purple);">${p.pl>0?winPct(p.w,p.pl):0}%</td>`:''}</tr>`).join('')}</tbody>
+                <tbody>${ftInfoRowMob}${rowData.map((p,i)=>`<tr class="${p.isWin?winRowCls:''}"><td><div class="pos-wrap"><div class="pos-bar ${i<topN?barTopCls:barMidCls}"></div><span class="pos-num ${i<topN?topNumCls:''}">${i+1}</span></div></td><td class="tl">${makeNameHtml(p.name,p.isWin?' 👑':'')}</td><td>${p.pl}</td><td>${p.w}</td><td>${p.d}</td><td>${p.l}</td><td class="${ptsCls}">${p.pts}</td>${showWinPct?`<td style="font-weight:700;color:${isFT?'var(--ft-orange)':'var(--purple)'};">${p.pl>0?winPct(p.w,p.pl):0}%</td>`:''}</tr>`).join('')}</tbody>
             </table>
-            <table class="mob-tbl" id="${tid}-full">
+            <table class="mob-tbl${tblFtCls}" id="${tid}-full">
                 <thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>${winPctThDesktop}</tr></thead>
-                <tbody>${rowData.map((p,i)=>`<tr class="${p.isWin?'win-row':''}"><td><div class="pos-wrap"><div class="pos-bar ${i<topN?'bar-top':'bar-mid'}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td><td class="tl">${makeNameHtml(p.name,p.isWin?' 👑':'')}</td><td>${p.pl}</td><td>${p.w}</td><td>${p.d}</td><td>${p.l}</td><td>${p.gf}</td><td>${p.ga}</td><td class="${gdClass(p.gd)}">${gdStr(p.gd)}</td><td class="pts-big">${p.pts}</td>${showWinPct?`<td style="font-weight:700;color:var(--purple);">${p.pl>0?winPct(p.w,p.pl):0}%</td>`:''}</tr>`).join('')}</tbody>
+                <tbody>${ftInfoRowMob}${rowData.map((p,i)=>`<tr class="${p.isWin?winRowCls:''}"><td><div class="pos-wrap"><div class="pos-bar ${i<topN?barTopCls:barMidCls}"></div><span class="pos-num ${i<topN?topNumCls:''}">${i+1}</span></div></td><td class="tl">${makeNameHtml(p.name,p.isWin?' 👑':'')}</td><td>${p.pl}</td><td>${p.w}</td><td>${p.d}</td><td>${p.l}</td><td>${p.gf}</td><td>${p.ga}</td><td class="${gdClass(p.gd)}">${gdStr(p.gd)}</td><td class="${ptsCls}">${p.pts}</td>${showWinPct?`<td style="font-weight:700;color:${isFT?'var(--ft-orange)':'var(--purple)'};">${p.pl>0?winPct(p.w,p.pl):0}%</td>`:''}</tr>`).join('')}</tbody>
             </table>
             ${showForm ? `
-            <table class="mob-tbl" id="${tid}-form">
+            <table class="mob-tbl${tblFtCls}" id="${tid}-form">
                 <thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Form</th></tr></thead>
-                <tbody>${rowData.map((p,i)=>`<tr class="${p.isWin?'win-row':''}"><td><div class="pos-wrap"><div class="pos-bar ${i<topN?'bar-top':'bar-mid'}"></div><span class="pos-num ${i<topN?'top':''}">${i+1}</span></div></td><td class="tl">${makeNameHtml(p.name,p.isWin?' 👑':'')}</td><td><div class="form-row" style="justify-content:flex-start;">${formCircles(p.form)}</div></td></tr>`).join('')}</tbody>
+                <tbody>${ftInfoRowMob}${rowData.map((p,i)=>`<tr class="${p.isWin?winRowCls:''}"><td><div class="pos-wrap"><div class="pos-bar ${i<topN?barTopCls:barMidCls}"></div><span class="pos-num ${i<topN?topNumCls:''}">${i+1}</span></div></td><td class="tl">${makeNameHtml(p.name,p.isWin?' 👑':'')}</td><td><div class="form-row" style="justify-content:flex-start;">${formCircles(p.form)}</div></td></tr>`).join('')}</tbody>
             </table>` : ''}
         </div>`;
 }
@@ -772,14 +934,14 @@ function bukaInfoPlayerMatch(nama, matchId) {
     const hari = getNamaHari(mc.tanggal, mc.bulan);
 
     document.getElementById('infoModalTitle').innerText    = nama;
-    document.getElementById('infoModalSubtitle').innerText = `📅 ${hari}, ${mc.tanggal} ${mc.bulan} — Liga ${mc.ligaNum}`;
+    document.getElementById('infoModalSubtitle').innerText = `📅 ${hari}, ${mc.tanggal} ${mc.bulan} — Liga ${ligaOrdinal(mc.ligaNum)}`;
 
     const clubSection  = buildClubDisplay(mi, w, d, l, pl, pct);
     const adminSection = modeAdmin ? buildAdminClubEdit(matchId, nama, mi) : '';
 
     document.getElementById('infoModalBody').innerHTML = `
         <div class="league-card">
-            <div class="league-card-head"><span class="lc-title">📋 Liga ${mc.ligaNum} — ${mc.bulan}</span></div>
+            <div class="league-card-head"><span class="lc-title">📋 Liga ${ligaOrdinal(mc.ligaNum)} — ${mc.bulan}</span></div>
             <div class="league-card-body">${clubSection}${adminSection}</div>
         </div>`;
     document.getElementById('infoModal').classList.add('on');
@@ -1024,19 +1186,17 @@ function renderStatsCards() {
         : '';
 }
 
-// ── EDIT STATS — FORM 5 LAGA DENGAN TOMBOL W/D/L ─────────────
+// ── EDIT STATS ────────────────────────────────────────────────
 function editStats() {
     editingStats = true;
     const gs = (n) => statsData[n] || { score:0, assist:0, formText:"" };
 
-    // Inisialisasi state form per player (index 0 = terlama, 4 = terbaru)
     editFormArr = {};
     ALL_PLAYERS.forEach(n => {
         const ft = (gs(n).formText || '').toUpperCase().replace(/[^WDL]/g, '');
         editFormArr[n] = Array.from({length: 5}, (_, i) => ft[i] || null);
     });
 
-    // Scores & Assists: input angka biasa
     document.getElementById('sbScoresBody').innerHTML = ALL_PLAYERS.map(n =>
         `<tr><td class="tl"><strong>${n}</strong></td><td><input type="number" id="es-${n}" value="${gs(n).score}" style="width:48px;padding:3px;border:1px solid #ccc;border-radius:4px;text-align:center;"></td></tr>`
     ).join('');
@@ -1044,7 +1204,6 @@ function editStats() {
         `<tr><td class="tl"><strong>${n}</strong></td><td><input type="number" id="ea-${n}" value="${gs(n).assist}" style="width:48px;padding:3px;border:1px solid #ccc;border-radius:4px;text-align:center;"></td></tr>`
     ).join('');
 
-    // Form 5 laga: tombol W/D/L per laga
     renderFormEditUI();
 
     document.getElementById('adminStatsTool').innerHTML = `
@@ -1056,7 +1215,6 @@ function editStats() {
 function renderFormEditUI() {
     const html = ALL_PLAYERS.map(player => {
         const arr = editFormArr[player];
-
         const lagaRows = Array.from({length: 5}, (_, i) => {
             const labelTeks = i === 4 ? `Laga ke-5 (terbaru)` : (i === 0 ? `Laga ke-1 (terlama)` : `Laga ke-${i+1}`);
             const v = arr[i];
@@ -1072,12 +1230,10 @@ function renderFormEditUI() {
                 </div>
             </div>`;
         }).join('');
-
         const preview = arr.map(v => v
             ? `<div class="fc fc-${v.toLowerCase()}">${v}</div>`
             : `<div class="fc-empty"></div>`
         ).join('');
-
         return `<div class="form-player-block">
             <div class="form-player-name">${player}</div>
             ${lagaRows}
@@ -1086,13 +1242,11 @@ function renderFormEditUI() {
             </div>
         </div>`;
     }).join('');
-
     document.getElementById('sbFormBody').innerHTML =
         `<tr><td colspan="2" style="padding:0;">${html}</td></tr>`;
 }
 
 function toggleFormBtn(player, lagaIdx, val) {
-    // Klik lagi pada nilai yang sama = hapus (toggle off)
     editFormArr[player][lagaIdx] = editFormArr[player][lagaIdx] === val ? null : val;
     renderFormEditUI();
 }
@@ -1111,7 +1265,7 @@ function saveStats() {
     db.ref(`${dbPath}/allTimeStats`).set(data).then(() => { editingStats = false; });
 }
 
-// ── ADMIN AREA — BUAT LIGA ────────────────────────────────────
+// ── ADMIN AREA ────────────────────────────────────────────────
 function renderAdminArea() {
     if (!modeAdmin) { document.getElementById('adminArea').innerHTML = ''; return; }
     if (currentMonth === 'ALL TIME STANDING') {
@@ -1151,7 +1305,7 @@ function renderAdminArea() {
             <p style="font-size:0.75rem;color:#999;margin-top:10px;">💡 Klik nama player di tabel untuk edit info klub per liga.</p>
         </div>`;
 
-    tipeLiga = null; // reset setiap renderAdminArea
+    tipeLiga = null;
 }
 
 function pilihTipeLiga(tipe) {
@@ -1206,7 +1360,6 @@ function buatLiga() {
         standings: sel.map((n, i) => ({ name:n, w:0, d:0, l:0, f:0, a:0, gd:0, pts:0, manualRank:i+1 }))
     })
     .then(() => {
-        // Simpan info klub + isFullTransfer langsung ke matchInfo
         const infoUpdates = {};
         sel.forEach(n => {
             infoUpdates[`${dbPath}/matchInfo/${matchId}/${n}`] = {
