@@ -28,7 +28,151 @@
             color: #37003c;
         }
 
-        /* LANDING */
+        /* ===================== EPIC MODE SWITCH LOADING SCREEN ===================== */
+        #modeSwitchOverlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 999999;
+            background: #0a001a;
+            justify-content: center; align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #modeSwitchOverlay.on { display: flex; }
+
+        .mso-bg-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(0,255,133,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,133,0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridPulse 2s ease-in-out infinite;
+        }
+        @keyframes gridPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+        .mso-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: orbFloat 3s ease-in-out infinite;
+        }
+        .mso-orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #e90052 0%, transparent 70%); top:-150px; left:-150px; opacity:0.35; animation-delay:0s; }
+        .mso-orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #00ff85 0%, transparent 70%); bottom:-100px; right:-100px; opacity:0.3; animation-delay:-1.5s; }
+        .mso-orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, #9b27af 0%, transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); opacity:0.4; animation-delay:-0.8s; }
+        @keyframes orbFloat { 0%,100%{transform:scale(1) translate(0,0)} 50%{transform:scale(1.15) translate(10px,-10px)} }
+
+        .mso-particles { position: absolute; inset: 0; pointer-events: none; }
+        .mso-particle {
+            position: absolute;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--cyan);
+            animation: particleRise linear infinite;
+        }
+        @keyframes particleRise {
+            0% { transform: translateY(100vh) scale(0); opacity:0; }
+            10% { opacity:1; }
+            90% { opacity:1; }
+            100% { transform: translateY(-20px) scale(1.5); opacity:0; }
+        }
+
+        .mso-center { position: relative; z-index: 10; text-align: center; }
+
+        .mso-mode-display {
+            display: flex; align-items: center; justify-content: center; gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .mso-mode-bubble {
+            display: flex; flex-direction: column; align-items: center;
+            position: relative;
+        }
+        .mso-mode-bubble .mso-num {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 7rem; font-weight: 900;
+            line-height: 1;
+            color: white;
+            text-shadow: 0 0 40px rgba(0,255,133,0.6), 0 0 80px rgba(0,255,133,0.3);
+            animation: numGlow 1.5s ease-in-out infinite;
+        }
+        .mso-mode-bubble.leaving .mso-num { color: rgba(255,255,255,0.3); text-shadow: none; animation: none; }
+        .mso-mode-bubble.arriving .mso-num { color: var(--cyan); text-shadow: 0 0 40px rgba(0,255,133,0.8), 0 0 100px rgba(0,255,133,0.5); }
+        @keyframes numGlow { 0%,100%{text-shadow:0 0 40px rgba(0,255,133,0.6),0 0 80px rgba(0,255,133,0.3)} 50%{text-shadow:0 0 60px rgba(0,255,133,0.9),0 0 120px rgba(0,255,133,0.6),0 0 200px rgba(0,255,133,0.3)} }
+        .mso-mode-bubble .mso-label {
+            font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5);
+            text-transform: uppercase; letter-spacing: 3px; margin-top: 4px;
+        }
+        .mso-mode-bubble.arriving .mso-label { color: rgba(0,255,133,0.8); }
+
+        .mso-arrow {
+            font-size: 2.5rem;
+            animation: arrowPulse 0.6s ease-in-out infinite alternate;
+        }
+        @keyframes arrowPulse { from{transform:translateX(-8px);opacity:0.6} to{transform:translateX(8px);opacity:1} }
+
+        .mso-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3.5rem; font-weight: 900;
+            color: white; letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .mso-title span { color: var(--cyan); }
+
+        .mso-subtitle {
+            font-size: 0.85rem; font-weight: 700;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 4px; text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+
+        .mso-bar-wrap {
+            width: 320px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .mso-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pink), var(--cyan));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 12px rgba(0,255,133,0.6);
+        }
+        .mso-loading-text {
+            font-size: 0.78rem; font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .mso-hexagons {
+            position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+        }
+        .mso-hex {
+            position: absolute;
+            width: 60px; height: 60px;
+            background: rgba(0,255,133,0.06);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            animation: hexFloat linear infinite;
+        }
+        @keyframes hexFloat {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .mso-scanline {
+            position: absolute; inset: 0; pointer-events: none;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+            animation: scanlineMove 8s linear infinite;
+        }
+        @keyframes scanlineMove { 0%{background-position:0 0} 100%{background-position:0 100vh} }
+
+        /* ===================== LANDING ===================== */
         .landing {
             position: fixed; inset: 0;
             background: linear-gradient(160deg, #270668 0%, #5d15a3 45%, #1a0535 100%);
@@ -44,7 +188,7 @@
         .mode-card h2 { font-size: 2.8rem; font-weight: 900; margin-bottom: 8px; }
         .mode-card span { font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; opacity: 0.8; text-transform: uppercase; }
 
-        /* APP */
+        /* ===================== APP ===================== */
         .app { display: none; max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; }
         .app.on { display: block; }
         .app-header { background: var(--purple); border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
@@ -62,6 +206,10 @@
         .btn-alltime { padding: 7px 18px; border-radius: 20px; border: none; background: var(--pink); color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
         .btn-alltime:hover { background: var(--purple); }
         .btn-alltime.active { background: var(--purple); }
+        /* STATS MENU BUTTON */
+        .btn-stats-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #ff6b35, #f7c59f); color: #7f0000; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
+        .btn-stats-menu:hover { background: linear-gradient(135deg, #ff4500, #ff6b35); color: white; }
+        .btn-stats-menu.active { background: linear-gradient(135deg, #b8360b, #e84c00); color: white; box-shadow: 0 4px 14px rgba(232,76,0,0.4); }
 
         .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
         .content-panel { background: white; border-radius: 14px; overflow: hidden; }
@@ -70,11 +218,8 @@
 
         /* SECTION HEAD */
         .section-head { color: white; padding: 11px 18px; font-family: 'Barlow Condensed', sans-serif; font-size: 1.15rem; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        /* Gradasi Hijau untuk Klub */
         .section-head.type-klub { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 40%, #43a047 80%, #66bb6a 100%); }
-        /* Gradasi Merah untuk Full Transfer */
         .section-head.type-ft { background: linear-gradient(135deg, #7f0000 0%, #c62828 40%, #e53935 80%, #ff5252 100%); }
-        /* Abu untuk unknown */
         .section-head.type-unknown { background: linear-gradient(135deg, #4a4a5a 0%, #6c6c80 100%); }
 
         .badge-liga { font-size: 0.68rem; padding: 2px 9px; border-radius: 10px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.3px; }
@@ -89,9 +234,6 @@
         .ft-accent-bar { background: linear-gradient(90deg, #7f0000, #e53935, #ff5252, #e53935, #7f0000); background-size: 200% 100%; animation: shimBar 2s linear infinite; height: 3px; }
         .klub-accent-bar { background: linear-gradient(90deg, #1b5e20, #69f0ae, #43a047, #69f0ae, #1b5e20); background-size: 200% 100%; animation: shimBar 2s linear infinite; height: 3px; }
         @keyframes shimBar { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-        .ft-info-row td { background: linear-gradient(90deg, #fff5f5, #ffebee); padding: 6px 18px !important; font-size: 0.72rem; font-weight: 700; color: #c62828; letter-spacing: 0.5px; border-bottom: 1px solid #ef9a9a !important; }
-        .klub-info-row td { background: linear-gradient(90deg, #f1f8f1, #e8f5e9); padding: 6px 18px !important; font-size: 0.72rem; font-weight: 700; color: #2e7d32; letter-spacing: 0.5px; border-bottom: 1px solid #a5d6a7 !important; }
 
         .tbl-wrap { overflow-x: auto; }
         .epl-tbl { width: 100%; border-collapse: collapse; min-width: 560px; }
@@ -133,6 +275,15 @@
         .clickable-name-klub { cursor: pointer; color: #2e7d32; font-weight: 800; font-size: 0.95rem; border-bottom: 1.5px dashed #2e7d32; transition: 0.2s; }
         .clickable-name-klub:hover { color: #43a047; border-bottom-color: #43a047; }
 
+        /* CLUB LOGO in player name cell */
+        .club-logo-inline {
+            width: 22px; height: 22px; object-fit: contain;
+            vertical-align: middle; margin-right: 5px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .club-logo-inline.error { display: none; }
+
         .info-modal { display: none; position: fixed; inset: 0; background: rgba(15, 5, 30, 0.85); z-index: 99999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
         .info-modal.on { display: flex; }
         .info-modal-box { background: white; width: 100%; max-width: 700px; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 24px 80px rgba(0,0,0,0.6); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
@@ -153,6 +304,8 @@
         .club-name { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 900; color: var(--purple); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         .club-name .full-transfer-tag { background: #ffebee; color: #c62828; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1px solid #ef9a9a; font-family: 'Barlow', sans-serif; }
         .club-name .klub-tag { background: #e8f5e9; color: #2e7d32; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1px solid #a5d6a7; font-family: 'Barlow', sans-serif; }
+
+        .club-name-logo { width: 38px; height: 38px; object-fit: contain; border-radius: 4px; }
 
         .stat-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .stat-pill { display: flex; flex-direction: column; align-items: center; background: #f3eaff; border-radius: 10px; padding: 8px 14px; min-width: 54px; }
@@ -189,6 +342,72 @@
         .match-block { border-top: 1px solid var(--border); }
         .match-block:first-child { border-top: none; }
 
+        /* ===================== STATS PAGE ===================== */
+        .stats-page { padding: 0; }
+        .stats-page-header {
+            background: linear-gradient(135deg, #ff6b35 0%, #e84c00 50%, #b8360b 100%);
+            padding: 24px 28px 20px;
+            color: white;
+        }
+        .stats-page-header h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2rem; font-weight: 900; letter-spacing: 2px;
+            margin: 0;
+        }
+        .stats-page-header p { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+        .stats-accent { background: linear-gradient(90deg, #ff4500, #ffd700, #ff4500); background-size: 200% 100%; animation: shimBar 2s linear infinite; height: 3px; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .stats-section { padding: 20px 24px; border-right: 1px solid var(--border); }
+        .stats-section:last-child { border-right: none; }
+        .stats-section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.1rem; font-weight: 900; letter-spacing: 1px;
+            color: var(--purple); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+            padding-bottom: 8px; border-bottom: 2px solid var(--border);
+        }
+
+        .stats-player-card {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+        }
+        .stats-player-card:last-child { border-bottom: none; }
+        .stats-player-rank {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 900; flex-shrink: 0;
+            background: #f0e6ff; color: var(--purple);
+        }
+        .stats-player-rank.r1 { background: #ffd700; color: #7a5000; }
+        .stats-player-rank.r2 { background: #c0c0c0; color: #3a3a3a; }
+        .stats-player-rank.r3 { background: #cd7f32; color: white; }
+        .stats-player-info { flex: 1; }
+        .stats-player-name { font-weight: 800; font-size: 0.9rem; color: var(--purple); }
+        .stats-player-sub { font-size: 0.7rem; color: var(--sub); font-weight: 600; }
+        .stats-player-val {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.8rem; font-weight: 900; color: var(--purple);
+            line-height: 1;
+        }
+        .stats-player-val.goals { color: var(--win); }
+        .stats-player-val.assists { color: var(--pink); }
+
+        .stats-form-section { padding: 20px 24px; border-top: 1px solid var(--border); }
+        .stats-form-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.1rem; font-weight: 900; letter-spacing: 1px;
+            color: var(--purple); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+            padding-bottom: 8px; border-bottom: 2px solid var(--border);
+        }
+        .stats-form-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+        }
+        .stats-form-row:last-child { border-bottom: none; }
+        .stats-form-name { font-weight: 800; font-size: 0.9rem; color: var(--purple); min-width: 60px; }
+
         /* ADMIN PANEL */
         .admin-panel { background: white; border-radius: 14px; padding: 20px; margin-top: 16px; border: 2px dashed var(--pink); }
         .admin-panel h3 { font-size: 0.85rem; font-weight: 800; color: var(--pink); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
@@ -206,7 +425,6 @@
         .tbl-in { width: 38px; text-align: center; padding: 3px 2px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; font-family: 'Barlow', sans-serif; }
         .tbl-in-pts { background: #f5f5f5; color: #888; }
 
-        /* TIPE LIGA — kartu besar dengan ikon */
         .liga-type-group { display: flex; gap: 12px; margin-bottom: 12px; }
         .liga-type-card {
             flex: 1; padding: 18px 14px; border-radius: 12px; border: 2px solid var(--border);
@@ -218,14 +436,12 @@
         .liga-type-card .ltc-icon { font-size: 2rem; line-height: 1; }
         .liga-type-card .ltc-label { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px; }
         .liga-type-card .ltc-desc { font-size: 0.72rem; font-weight: 600; opacity: 0.65; }
-        /* Aktif Klub = Gradasi Hijau */
         .liga-type-card.aktif-klub {
             background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #43a047 100%);
             border-color: #1b5e20; color: white;
             box-shadow: 0 8px 24px rgba(27,94,32,0.35); transform: translateY(-3px);
         }
         .liga-type-card.aktif-klub .ltc-desc { opacity: 0.85; }
-        /* Aktif FT = Gradasi Merah */
         .liga-type-card.aktif-ft {
             background: linear-gradient(135deg, #7f0000 0%, #c62828 50%, #e53935 100%);
             border-color: #7f0000; color: white;
@@ -291,6 +507,8 @@
             .sidebar { order: 2; } .content-panel { order: 1; }
             .desktop-only { display: none !important; }
             .mob-tabs { display: block; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stats-section { border-right: none; border-bottom: 1px solid var(--border); }
         }
         @media (min-width: 901px) {
             .mob-tabs { display: none !important; }
@@ -311,6 +529,36 @@
     </style>
 </head>
 <body>
+
+<!-- ===================== EPIC MODE SWITCH OVERLAY ===================== -->
+<div id="modeSwitchOverlay">
+    <div class="mso-bg-grid"></div>
+    <div class="mso-hexagons" id="msoHexagons"></div>
+    <div class="mso-particles" id="msoParticles"></div>
+    <div class="mso-scanline"></div>
+    <div class="mso-orb mso-orb-1"></div>
+    <div class="mso-orb mso-orb-2"></div>
+    <div class="mso-orb mso-orb-3"></div>
+    <div class="mso-center">
+        <div class="mso-title">LIGA <span>PES</span></div>
+        <div class="mso-subtitle">&#9917; Switching Mode</div>
+        <div class="mso-mode-display">
+            <div class="mso-mode-bubble leaving" id="msoFromBubble">
+                <div class="mso-num" id="msoFromNum">3</div>
+                <div class="mso-label">Player Mode</div>
+            </div>
+            <div class="mso-arrow">&#10145;&#65039;</div>
+            <div class="mso-mode-bubble arriving" id="msoToBubble">
+                <div class="mso-num" id="msoToNum">4</div>
+                <div class="mso-label">Player Mode</div>
+            </div>
+        </div>
+        <div class="mso-bar-wrap">
+            <div class="mso-bar-fill" id="msoBarFill"></div>
+        </div>
+        <div class="mso-loading-text" id="msoLoadingText">Initializing...</div>
+    </div>
+</div>
 
 <!-- LANDING -->
 <div id="landingPage" class="landing">
@@ -336,6 +584,7 @@
         <span class="nav-label">&#128197; Bulan:</span>
         <select id="monthSelect" class="nav-select" onchange="gantiBulan(this.value)"></select>
         <button id="btnAllTime" class="btn-alltime" onclick="gantiBulan('ALL TIME STANDING')">&#127942; All Time Standing</button>
+        <button id="btnStats" class="btn-stats-menu" onclick="gantiBulan('STATS')">&#128202; Stats</button>
     </div>
 
     <div class="main-layout">
@@ -374,27 +623,6 @@
                 <table class="sb-tbl">
                     <thead><tr><th class="tl">Player</th><th>Pts</th></tr></thead>
                     <tbody id="sbAllTimeBody"></tbody>
-                </table>
-            </div>
-            <div class="sb-card">
-                <div class="sb-head stat">&#9917; Top Scores</div>
-                <table class="sb-tbl">
-                    <thead><tr><th class="tl">Player</th><th>Goals</th></tr></thead>
-                    <tbody id="sbScoresBody"></tbody>
-                </table>
-            </div>
-            <div class="sb-card">
-                <div class="sb-head stat">&#127919; Top Assists</div>
-                <table class="sb-tbl">
-                    <thead><tr><th class="tl">Player</th><th>Assists</th></tr></thead>
-                    <tbody id="sbAssistsBody"></tbody>
-                </table>
-            </div>
-            <div class="sb-card">
-                <div class="sb-head stat">&#128200; Form 5 Laga</div>
-                <table class="sb-tbl">
-                    <thead><tr><th class="tl">Player</th><th>Form</th></tr></thead>
-                    <tbody id="sbFormBody"></tbody>
                 </table>
             </div>
             <div id="adminStatsTool"></div>
@@ -460,6 +688,258 @@ let editFormArr  = {};
 let allMatchesCache = {};
 let matchInfoData   = {};
 
+/* ===================== CLUB LOGO MAPPING ===================== */
+/* Uses Wikipedia/public SVG logos via direct CDN URLs */
+const CLUB_LOGO_MAP = {
+    // Spain / La Liga
+    'real madrid': 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg',
+    'barcelona': 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg',
+    'atletico madrid': 'https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg',
+    'atletico de madrid': 'https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg',
+    'sevilla': 'https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg',
+    'villarreal': 'https://upload.wikimedia.org/wikipedia/en/b/b9/Villarreal_CF_logo-en.svg',
+    'valencia': 'https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg',
+    'real betis': 'https://upload.wikimedia.org/wikipedia/en/1/13/Real_betis_logo.svg',
+    'real sociedad': 'https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg',
+    'athletic bilbao': 'https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_de_Bilbao_logo.svg',
+    'athletic club': 'https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_de_Bilbao_logo.svg',
+    'osasuna': 'https://upload.wikimedia.org/wikipedia/en/6/60/CA_Osasuna_logo.svg',
+    'espanyol': 'https://upload.wikimedia.org/wikipedia/en/6/6e/RCD_Espanyol_logo.svg',
+    'deportivo alavés': 'https://upload.wikimedia.org/wikipedia/en/0/02/Deportivo_Alav%C3%A9s_logo.svg',
+    'alaves': 'https://upload.wikimedia.org/wikipedia/en/0/02/Deportivo_Alav%C3%A9s_logo.svg',
+    'celta vigo': 'https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg',
+    'mallorca': 'https://upload.wikimedia.org/wikipedia/en/d/d3/RCD_Mallorca_logo.svg',
+    'getafe': 'https://upload.wikimedia.org/wikipedia/en/f/ff/Getafe_CF_logo.svg',
+    'granada': 'https://upload.wikimedia.org/wikipedia/en/9/9d/Granada_CF.svg',
+    'cadiz': 'https://upload.wikimedia.org/wikipedia/en/a/ac/C%C3%A1diz_CF_logo.svg',
+    'rayo vallecano': 'https://upload.wikimedia.org/wikipedia/en/5/51/Rayo_Vallecano_logo.svg',
+    'girona': 'https://upload.wikimedia.org/wikipedia/en/6/6d/Girona_FC_crest.svg',
+    'las palmas': 'https://upload.wikimedia.org/wikipedia/en/0/0b/UD_Las_Palmas_logo.svg',
+    // England / Premier League
+    'manchester city': 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg',
+    'man city': 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg',
+    'manchester united': 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg',
+    'man utd': 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg',
+    'man united': 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg',
+    'liverpool': 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg',
+    'chelsea': 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg',
+    'arsenal': 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg',
+    'tottenham': 'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg',
+    'tottenham hotspur': 'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg',
+    'spurs': 'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg',
+    'newcastle': 'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg',
+    'newcastle united': 'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg',
+    'aston villa': 'https://upload.wikimedia.org/wikipedia/en/9/9f/Aston_Villa_FC_crest_%282016%29.svg',
+    'west ham': 'https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg',
+    'west ham united': 'https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg',
+    'brighton': 'https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_logo.svg',
+    'brighton & hove albion': 'https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_logo.svg',
+    'brentford': 'https://upload.wikimedia.org/wikipedia/en/2/2a/Brentford_FC_crest.svg',
+    'fulham': 'https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg',
+    'wolves': 'https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg',
+    'wolverhampton': 'https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg',
+    'wolverhampton wanderers': 'https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg',
+    'crystal palace': 'https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg',
+    'everton': 'https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg',
+    'leicester': 'https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg',
+    'leicester city': 'https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg',
+    'nottingham forest': 'https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg',
+    'forest': 'https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg',
+    'bournemouth': 'https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg',
+    'afc bournemouth': 'https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg',
+    'luton': 'https://upload.wikimedia.org/wikipedia/en/6/6d/Luton_Town_logo.svg',
+    'luton town': 'https://upload.wikimedia.org/wikipedia/en/6/6d/Luton_Town_logo.svg',
+    'sheffield united': 'https://upload.wikimedia.org/wikipedia/en/9/9c/Sheffield_United_FC_logo.svg',
+    'burnley': 'https://upload.wikimedia.org/wikipedia/en/6/62/Burnley_F.C._Logo.svg',
+    'ipswich': 'https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg',
+    'ipswich town': 'https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town.svg',
+    'southampton': 'https://upload.wikimedia.org/wikipedia/en/c/c9/FC_Southampton.svg',
+    // Germany / Bundesliga
+    'bayern munich': 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg',
+    'bayern': 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282002%E2%80%932017%29.svg',
+    'dortmund': 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg',
+    'borussia dortmund': 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg',
+    'bvb': 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg',
+    'bayer leverkusen': 'https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg',
+    'leverkusen': 'https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg',
+    'rb leipzig': 'https://upload.wikimedia.org/wikipedia/en/0/04/RB_Leipzig_2014_logo.svg',
+    'leipzig': 'https://upload.wikimedia.org/wikipedia/en/0/04/RB_Leipzig_2014_logo.svg',
+    'eintracht frankfurt': 'https://upload.wikimedia.org/wikipedia/commons/0/04/Eintracht_Frankfurt_Logo.svg',
+    'frankfurt': 'https://upload.wikimedia.org/wikipedia/commons/0/04/Eintracht_Frankfurt_Logo.svg',
+    'wolfsburg': 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Logo-VfL-Wolfsburg.svg',
+    'borussia monchengladbach': 'https://upload.wikimedia.org/wikipedia/commons/8/81/Borussia_M%C3%B6nchengladbach_logo.svg',
+    'gladbach': 'https://upload.wikimedia.org/wikipedia/commons/8/81/Borussia_M%C3%B6nchengladbach_logo.svg',
+    'freiburg': 'https://upload.wikimedia.org/wikipedia/de/f/f7/Logo_SC_Freiburg.svg',
+    'union berlin': 'https://upload.wikimedia.org/wikipedia/commons/4/44/1_FC_Union_Berlin_Logo.svg',
+    'hoffenheim': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Logo_TSG_Hoffenheim.svg',
+    'werder bremen': 'https://upload.wikimedia.org/wikipedia/commons/b/be/SV-Werder-Bremen-Logo.svg',
+    'mainz': 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Logo_Mainz_05.svg',
+    'augsburg': 'https://upload.wikimedia.org/wikipedia/de/b/b5/Logo_FC_Augsburg.svg',
+    'stuttgart': 'https://upload.wikimedia.org/wikipedia/commons/a/ab/VfB_Stuttgart_1893_Logo.svg',
+    'hertha berlin': 'https://upload.wikimedia.org/wikipedia/commons/8/81/Hertha_BSC_Logo_2012.svg',
+    'schalke': 'https://upload.wikimedia.org/wikipedia/commons/6/6d/FC_Schalke_04_Logo.svg',
+    // Italy / Serie A
+    'juventus': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Juventus_FC_2017_icon_%28black%29.svg',
+    'ac milan': 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg',
+    'milan': 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg',
+    'inter milan': 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg',
+    'inter': 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg',
+    'internazionale': 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg',
+    'napoli': 'https://upload.wikimedia.org/wikipedia/commons/2/2d/SSC_Napoli.svg',
+    'roma': 'https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282013%29.svg',
+    'as roma': 'https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282013%29.svg',
+    'lazio': 'https://upload.wikimedia.org/wikipedia/en/c/c7/SS_Lazio_Badge_2017.svg',
+    'ss lazio': 'https://upload.wikimedia.org/wikipedia/en/c/c7/SS_Lazio_Badge_2017.svg',
+    'atalanta': 'https://upload.wikimedia.org/wikipedia/en/6/67/Atalanta_BC_logo.svg',
+    'fiorentina': 'https://upload.wikimedia.org/wikipedia/commons/d/d4/ACF_Fiorentina_logo_%282022%29.svg',
+    'torino': 'https://upload.wikimedia.org/wikipedia/commons/3/38/Torino-FC-Logo.svg',
+    'udinese': 'https://upload.wikimedia.org/wikipedia/it/1/1f/Udinese_Calcio_logo.svg',
+    'sampdoria': 'https://upload.wikimedia.org/wikipedia/commons/e/e3/UC_Sampdoria_logo.svg',
+    'sassuolo': 'https://upload.wikimedia.org/wikipedia/en/9/99/Sassuolo_Calcio_logo.svg',
+    'bologna': 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Bologna_FC_1909_logo.svg',
+    'verona': 'https://upload.wikimedia.org/wikipedia/en/9/9e/Hellas_Verona_FC.svg',
+    'hellas verona': 'https://upload.wikimedia.org/wikipedia/en/9/9e/Hellas_Verona_FC.svg',
+    'genoa': 'https://upload.wikimedia.org/wikipedia/commons/4/41/Genoa_CFC_logo_2024.svg',
+    'cagliari': 'https://upload.wikimedia.org/wikipedia/commons/b/bf/Cagliari_Calcio_1920_%28crest%29.svg',
+    'empoli': 'https://upload.wikimedia.org/wikipedia/en/a/a7/Empoli_FC_logo.svg',
+    'venezia': 'https://upload.wikimedia.org/wikipedia/en/8/8b/FC_Venezia_S.r.l._logo.svg',
+    // France / Ligue 1
+    'psg': 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg',
+    'paris saint-germain': 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg',
+    'paris sg': 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg',
+    'marseille': 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg',
+    'olympique marseille': 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg',
+    'lyon': 'https://upload.wikimedia.org/wikipedia/en/e/e9/Olympique_Lyonnais_%28logo%29.svg',
+    'olympique lyonnais': 'https://upload.wikimedia.org/wikipedia/en/e/e9/Olympique_Lyonnais_%28logo%29.svg',
+    'monaco': 'https://upload.wikimedia.org/wikipedia/en/e/e1/AS_Monaco_FC.svg',
+    'as monaco': 'https://upload.wikimedia.org/wikipedia/en/e/e1/AS_Monaco_FC.svg',
+    'nice': 'https://upload.wikimedia.org/wikipedia/commons/4/48/OGC_Nice_logo.svg',
+    'lens': 'https://upload.wikimedia.org/wikipedia/en/6/68/RC_Lens_logo.svg',
+    'rennes': 'https://upload.wikimedia.org/wikipedia/en/6/60/Stade_Rennais_FC.svg',
+    'lille': 'https://upload.wikimedia.org/wikipedia/en/1/1a/LOSC_Lille_Logo.svg',
+    // Portugal
+    'benfica': 'https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg',
+    'sl benfica': 'https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg',
+    'porto': 'https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg',
+    'fc porto': 'https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg',
+    'sporting cp': 'https://upload.wikimedia.org/wikipedia/en/0/0d/Sporting_CP_logo.svg',
+    'sporting': 'https://upload.wikimedia.org/wikipedia/en/0/0d/Sporting_CP_logo.svg',
+    // Netherlands
+    'ajax': 'https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg',
+    'psv': 'https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg',
+    'psv eindhoven': 'https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg',
+    'feyenoord': 'https://upload.wikimedia.org/wikipedia/en/5/52/Feyenoord_logo.svg',
+    // Brazil
+    'flamengo': 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Flamengo_braz_logo.svg',
+    'cr flamengo': 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Flamengo_braz_logo.svg',
+    'palmeiras': 'https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg',
+    'corinthians': 'https://upload.wikimedia.org/wikipedia/pt/4/40/Corinthians_logo.svg',
+    'santos': 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Santos_FC_logo.svg',
+    'sao paulo': 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Escudo_do_S%C3%A3o_Paulo_Futebol_Clube.svg',
+    // Argentina
+    'boca juniors': 'https://upload.wikimedia.org/wikipedia/commons/d/da/Boca_jrs_crest.svg',
+    'river plate': 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudo_del_Club_Atl%C3%A9tico_River_Plate.svg',
+    // International / National
+    'indonesia': 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Indonesia.svg',
+    'brazil': 'https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg',
+    'brazil nt': 'https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg',
+    'argentina': 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg',
+    'france': 'https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg',
+    'germany': 'https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg',
+    'spain': 'https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg',
+    'england': 'https://upload.wikimedia.org/wikipedia/en/b/be/Flag_of_England.svg',
+    'italy': 'https://upload.wikimedia.org/wikipedia/en/0/03/Flag_of_Italy.svg',
+    'portugal': 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg',
+    'netherlands': 'https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg',
+    'belgium': 'https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Belgium.svg',
+};
+
+function getClubLogo(clubName) {
+    if (!clubName) return null;
+    const key = clubName.trim().toLowerCase();
+    return CLUB_LOGO_MAP[key] || null;
+}
+
+function makeClubLogoImg(clubName, size) {
+    const url = getClubLogo(clubName);
+    if (!url) return '';
+    const s = size || 22;
+    return `<img src="${url}" class="club-logo-inline" width="${s}" height="${s}" onerror="this.classList.add('error')" title="${escHtml(clubName)}">`;
+}
+
+/* ===================== EPIC LOADING SCREEN ===================== */
+function spawnParticles() {
+    const container = document.getElementById('msoParticles');
+    container.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+        const el = document.createElement('div');
+        el.className = 'mso-particle';
+        const left = Math.random() * 100;
+        const size = 2 + Math.random() * 5;
+        const dur  = 3 + Math.random() * 5;
+        const del  = Math.random() * 4;
+        el.style.cssText = `left:${left}%;width:${size}px;height:${size}px;animation-duration:${dur}s;animation-delay:${del}s;background:${Math.random()>0.5?'#00ff85':'#e90052'}`;
+        container.appendChild(el);
+    }
+}
+function spawnHexagons() {
+    const container = document.getElementById('msoHexagons');
+    container.innerHTML = '';
+    for (let i = 0; i < 12; i++) {
+        const el = document.createElement('div');
+        el.className = 'mso-hex';
+        const left = Math.random() * 100;
+        const sz   = 40 + Math.random() * 80;
+        const dur  = 6 + Math.random() * 8;
+        const del  = Math.random() * 6;
+        el.style.cssText = `left:${left}%;width:${sz}px;height:${sz}px;animation-duration:${dur}s;animation-delay:${del}s;`;
+        container.appendChild(el);
+    }
+}
+
+const LOADING_MESSAGES = [
+    'Booting Up Engines...',
+    'Configuring Players...',
+    'Loading Database...',
+    'Syncing Stats...',
+    'Almost Ready...',
+    'Launching Mode!'
+];
+
+function showModeSwitch(fromMode, toMode, callback) {
+    document.getElementById('msoFromNum').textContent = fromMode;
+    document.getElementById('msoToNum').textContent   = toMode;
+    const overlay = document.getElementById('modeSwitchOverlay');
+    overlay.classList.add('on');
+    spawnParticles();
+    spawnHexagons();
+
+    let progress = 0;
+    const bar    = document.getElementById('msoBarFill');
+    const txt    = document.getElementById('msoLoadingText');
+    bar.style.width = '0%';
+    txt.textContent = LOADING_MESSAGES[0];
+
+    let msgIdx = 0;
+    const interval = setInterval(() => {
+        progress += (100 - progress) * 0.06 + 0.5;
+        if (progress > 98) progress = 98;
+        bar.style.width = progress + '%';
+        const mIdx = Math.min(Math.floor((progress / 100) * LOADING_MESSAGES.length), LOADING_MESSAGES.length - 1);
+        if (mIdx !== msgIdx) { msgIdx = mIdx; txt.textContent = LOADING_MESSAGES[msgIdx]; }
+    }, 80);
+
+    setTimeout(() => {
+        clearInterval(interval);
+        bar.style.width = '100%';
+        txt.textContent = '✅ Ready!';
+        setTimeout(() => {
+            overlay.classList.remove('on');
+            if (callback) callback();
+        }, 400);
+    }, 2400);
+}
+
 auth.onAuthStateChanged((user) => {
     if (user) { modeAdmin = true; } else { modeAdmin = false; editingId = null; editingStats = false; }
     renderAdminArea(); renderStatsCards(); loadData();
@@ -477,7 +957,7 @@ function gdClass(v) { return v > 0 ? 'gd-pos' : v < 0 ? 'gd-neg' : 'gd-zero'; }
 function gdStr(v)   { return v > 0 ? '+' + v : '' + v; }
 function escHtml(str) { return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function formCircles(arr) {
-    if (!arr || arr.length === 0) return '<span style="color:#ccc;font-size:0.75rem;">\u2014</span>';
+    if (!arr || arr.length === 0) return '<span style="color:#ccc;font-size:0.75rem;">—</span>';
     return arr.map(f => '<div class="fc fc-'+f.toLowerCase()+'">'+f+'</div>').join('');
 }
 function sortStandings(match) {
@@ -491,9 +971,9 @@ function sortStandings(match) {
     return s;
 }
 function winPct(w, pl) { if (!pl||pl===0) return 0; return Math.round((w/pl)*100); }
-function toggleSidebarMode(isAllTime) {
-    document.getElementById('sbTrophyMonthCard').style.display = isAllTime ? 'none' : 'block';
-    document.getElementById('sbMonthCard').style.display       = isAllTime ? 'none' : 'block';
+function toggleSidebarMode(isAllTime, isStats) {
+    document.getElementById('sbTrophyMonthCard').style.display = (isAllTime||isStats) ? 'none' : 'block';
+    document.getElementById('sbMonthCard').style.display       = (isAllTime||isStats) ? 'none' : 'block';
     document.getElementById('sbTrophyAllCard').style.display   = isAllTime ? 'block' : 'none';
     document.getElementById('sbAllTimeCard').style.display     = isAllTime ? 'block' : 'none';
 }
@@ -517,44 +997,83 @@ function setMode(m) {
         applyMode();
     }, 500);
 }
+
 function kembaliKeMenuAwal() {
+    const prevMode = currentMode;
+    // Determine which mode to show in landing
     if (matchesRef) matchesRef.off();
     if (statsRef)   statsRef.off();
     document.getElementById('appRoot').classList.remove('on');
     document.getElementById('landingPage').style.display = 'flex';
     setTimeout(() => { document.getElementById('landingPage').style.opacity = '1'; }, 10);
+
+    // Override mode cards to show loading when switching
+    const modeCards = document.querySelectorAll('.mode-card');
+    modeCards.forEach(card => {
+        card.onclick = function() {
+            const newMode = this.querySelector('h2').textContent;
+            if (newMode !== prevMode) {
+                // Show epic loading screen when switching modes
+                showModeSwitch(prevMode, newMode, () => {
+                    currentMode = newMode;
+                    document.getElementById('landingPage').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('landingPage').style.display = 'none';
+                        document.getElementById('appRoot').classList.add('on');
+                        applyMode();
+                    }, 300);
+                });
+            } else {
+                // Same mode, just go back in
+                setMode(newMode);
+            }
+        };
+    });
 }
+
 function applyMode() {
     dbPath = currentMode === '3' ? 'liga3' : 'liga';
-    document.getElementById('modeBadge').innerText = '\uD83D\uDD25 ' + currentMode + ' Player Mode';
+    document.getElementById('modeBadge').innerText = '🔥 ' + currentMode + ' Player Mode';
     editingId = null; editingStats = false; tipeLiga = null;
     currentMonth = 'ALL TIME STANDING';
+    document.getElementById('btnStats').classList.remove('active');
+    document.getElementById('btnAllTime').classList.add('active');
     buildMonthSelect(); loadData(); listenStats(); listenMatchInfo();
 }
 function buildMonthSelect() {
     const sel = document.getElementById('monthSelect');
-    sel.innerHTML = MONTHS.map(m => '<option value="'+m+'" '+(m===currentMonth&&currentMonth!=='ALL TIME STANDING'?'selected':'')+'>'+m+'</option>').join('');
+    sel.innerHTML = MONTHS.map(m => '<option value="'+m+'" '+(m===currentMonth&&currentMonth!=='ALL TIME STANDING'&&currentMonth!=='STATS'?'selected':'')+'>'+m+'</option>').join('');
     document.getElementById('btnAllTime').classList.toggle('active', currentMonth === 'ALL TIME STANDING');
+    document.getElementById('btnStats').classList.toggle('active', currentMonth === 'STATS');
 }
 function gantiBulan(m) {
     currentMonth = m;
-    if (m !== 'ALL TIME STANDING') { try { localStorage.setItem('activeMonth', m); } catch(e) {} document.getElementById('monthSelect').value = m; }
+    if (m !== 'ALL TIME STANDING' && m !== 'STATS') { try { localStorage.setItem('activeMonth', m); } catch(e) {} document.getElementById('monthSelect').value = m; }
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
+    document.getElementById('btnStats').classList.toggle('active', m === 'STATS');
     editingId = null; tipeLiga = null; loadData(); renderAdminArea();
 }
 
 function loadData() {
     const banner = document.getElementById('champBanner');
+    if (currentMonth === 'STATS') {
+        banner.classList.add('hidden');
+        toggleSidebarMode(false, true);
+        if (matchesRef) matchesRef.off();
+        renderStatsPage();
+        renderAdminArea();
+        return;
+    }
     if (currentMonth === 'ALL TIME STANDING') {
         document.getElementById('sbMonthTitle').innerText = 'All Time Standing';
-        banner.classList.add('hidden'); toggleSidebarMode(true);
+        banner.classList.add('hidden'); toggleSidebarMode(true, false);
         if (matchesRef) matchesRef.off();
         renderAllTime(); updateSidebarAllTime(); return;
     }
     document.getElementById('sbMonthTitle').innerText = 'Total Poin ' + currentMonth;
     document.getElementById('sbTrophyMonthTitle').innerText = currentMonth;
-    banner.classList.remove('hidden'); banner.innerHTML = '\u23F3 Memuat...';
-    toggleSidebarMode(false);
+    banner.classList.remove('hidden'); banner.innerHTML = '⏳ Memuat...';
+    toggleSidebarMode(false, false);
     if (matchesRef) matchesRef.off();
     matchesRef = db.ref(dbPath+'/'+currentMonth+'/matches');
     matchesRef.on('value', snap => {
@@ -572,7 +1091,8 @@ function loadData() {
 function listenMatchInfo() {
     db.ref(dbPath+'/matchInfo').on('value', snap => {
         matchInfoData = snap.val() || {};
-        if (currentMonth !== 'ALL TIME STANDING' && localData && Object.keys(localData).length) renderMonthly(localData);
+        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && localData && Object.keys(localData).length) renderMonthly(localData);
+        if (currentMonth === 'STATS') renderStatsPage();
     });
 }
 function listenStats() {
@@ -589,8 +1109,86 @@ function listenStats() {
             statsData[ck].assist  += raw[k].assist  || 0;
             statsData[ck].formText = raw[k].formText || "";
         });
-        renderStatsCards();
+        if (currentMonth === 'STATS') renderStatsPage();
+        else renderStatsCards();
     });
+}
+
+/* ===================== STATS PAGE (new full page) ===================== */
+function renderStatsPage() {
+    const el = document.getElementById('mainContent');
+    const banner = document.getElementById('champBanner');
+    banner.classList.add('hidden');
+
+    const list = modeAdmin ? ALL_PLAYERS : (activeSet.size > 0 ? Array.from(activeSet) : ALL_PLAYERS);
+    const gs = (n) => statsData[n] || {score:0, assist:0, formText:""};
+
+    const scoresSorted  = [...list].sort((a,b) => gs(b).score - gs(a).score);
+    const assistsSorted = [...list].sort((a,b) => gs(b).assist - gs(a).assist);
+
+    function rankClass(i) { return i===0?'r1':i===1?'r2':i===2?'r3':''; }
+    function rankLabel(i) { return i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1); }
+
+    const scoresHtml = scoresSorted.map((n,i) => {
+        const val = gs(n).score;
+        return `<div class="stats-player-card">
+            <div class="stats-player-rank ${rankClass(i)}">${rankLabel(i)}</div>
+            <div class="stats-player-info">
+                <div class="stats-player-name">${n}</div>
+                <div class="stats-player-sub">${val} gol total</div>
+            </div>
+            <div class="stats-player-val goals">${val}</div>
+        </div>`;
+    }).join('');
+
+    const assistsHtml = assistsSorted.map((n,i) => {
+        const val = gs(n).assist;
+        return `<div class="stats-player-card">
+            <div class="stats-player-rank ${rankClass(i)}">${rankLabel(i)}</div>
+            <div class="stats-player-info">
+                <div class="stats-player-name">${n}</div>
+                <div class="stats-player-sub">${val} assist total</div>
+            </div>
+            <div class="stats-player-val assists">${val}</div>
+        </div>`;
+    }).join('');
+
+    const formHtml = list.map(n => {
+        const formArr = (gs(n).formText||'').toUpperCase().replace(/[^WDL]/g,'').split('').slice(-5);
+        return `<div class="stats-form-row">
+            <div class="stats-form-name">${n}</div>
+            <div class="form-row">${formCircles(formArr)}</div>
+        </div>`;
+    }).join('');
+
+    el.innerHTML = `
+        <div class="stats-page">
+            <div class="stats-page-header">
+                <h2>📊 STATISTIK PLAYER</h2>
+                <p>All Time &mdash; ${currentMode} Player Mode</p>
+            </div>
+            <div class="stats-accent"></div>
+            <div class="stats-grid">
+                <div class="stats-section">
+                    <div class="stats-section-title">⚽ Top Scores</div>
+                    ${scoresHtml}
+                </div>
+                <div class="stats-section">
+                    <div class="stats-section-title">🎯 Top Assists</div>
+                    ${assistsHtml}
+                </div>
+            </div>
+            <div class="stats-form-section">
+                <div class="stats-form-title">📈 Form 5 Laga Terakhir</div>
+                ${formHtml}
+            </div>
+        </div>
+    `;
+
+    // Show edit button in admin stat tool
+    document.getElementById('adminStatsTool').innerHTML = modeAdmin
+        ? '<div style="padding:10px;"><button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family:\'Barlow\',sans-serif;">✏️ Edit Stats Manual</button></div>'
+        : '';
 }
 
 function renderAllTime() {
@@ -639,18 +1237,18 @@ function renderMonthly(matches) {
 
         const headCls   = isFT ? 'section-head type-ft' : (isKlub ? 'section-head type-klub' : 'section-head type-unknown');
         const badgeCls  = isFT ? 'badge-liga badge-ft'  : (isKlub ? 'badge-liga badge-klub'  : 'badge-liga badge-unknown');
-        const badgeIcon = isFT ? '\uD83D\uDD00' : (isKlub ? '\u26BD' : '?');
+        const badgeIcon = isFT ? '🔀' : (isKlub ? '⚽' : '?');
         const ligaNama  = ligaOrdinal(ligaNum);
 
         const modeLabel = isFT ? 'Full Transfer' : (isKlub ? 'Klub' : '');
         const modeCls   = isFT ? 'badge-mode mode-ft' : 'badge-mode mode-klub';
-        const modeIcon  = isFT ? '\uD83D\uDD00' : '\u26BD';
+        const modeIcon  = isFT ? '🔀' : '⚽';
         const modeBadgeHtml = modeLabel ? '<span class="'+modeCls+'">'+modeIcon+' '+modeLabel+'</span>' : '';
 
         const heading = isEdit
             ? '<select id="editTgl" style="padding:4px 8px;border-radius:6px;border:none;font-family:\'Barlow\',sans-serif;font-weight:700;">'
               + Array.from({length:31},(_,i)=>'<option value="'+(i+1)+'" '+(m.tanggal==i+1?'selected':'')+'> Tgl '+(i+1)+'</option>').join('') + '</select>'
-            : '\uD83D\uDCC5 '+getNamaHari(m.tanggal||1,currentMonth)+', '+(m.tanggal||1)+' '+currentMonth;
+            : '📅 '+getNamaHari(m.tanggal||1,currentMonth)+', '+(m.tanggal||1)+' '+currentMonth;
 
         const accentBar = isFT ? '<div class="ft-accent-bar"></div>' : (isKlub ? '<div class="klub-accent-bar"></div>' : '');
 
@@ -660,9 +1258,9 @@ function renderMonthly(matches) {
             + '<span class="'+badgeCls+'">'+badgeIcon+' Liga '+ligaNama+'</span>'
             + modeBadgeHtml
             + '<span style="margin-left:auto;display:flex;align-items:center;gap:4px;">'
-            + '<span style="background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">\uD83C\uDFC6 '+((s[0]&&(s[0].pts||0)>0)?s[0].name:'-')+'</span>'
-            + (modeAdmin&&!isEdit ? '<button class="btn-del" onclick="hapus(\''+id+'\')">&#128465;&#65039;</button>' : '')
-            + (modeAdmin ? '<button class="'+(isEdit?'btn-save':'btn-edit')+'" onclick="'+(isEdit?'simpan(\''+id+'\')':'edit(\''+id+'\')')+'">'+(isEdit?'\uD83D\uDCBE Simpan':'\u270F\uFE0F Edit')+'</button>' : '')
+            + '<span style="background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">🏆 '+((s[0]&&(s[0].pts||0)>0)?s[0].name:'-')+'</span>'
+            + (modeAdmin&&!isEdit ? '<button class="btn-del" onclick="hapus(\''+id+'\')">🗑️</button>' : '')
+            + (modeAdmin ? '<button class="'+(isEdit?'btn-save':'btn-edit')+'" onclick="'+(isEdit?'simpan(\''+id+'\')':'edit(\''+id+'\')')+'">'+(isEdit?'💾 Simpan':'✏️ Edit')+'</button>' : '')
             + '</span></div>' + accentBar;
 
         const rowData = s.map((p,i) => ({
@@ -670,6 +1268,12 @@ function renderMonthly(matches) {
             w:p.w||0, d:p.d||0, l:p.l||0, gf:p.f||0, ga:p.a||0,
             gd:p.gd||0, pts:p.pts||0, form:[], manualRank:p.manualRank, isWin: i===0&&(p.pts||0)>0
         }));
+        // Attach club info for logo display
+        rowData.forEach(p => {
+            const mi = (matchInfoData[id]||{})[p.name]||{};
+            p.club = mi.club || '';
+            p.isFullTransfer = mi.isFullTransfer || false;
+        });
         htmlAll += html + buildEplBlock(rowData,false,isEdit,s,false,id,ligaType) + '</div>';
     });
     el.innerHTML = htmlAll;
@@ -687,21 +1291,16 @@ function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matc
     const winRowCls=isFT?'win-row-ft':(isKlub?'win-row-klub':'win-row');
     const ptsColor=isFT?'#c62828':(isKlub?'#2e7d32':'var(--purple)');
 
-    function makeNameHtml(name, crown) {
+    function makeNameHtml(name, crown, club, isFTRow) {
         const cls=isFT?'clickable-name-ft':(isKlub?'clickable-name-klub':'clickable-name');
-        if (isAllTime) return '<span class="'+cls+'" onclick="bukaInfoPlayerAllTime(\''+name+'\')" title="Klik untuk lihat semua rekap">'+name+crown+'</span>';
-        return '<span class="'+cls+'" onclick="bukaInfoPlayerMatch(\''+name+'\',\''+matchId+'\')" title="Klik untuk info klub liga ini">'+name+crown+'</span>';
+        // Show club logo if club is set and not FT
+        const logoHtml = (!isFTRow && club) ? makeClubLogoImg(club, 20) : '';
+        if (isAllTime) return '<span class="'+cls+'" onclick="bukaInfoPlayerAllTime(\''+name+'\')" title="Klik untuk lihat semua rekap">'+logoHtml+name+crown+'</span>';
+        return '<span class="'+cls+'" onclick="bukaInfoPlayerMatch(\''+name+'\',\''+matchId+'\')" title="Klik untuk info klub liga ini">'+logoHtml+name+crown+'</span>';
     }
 
-    const infoRowCls=isFT?'ft-info-row':(isKlub?'klub-info-row':'');
-    const infoText=isFT
-        ? '\uD83D\uDD00 Liga ini menggunakan format <strong>Full Transfer</strong>'
-        : '\u26BD Liga ini menggunakan format <strong>Klub</strong> \u2014 setiap pemain memakai satu klub tetap';
-    const infoRowD=infoRowCls&&!isEdit?'<tr class="'+infoRowCls+'"><td colspan="99">'+infoText+'</td></tr>':'';
-    const infoRowM=infoRowCls&&!isEdit?'<tr class="'+infoRowCls+'"><td colspan="99">'+(isFT?'\uD83D\uDD00 <strong>Full Transfer</strong>':'\u26BD <strong>Klub</strong>')+'</td></tr>':'';
-
     const dRows=rowData.map((p,i)=>{
-        const barCls=i<topN?barTopCls:barMidCls; const crown=p.isWin?' \uD83D\uDC51':'';
+        const barCls=i<topN?barTopCls:barMidCls; const crown=p.isWin?' 👑':'';
         let wCell,dCell,lCell,fCell,aCell;
         if (isEdit) {
             const raw=rawStandings[i]||{};
@@ -712,7 +1311,7 @@ function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matc
             aCell='<td><input type="number" class="tbl-in a-in" data-n="'+p.name+'" value="'+(raw.a||0)+'"></td>';
         } else { wCell='<td>'+p.w+'</td>'; dCell='<td>'+p.d+'</td>'; lCell='<td>'+p.l+'</td>'; fCell='<td>'+p.gf+'</td>'; aCell='<td>'+p.ga+'</td>'; }
         return '<tr class="'+(p.isWin?winRowCls:'')+'"><td><div class="pos-wrap"><div class="pos-bar '+barCls+'"></div><span class="pos-num '+(i<topN?topNumCls:'')+'">'+(i+1)+'</span></div></td>'
-            +'<td class="tl">'+makeNameHtml(p.name,crown)+'</td><td>'+p.pl+'</td>'+wCell+dCell+lCell+fCell+aCell
+            +'<td class="tl">'+makeNameHtml(p.name,crown,p.club||'',p.isFullTransfer||false)+'</td><td>'+p.pl+'</td>'+wCell+dCell+lCell+fCell+aCell
             +'<td class="'+gdClass(p.gd)+'">'+gdStr(p.gd)+'</td>'
             +(isEdit?'<td><input class="tbl-in tbl-in-pts pts-in" data-n="'+p.name+'" value="'+p.pts+'" readonly></td>':'<td class="'+ptsCls+'">'+p.pts+'</td>')
             +(showWinPct?'<td style="font-weight:700;color:'+ptsColor+';">'+(p.pl>0?winPct(p.w,p.pl):0)+'%</td>':'')
@@ -722,14 +1321,14 @@ function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matc
     }).join('');
 
     const tid='tbl'+Math.random().toString(36).slice(2,7);
-    const shortRows=rowData.map((p,i)=>'<tr class="'+(p.isWin?winRowCls:'')+'"><td><div class="pos-wrap"><div class="pos-bar '+(i<topN?barTopCls:barMidCls)+'"></div><span class="pos-num '+(i<topN?topNumCls:'')+'">'+(i+1)+'</span></div></td><td class="tl">'+makeNameHtml(p.name,p.isWin?' \uD83D\uDC51':'')+'</td><td>'+p.pl+'</td><td>'+p.w+'</td><td>'+p.d+'</td><td>'+p.l+'</td><td class="'+ptsCls+'">'+p.pts+'</td>'+(showWinPct?'<td style="font-weight:700;color:'+ptsColor+';">'+(p.pl>0?winPct(p.w,p.pl):0)+'%</td>':'')+'</tr>').join('');
-    const fullRows=rowData.map((p,i)=>'<tr class="'+(p.isWin?winRowCls:'')+'"><td><div class="pos-wrap"><div class="pos-bar '+(i<topN?barTopCls:barMidCls)+'"></div><span class="pos-num '+(i<topN?topNumCls:'')+'">'+(i+1)+'</span></div></td><td class="tl">'+makeNameHtml(p.name,p.isWin?' \uD83D\uDC51':'')+'</td><td>'+p.pl+'</td><td>'+p.w+'</td><td>'+p.d+'</td><td>'+p.l+'</td><td>'+p.gf+'</td><td>'+p.ga+'</td><td class="'+gdClass(p.gd)+'">'+gdStr(p.gd)+'</td><td class="'+ptsCls+'">'+p.pts+'</td>'+(showWinPct?'<td style="font-weight:700;color:'+ptsColor+';">'+(p.pl>0?winPct(p.w,p.pl):0)+'%</td>':'')+'</tr>').join('');
+    const shortRows=rowData.map((p,i)=>'<tr class="'+(p.isWin?winRowCls:'')+'"><td><div class="pos-wrap"><div class="pos-bar '+(i<topN?barTopCls:barMidCls)+'"></div><span class="pos-num '+(i<topN?topNumCls:'')+'">'+(i+1)+'</span></div></td><td class="tl">'+makeNameHtml(p.name,p.isWin?' 👑':'',p.club||'',p.isFullTransfer||false)+'</td><td>'+p.pl+'</td><td>'+p.w+'</td><td>'+p.d+'</td><td>'+p.l+'</td><td class="'+ptsCls+'">'+p.pts+'</td>'+(showWinPct?'<td style="font-weight:700;color:'+ptsColor+';">'+(p.pl>0?winPct(p.w,p.pl):0)+'%</td>':'')+'</tr>').join('');
+    const fullRows=rowData.map((p,i)=>'<tr class="'+(p.isWin?winRowCls:'')+'"><td><div class="pos-wrap"><div class="pos-bar '+(i<topN?barTopCls:barMidCls)+'"></div><span class="pos-num '+(i<topN?topNumCls:'')+'">'+(i+1)+'</span></div></td><td class="tl">'+makeNameHtml(p.name,p.isWin?' 👑':'',p.club||'',p.isFullTransfer||false)+'</td><td>'+p.pl+'</td><td>'+p.w+'</td><td>'+p.d+'</td><td>'+p.l+'</td><td>'+p.gf+'</td><td>'+p.ga+'</td><td class="'+gdClass(p.gd)+'">'+gdStr(p.gd)+'</td><td class="'+ptsCls+'">'+p.pts+'</td>'+(showWinPct?'<td style="font-weight:700;color:'+ptsColor+';">'+(p.pl>0?winPct(p.w,p.pl):0)+'%</td>':'')+'</tr>').join('');
 
-    return '<div class="tbl-wrap desktop-only"><table class="epl-tbl'+tblCls+'"><thead><tr><th style="width:46px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>'+(showWinPct?'<th>WINS%</th>':'')+(showForm?'<th>Form</th>':'')+(isEdit?'<th>Rank</th>':'')+'</tr></thead><tbody>'+infoRowD+dRows+'</tbody></table></div>'
+    return '<div class="tbl-wrap desktop-only"><table class="epl-tbl'+tblCls+'"><thead><tr><th style="width:46px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>'+(showWinPct?'<th>WINS%</th>':'')+(showForm?'<th>Form</th>':'')+(isEdit?'<th>Rank</th>':'')+'</tr></thead><tbody>'+dRows+'</tbody></table></div>'
         +'<div class="mob-tabs"><div class="mob-tab-btns"><button class="mob-tab-btn on" onclick="swTab(this,\''+tid+'\',\'short\')">Short</button><button class="mob-tab-btn" onclick="swTab(this,\''+tid+'\',\'full\')">Full</button>'+(showForm?'<button class="mob-tab-btn" onclick="swTab(this,\''+tid+'\',\'form\')">Form</button>':'')+'</div>'
-        +'<table class="mob-tbl'+tblCls+' on" id="'+tid+'-short"><thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>Pts</th>'+(showWinPct?'<th>WINS%</th>':'')+'</tr></thead><tbody>'+infoRowM+shortRows+'</tbody></table>'
-        +'<table class="mob-tbl'+tblCls+'" id="'+tid+'-full"><thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>'+(showWinPct?'<th>WINS%</th>':'')+'</tr></thead><tbody>'+infoRowM+fullRows+'</tbody></table>'
-        +(showForm?'<table class="mob-tbl'+tblCls+'" id="'+tid+'-form"><thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Form</th></tr></thead><tbody>'+infoRowM+rowData.map((p,i)=>'<tr class="'+(p.isWin?winRowCls:'')+'"><td><div class="pos-wrap"><div class="pos-bar '+(i<topN?barTopCls:barMidCls)+'"></div><span class="pos-num '+(i<topN?topNumCls:'')+'">'+(i+1)+'</span></div></td><td class="tl">'+makeNameHtml(p.name,p.isWin?' \uD83D\uDC51':'')+'</td><td><div class="form-row" style="justify-content:flex-start;">'+formCircles(p.form)+'</div></td></tr>').join('')+'</tbody></table>':'')
+        +'<table class="mob-tbl'+tblCls+' on" id="'+tid+'-short"><thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>Pts</th>'+(showWinPct?'<th>WINS%</th>':'')+'</tr></thead><tbody>'+shortRows+'</tbody></table>'
+        +'<table class="mob-tbl'+tblCls+'" id="'+tid+'-full"><thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>'+(showWinPct?'<th>WINS%</th>':'')+'</tr></thead><tbody>'+fullRows+'</tbody></table>'
+        +(showForm?'<table class="mob-tbl'+tblCls+'" id="'+tid+'-form"><thead><tr><th style="width:38px;">Pos</th><th class="tl">Player</th><th>Form</th></tr></thead><tbody>'+rowData.map((p,i)=>'<tr class="'+(p.isWin?winRowCls:'')+'"><td><div class="pos-wrap"><div class="pos-bar '+(i<topN?barTopCls:barMidCls)+'"></div><span class="pos-num '+(i<topN?topNumCls:'')+'">'+(i+1)+'</span></div></td><td class="tl">'+makeNameHtml(p.name,p.isWin?' 👑':'',p.club||'',p.isFullTransfer||false)+'</td><td><div class="form-row" style="justify-content:flex-start;">'+formCircles(p.form)+'</div></td></tr>').join('')+'</tbody></table>':'')
         +'</div>';
 }
 
@@ -769,17 +1368,17 @@ function bukaInfoPlayerMatch(nama, matchId) {
     const w=parseInt(st.w)||0,d=parseInt(st.d)||0,l=parseInt(st.l)||0,pl=w+d+l;
     const pct=winPct(w,pl); const hari=getNamaHari(mc.tanggal,mc.bulan);
     document.getElementById('infoModalTitle').innerText=nama;
-    document.getElementById('infoModalSubtitle').innerText='\uD83D\uDCC5 '+hari+', '+mc.tanggal+' '+mc.bulan+' \u2014 Liga '+ligaOrdinal(mc.ligaNum);
+    document.getElementById('infoModalSubtitle').innerText='📅 '+hari+', '+mc.tanggal+' '+mc.bulan+' — Liga '+ligaOrdinal(mc.ligaNum);
     const clubSection=buildClubDisplay(mi,w,d,l,pl,pct);
     const adminSection=modeAdmin?buildAdminClubEdit(matchId,nama,mi):'';
-    document.getElementById('infoModalBody').innerHTML='<div class="league-card"><div class="league-card-head"><span class="lc-title">\uD83D\uDCCB Liga '+ligaOrdinal(mc.ligaNum)+' \u2014 '+mc.bulan+'</span></div><div class="league-card-body">'+clubSection+adminSection+'</div></div>';
+    document.getElementById('infoModalBody').innerHTML='<div class="league-card"><div class="league-card-head"><span class="lc-title">📋 Liga '+ligaOrdinal(mc.ligaNum)+' — '+mc.bulan+'</span></div><div class="league-card-body">'+clubSection+adminSection+'</div></div>';
     document.getElementById('infoModal').classList.add('on');
 }
 
 function bukaInfoPlayerAllTime(nama) {
     document.getElementById('infoModalTitle').innerText=nama;
-    document.getElementById('infoModalSubtitle').innerText='\uD83C\uDFC6 Statistik per Klub \u2014 All Time';
-    document.getElementById('infoModalBody').innerHTML='<div class="no-club" style="text-align:center;padding:20px;">\u23F3 Memuat data...</div>';
+    document.getElementById('infoModalSubtitle').innerText='🏆 Statistik per Klub — All Time';
+    document.getElementById('infoModalBody').innerHTML='<div class="no-club" style="text-align:center;padding:20px;">⏳ Memuat data...</div>';
     document.getElementById('infoModal').classList.add('on');
     db.ref(dbPath).once('value', snap=>{
         const root=snap.val()||{}; const clubStats={};
@@ -809,9 +1408,9 @@ function bukaInfoPlayerAllTime(nama) {
         });
         const grandPct=winPct(grandTotalW,grandTotalPl); const grandPts=grandTotalW*3+grandTotalD;
         let html='<div style="background:linear-gradient(135deg,#37003c,#6a0dad);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:white;">'
-            +'<div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.7;margin-bottom:10px;">\uD83D\uDCCA Grand Total \u2014 '+grandLiga+' Liga</div>'
+            +'<div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.7;margin-bottom:10px;">📊 Grand Total — '+grandLiga+' Liga</div>'
             +'<div style="display:flex;gap:10px;flex-wrap:wrap;">'
-            +'<div style="text-align:center;background:rgba(255,215,0,0.25);border-radius:8px;padding:8px 14px;min-width:50px;border:1px solid rgba(255,215,0,0.4);"><div style="font-size:1.4rem;font-weight:900;color:#ffd700;">'+grandJuara+'</div><div style="font-size:0.58rem;font-weight:700;opacity:0.8;text-transform:uppercase;margin-top:2px;">\uD83C\uDFC6 Juara</div></div>'
+            +'<div style="text-align:center;background:rgba(255,215,0,0.25);border-radius:8px;padding:8px 14px;min-width:50px;border:1px solid rgba(255,215,0,0.4);"><div style="font-size:1.4rem;font-weight:900;color:#ffd700;">'+grandJuara+'</div><div style="font-size:0.58rem;font-weight:700;opacity:0.8;text-transform:uppercase;margin-top:2px;">🏆 Juara</div></div>'
             +'<div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#00ff85;">'+grandTotalW+'</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Win</div></div>'
             +'<div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#d0d0d0;">'+grandTotalD+'</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Draw</div></div>'
             +'<div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#ff6b6b;">'+grandTotalL+'</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Loss</div></div>'
@@ -819,20 +1418,22 @@ function bukaInfoPlayerAllTime(nama) {
             +'<div style="text-align:center;background:rgba(233,0,82,0.4);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#fff;">'+grandPct+'%</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Win%</div></div>'
             +'<div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#fdbb2d;">'+grandPts+'</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Pts</div></div>'
             +'</div></div>'
-            +'<div style="font-size:0.68rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">\u26BD Statistik per Klub ('+clubs.length+' klub)</div>';
+            +'<div style="font-size:0.68rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">⚽ Statistik per Klub ('+clubs.length+' klub)</div>';
         clubs.forEach((club,idx)=>{
             const cs=clubStats[club]; const pct=winPct(cs.w,cs.pl);
             const isUnknown=club==='(Tidak Diisi)'; const isBest=idx===0&&!isUnknown;
-            html+='<div class="league-card" style="margin-bottom:10px;"><div class="league-card-head" style="'+(isBest?'background:linear-gradient(90deg,#fff9c4,#fff3e0);':'')+'"><div><span class="lc-title" style="'+(isUnknown?'color:#aaa;font-style:italic;':'')+'">'+( isBest?'\uD83E\uDD47 ':'')+'\u26BD '+escHtml(club)+(cs.isFT?'<span style="background:#ffebee;color:#c62828;font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:5px;border:1px solid #ef9a9a;margin-left:4px;font-family:Barlow,sans-serif;">FULL TRANSFER</span>':'')+'</span><div style="font-size:0.68rem;color:var(--sub);margin-top:2px;">'+cs.liga+'x Liga dipakai</div></div><span class="lc-badge" style="background:'+(pct>=60?'var(--win)':pct>=40?'#888':'var(--loss)')+';">'+pct+'% WR</span></div>'
+            const logoUrl=getClubLogo(club);
+            const logoHtml=logoUrl?'<img src="'+logoUrl+'" style="width:32px;height:32px;object-fit:contain;vertical-align:middle;margin-right:8px;" onerror="this.style.display=\'none\'" title="'+escHtml(club)+'">':'';
+            html+='<div class="league-card" style="margin-bottom:10px;"><div class="league-card-head" style="'+(isBest?'background:linear-gradient(90deg,#fff9c4,#fff3e0);':'')+'"><div style="display:flex;align-items:center;">'+logoHtml+'<div><span class="lc-title" style="'+(isUnknown?'color:#aaa;font-style:italic;':'')+'">'+( isBest?'🥇 ':'')+'⚽ '+escHtml(club)+(cs.isFT?'<span style="background:#ffebee;color:#c62828;font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:5px;border:1px solid #ef9a9a;margin-left:4px;font-family:Barlow,sans-serif;">FULL TRANSFER</span>':'')+'</span><div style="font-size:0.68rem;color:var(--sub);margin-top:2px;">'+cs.liga+'x Liga dipakai</div></div></div><span class="lc-badge" style="background:'+(pct>=60?'var(--win)':pct>=40?'#888':'var(--loss)')+';">'+pct+'% WR</span></div>'
                 +'<div class="league-card-body"><div class="stat-pills">'
-                +'<div class="stat-pill" style="background:'+(cs.juara>0?'#fffde7':'#f5f5f5')+';'+(cs.juara>0?'border:1px solid #ffd700;':'')+'"><span class="sp-val" style="color:'+(cs.juara>0?'#c6a000':'#bbb')+';">'+cs.juara+'\uD83C\uDFC6</span><span class="sp-lbl">Juara</span></div>'
+                +'<div class="stat-pill" style="background:'+(cs.juara>0?'#fffde7':'#f5f5f5')+';'+(cs.juara>0?'border:1px solid #ffd700;':'')+'"><span class="sp-val" style="color:'+(cs.juara>0?'#c6a000':'#bbb')+';">'+cs.juara+'🏆</span><span class="sp-lbl">Juara</span></div>'
                 +'<div class="stat-pill"><span class="sp-val win">'+cs.w+'</span><span class="sp-lbl">Win</span></div>'
                 +'<div class="stat-pill"><span class="sp-val draw">'+cs.d+'</span><span class="sp-lbl">Draw</span></div>'
                 +'<div class="stat-pill"><span class="sp-val loss">'+cs.l+'</span><span class="sp-lbl">Loss</span></div>'
                 +'<div class="stat-pill"><span class="sp-val">'+cs.pl+'</span><span class="sp-lbl">Main</span></div>'
                 +'<div class="stat-pill"><span class="sp-val pct">'+pct+'%</span><span class="sp-lbl">Win%</span></div>'
                 +'<div class="stat-pill"><span class="sp-val" style="color:#fdbb2d;">'+cs.pts+'</span><span class="sp-lbl">Pts</span></div>'
-                +'</div><div class="win-bar-wrap"><div class="win-bar-label"><span>Win Rate</span><span>'+cs.w+'W \u00B7 '+cs.d+'D \u00B7 '+cs.l+'L dari '+cs.pl+' pertandingan</span></div>'
+                +'</div><div class="win-bar-wrap"><div class="win-bar-label"><span>Win Rate</span><span>'+cs.w+'W · '+cs.d+'D · '+cs.l+'L dari '+cs.pl+' pertandingan</span></div>'
                 +'<div class="win-bar-bg"><div class="win-bar-fill" style="width:'+pct+'%;background:'+(pct>=60?'linear-gradient(90deg,var(--win),#00e676)':pct>=40?'linear-gradient(90deg,#888,#bbb)':'linear-gradient(90deg,var(--loss),#ff8a80)')+'"></div></div></div></div></div>';
         });
         document.getElementById('infoModalBody').innerHTML=html;
@@ -841,11 +1442,13 @@ function bukaInfoPlayerAllTime(nama) {
 
 function buildClubDisplay(mi, w, d, l, pl, pct) {
     const club=mi.club||''; const isFT=mi.isFullTransfer||false;
+    const logoUrl=getClubLogo(club);
+    const logoHtml=(!isFT&&club&&logoUrl)?'<img src="'+logoUrl+'" class="club-name-logo" onerror="this.style.display=\'none\'" title="'+escHtml(club)+'">':'';
     let clubHtml=club
-        ?'<div class="club-name">\u26BD '+escHtml(club)+' '+(isFT?'<span class="full-transfer-tag">FULL TRANSFER</span>':'<span class="klub-tag">KLUB</span>')+'</div>'
+        ?'<div class="club-name">'+logoHtml+'⚽ '+escHtml(club)+' '+(isFT?'<span class="full-transfer-tag">FULL TRANSFER</span>':'<span class="klub-tag">KLUB</span>')+'</div>'
         :isFT
-            ?'<div class="club-name" style="color:#c62828;">\uD83D\uDD00 <span class="full-transfer-tag" style="font-size:0.9rem;padding:4px 10px;">FULL TRANSFER</span></div>'
-            :'<div class="no-club">Klub belum diisi'+(modeAdmin?' \u2014 isi via tombol Edit di bawah':'')+'.</div>';
+            ?'<div class="club-name" style="color:#c62828;">🔀 <span class="full-transfer-tag" style="font-size:0.9rem;padding:4px 10px;">FULL TRANSFER</span></div>'
+            :'<div class="no-club">Klub belum diisi'+(modeAdmin?' — isi via tombol Edit di bawah':'')+'.</div>';
     return clubHtml
         +'<div class="stat-pills"><div class="stat-pill"><span class="sp-val win">'+w+'</span><span class="sp-lbl">Win</span></div><div class="stat-pill"><span class="sp-val draw">'+d+'</span><span class="sp-lbl">Draw</span></div><div class="stat-pill"><span class="sp-val loss">'+l+'</span><span class="sp-lbl">Loss</span></div><div class="stat-pill"><span class="sp-val">'+pl+'</span><span class="sp-lbl">Main</span></div><div class="stat-pill"><span class="sp-val pct">'+pct+'%</span><span class="sp-lbl">Win%</span></div></div>'
         +'<div class="win-bar-wrap"><div class="win-bar-label"><span>Win Rate</span><span>'+pct+'%</span></div><div class="win-bar-bg"><div class="win-bar-fill" style="width:'+pct+'%"></div></div></div>';
@@ -853,10 +1456,10 @@ function buildClubDisplay(mi, w, d, l, pl, pct) {
 
 function buildAdminClubEdit(matchId, nama, mi) {
     const safeId=matchId.replace(/[^a-zA-Z0-9_-]/g,'_');
-    return '<div class="admin-club-edit"><label>\u270F\uFE0F Edit Klub (Admin)</label>'
+    return '<div class="admin-club-edit"><label>✏️ Edit Klub (Admin)</label>'
         +'<input class="admin-club-input" id="clubInput_'+safeId+'_'+nama+'" placeholder="contoh: Real Madrid" value="'+escHtml(mi.club||'')+'">'
         +'<label class="admin-club-check"><input type="checkbox" id="ftCheck_'+safeId+'_'+nama+'" '+(mi.isFullTransfer?'checked':'')+'>Full Transfer</label>'
-        +'<button class="btn-save-club" onclick="simpanKlub(\''+matchId+'\',\''+nama+'\',\''+safeId+'\')">&#128190; Simpan Klub</button></div>';
+        +'<button class="btn-save-club" onclick="simpanKlub(\''+matchId+'\',\''+nama+'\',\''+safeId+'\')">💾 Simpan Klub</button></div>';
 }
 
 function simpanKlub(matchId, nama, safeId) {
@@ -864,10 +1467,10 @@ function simpanKlub(matchId, nama, safeId) {
     const ftVal=document.getElementById('ftCheck_'+safeId+'_'+nama)?.checked||false;
     db.ref(dbPath+'/matchInfo/'+matchId+'/'+nama).set({club:clubVal,isFullTransfer:ftVal})
       .then(()=>{
-          alert('\u2705 Data klub '+nama+' berhasil disimpan!');
+          alert('✅ Data klub '+nama+' berhasil disimpan!');
           if (!matchInfoData[matchId]) matchInfoData[matchId]={};
           matchInfoData[matchId][nama]={club:clubVal,isFullTransfer:ftVal};
-      }).catch(e=>alert('\u274C Gagal: '+e.message));
+      }).catch(e=>alert('❌ Gagal: '+e.message));
 }
 
 function tutupInfoPlayer() { document.getElementById('infoModal').classList.remove('on'); }
@@ -887,11 +1490,11 @@ function updateSidebar(monthlyMatches) {
             });
         }
         const list=modeAdmin?ALL_PLAYERS:Array.from(activeSet);
-        document.getElementById('sbTrophyMonthBody').innerHTML=list.map(n=>[n,trophyMonth[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,t],i)=>'<tr class="'+(i===0&&t>0?'sb-r1':'')+'"><td class="tl">'+(i===0&&t>0?'\uD83D\uDC51 ':'')+' <strong>'+n+'</strong></td><td class="trophy-count">'+(t>0?t+'x \uD83C\uDFC6':'\u2014')+'</td></tr>').join('');
-        document.getElementById('sbMonthBody').innerHTML=list.map(n=>[n,ptsMonth[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,p],i)=>'<tr class="'+(i===0?'sb-r1':'')+'"><td class="tl">'+(i===0&&p>0?'\uD83D\uDC51 ':'')+'<strong>'+n+'</strong></td><td class="sb-pts">'+p+'</td></tr>').join('');
+        document.getElementById('sbTrophyMonthBody').innerHTML=list.map(n=>[n,trophyMonth[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,t],i)=>'<tr class="'+(i===0&&t>0?'sb-r1':'')+'"><td class="tl">'+(i===0&&t>0?'👑 ':'')+' <strong>'+n+'</strong></td><td class="trophy-count">'+(t>0?t+'x 🏆':'—')+'</td></tr>').join('');
+        document.getElementById('sbMonthBody').innerHTML=list.map(n=>[n,ptsMonth[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,p],i)=>'<tr class="'+(i===0?'sb-r1':'')+'"><td class="tl">'+(i===0&&p>0?'👑 ':'')+'<strong>'+n+'</strong></td><td class="sb-pts">'+p+'</td></tr>').join('');
         const tList=Object.entries(trophyMonth).sort((a,b)=>b[1]-a[1]);
         const banner=document.getElementById('champBanner');
-        if (tList.length>0&&tList[0][1]>0) banner.innerHTML='\uD83C\uDF1F CHAMPION '+currentMonth.toUpperCase()+': '+tList.filter(t=>t[1]===tList[0][1]).map(t=>t[0]+' ('+t[1]+'x\uD83C\uDFC6)').join(' & ')+' \uD83C\uDF1F';
+        if (tList.length>0&&tList[0][1]>0) banner.innerHTML='🌟 CHAMPION '+currentMonth.toUpperCase()+': '+tList.filter(t=>t[1]===tList[0][1]).map(t=>t[0]+' ('+t[1]+'x🏆)').join(' & ')+' 🌟';
         else banner.innerHTML='Belum ada juara di bulan '+currentMonth;
         renderStatsCards();
     });
@@ -903,20 +1506,19 @@ function updateSidebarAllTime() {
         activeSet=new Set();
         Object.values(root).forEach(m=>{ if (m&&m.matches) Object.values(m.matches).forEach(match=>{ if (!match||!match.standings) return; const s=sortStandings(match); match.standings.forEach(p=>{const n=fix(p.name);activeSet.add(n);ptsAll[n]=(ptsAll[n]||0)+(p.pts||0);}); if (s[0]&&(s[0].pts||0)>0) trophyAll[fix(s[0].name)]=(trophyAll[fix(s[0].name)]||0)+1; }); });
         const list=modeAdmin?ALL_PLAYERS:Array.from(activeSet);
-        document.getElementById('sbTrophyAllBody').innerHTML=list.map(n=>[n,trophyAll[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,t],i)=>'<tr class="'+(i===0&&t>0?'sb-r1':'')+'"><td class="tl">'+(i===0&&t>0?'\uD83D\uDC51 ':'')+'<strong>'+n+'</strong></td><td class="trophy-count">'+(t>0?t+'x \uD83C\uDFC6':'\u2014')+'</td></tr>').join('');
-        document.getElementById('sbAllTimeBody').innerHTML=list.map(n=>[n,ptsAll[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,p],i)=>'<tr class="'+(i===0?'sb-r1':'')+'"><td class="tl">'+(i===0&&p>0?'\uD83D\uDC51 ':'')+'<strong>'+n+'</strong></td><td class="sb-pts">'+p+'</td></tr>').join('');
+        document.getElementById('sbTrophyAllBody').innerHTML=list.map(n=>[n,trophyAll[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,t],i)=>'<tr class="'+(i===0&&t>0?'sb-r1':'')+'"><td class="tl">'+(i===0&&t>0?'👑 ':'')+'<strong>'+n+'</strong></td><td class="trophy-count">'+(t>0?t+'x 🏆':'—')+'</td></tr>').join('');
+        document.getElementById('sbAllTimeBody').innerHTML=list.map(n=>[n,ptsAll[n]||0]).sort((a,b)=>b[1]-a[1]).map(([n,p],i)=>'<tr class="'+(i===0?'sb-r1':'')+'"><td class="tl">'+(i===0&&p>0?'👑 ':'')+'<strong>'+n+'</strong></td><td class="sb-pts">'+p+'</td></tr>').join('');
         renderStatsCards();
     });
 }
 
 function renderStatsCards() {
     if (editingStats) return;
-    const list=modeAdmin?ALL_PLAYERS:(activeSet.size>0?Array.from(activeSet):ALL_PLAYERS);
-    const gs=(n)=>statsData[n]||{score:0,assist:0,formText:""};
-    document.getElementById('sbScoresBody').innerHTML=[...list].sort((a,b)=>gs(b).score-gs(a).score).map((n,i)=>'<tr><td class="tl">'+(i===0&&gs(n).score>0?'\uD83E\uDD47 ':'')+'<strong>'+n+'</strong></td><td style="font-weight:700;">'+gs(n).score+'x</td></tr>').join('');
-    document.getElementById('sbAssistsBody').innerHTML=[...list].sort((a,b)=>gs(b).assist-gs(a).assist).map((n,i)=>'<tr><td class="tl">'+(i===0&&gs(n).assist>0?'\uD83E\uDD47 ':'')+'<strong>'+n+'</strong></td><td style="font-weight:700;">'+gs(n).assist+'x</td></tr>').join('');
-    document.getElementById('sbFormBody').innerHTML=[...list].map(n=>'<tr><td class="tl"><strong>'+n+'</strong></td><td><div class="form-row" style="justify-content:center;">'+formCircles((gs(n).formText||'').toUpperCase().replace(/[^WDL]/g,'').split('').slice(-5))+'</div></td></tr>').join('');
-    document.getElementById('adminStatsTool').innerHTML=modeAdmin?'<div style="padding:10px;"><button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family:\'Barlow\',sans-serif;">\u270F\uFE0F Edit Stats Manual</button></div>':'';
+    // Stats are now shown in main content page, not sidebar
+    // Admin tool still shown
+    document.getElementById('adminStatsTool').innerHTML = (modeAdmin && currentMonth === 'STATS')
+        ? '<div style="padding:10px;"><button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family:\'Barlow\',sans-serif;">✏️ Edit Stats Manual</button></div>'
+        : '';
 }
 
 function editStats() {
@@ -924,12 +1526,39 @@ function editStats() {
     const gs=(n)=>statsData[n]||{score:0,assist:0,formText:""};
     editFormArr={};
     ALL_PLAYERS.forEach(n=>{ const ft=(gs(n).formText||'').toUpperCase().replace(/[^WDL]/g,''); editFormArr[n]=Array.from({length:5},(_,i)=>ft[i]||null); });
-    document.getElementById('sbScoresBody').innerHTML=ALL_PLAYERS.map(n=>'<tr><td class="tl"><strong>'+n+'</strong></td><td><input type="number" id="es-'+n+'" value="'+gs(n).score+'" style="width:48px;padding:3px;border:1px solid #ccc;border-radius:4px;text-align:center;"></td></tr>').join('');
-    document.getElementById('sbAssistsBody').innerHTML=ALL_PLAYERS.map(n=>'<tr><td class="tl"><strong>'+n+'</strong></td><td><input type="number" id="ea-'+n+'" value="'+gs(n).assist+'" style="width:48px;padding:3px;border:1px solid #ccc;border-radius:4px;text-align:center;"></td></tr>').join('');
+
+    // Replace the stats page content with editable form
+    const el = document.getElementById('mainContent');
+    el.innerHTML = `
+        <div class="stats-page">
+            <div class="stats-page-header">
+                <h2>✏️ EDIT STATISTIK</h2>
+                <p>Edit manual — All Time</p>
+            </div>
+            <div class="stats-accent"></div>
+            <div class="stats-grid">
+                <div class="stats-section">
+                    <div class="stats-section-title">⚽ Goals</div>
+                    ${ALL_PLAYERS.map(n=>'<div class="stats-player-card"><div class="stats-player-info"><div class="stats-player-name">'+n+'</div></div><input type="number" id="es-'+n+'" value="'+gs(n).score+'" style="width:60px;padding:5px;border:1.5px solid var(--border);border-radius:6px;font-size:0.95rem;font-weight:700;text-align:center;color:var(--win);"></div>').join('')}
+                </div>
+                <div class="stats-section">
+                    <div class="stats-section-title">🎯 Assists</div>
+                    ${ALL_PLAYERS.map(n=>'<div class="stats-player-card"><div class="stats-player-info"><div class="stats-player-name">'+n+'</div></div><input type="number" id="ea-'+n+'" value="'+gs(n).assist+'" style="width:60px;padding:5px;border:1.5px solid var(--border);border-radius:6px;font-size:0.95rem;font-weight:700;text-align:center;color:var(--pink);"></div>').join('')}
+                </div>
+            </div>
+            <div class="stats-form-section">
+                <div class="stats-form-title">📈 Form 5 Laga</div>
+                <div id="formEditArea"></div>
+            </div>
+        </div>
+    `;
     renderFormEditUI();
-    document.getElementById('adminStatsTool').innerHTML='<div style="padding:10px;"><button onclick="saveStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#00c853;color:white;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;font-size:0.9rem;">\uD83D\uDCBE Simpan Stats</button></div>';
+    document.getElementById('adminStatsTool').innerHTML='<div style="padding:10px;"><button onclick="saveStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#00c853;color:white;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;font-size:0.9rem;">💾 Simpan Stats</button></div>';
 }
+
 function renderFormEditUI() {
+    const container = document.getElementById('formEditArea');
+    if (!container) return;
     const html=ALL_PLAYERS.map(player=>{
         const arr=editFormArr[player];
         const lagaRows=Array.from({length:5},(_,i)=>{
@@ -939,48 +1568,48 @@ function renderFormEditUI() {
         const preview=arr.map(v=>v?'<div class="fc fc-'+v.toLowerCase()+'">'+v+'</div>':'<div class="fc-empty"></div>').join('');
         return '<div class="form-player-block"><div class="form-player-name">'+player+'</div>'+lagaRows+'<div class="form-preview"><span class="form-preview-lbl">Preview</span>'+preview+'</div></div>';
     }).join('');
-    document.getElementById('sbFormBody').innerHTML='<tr><td colspan="2" style="padding:0;">'+html+'</td></tr>';
+    container.innerHTML = html;
 }
 function toggleFormBtn(player, lagaIdx, val) { editFormArr[player][lagaIdx]=editFormArr[player][lagaIdx]===val?null:val; renderFormEditUI(); }
 function saveStats() {
     const data={};
     ALL_PLAYERS.forEach(n=>{ const arr=editFormArr[n]||[]; const formText=arr.map(v=>v||'').join('').replace(/[^WDL]/g,''); data[n]={score:parseInt(document.getElementById('es-'+n)?.value)||0,assist:parseInt(document.getElementById('ea-'+n)?.value)||0,formText}; });
-    db.ref(dbPath+'/allTimeStats').set(data).then(()=>{editingStats=false;});
+    db.ref(dbPath+'/allTimeStats').set(data).then(()=>{editingStats=false; renderStatsPage();});
 }
 
 function renderAdminArea() {
     if (!modeAdmin) { document.getElementById('adminArea').innerHTML=''; return; }
-    if (currentMonth==='ALL TIME STANDING') {
-        document.getElementById('adminArea').innerHTML='<div class="admin-panel"><h3>\u2699\uFE0F Admin Mode</h3><p style="font-size:0.85rem;color:#999;margin-bottom:12px;">Pilih bulan terlebih dahulu untuk membuat liga baru.</p><button class="btn-adm btn-off" onclick="matikanAdmin()">\uD83D\uDD12 Log Out Admin</button></div>';
+    if (currentMonth==='ALL TIME STANDING' || currentMonth==='STATS') {
+        document.getElementById('adminArea').innerHTML='<div class="admin-panel"><h3>⚙️ Admin Mode</h3><p style="font-size:0.85rem;color:#999;margin-bottom:12px;">Pilih bulan terlebih dahulu untuk membuat liga baru.</p><button class="btn-adm btn-off" onclick="matikanAdmin()">🔒 Log Out Admin</button></div>';
         return;
     }
     document.getElementById('adminArea').innerHTML=
         '<div class="admin-panel">'
-        +'<h3>\u2699\uFE0F Buat Liga \u2014 '+currentMonth+'</h3>'
+        +'<h3>⚙️ Buat Liga — '+currentMonth+'</h3>'
         +'<p style="font-size:0.82rem;color:#666;margin-bottom:6px;">Centang tepat <strong>'+currentMode+' pemain</strong>:</p>'
         +'<div class="p-checks">'+ALL_PLAYERS.map(p=>'<label><input type="checkbox" class="p-check" value="'+p+'" checked> '+p+'</label>').join('')+'</div>'
         +'<select id="newDate" class="adm-select">'+Array.from({length:31},(_,i)=>'<option value="'+(i+1)+'">Tanggal '+(i+1)+'</option>').join('')+'</select>'
         +'<p style="font-size:0.72rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Tipe Liga:</p>'
         +'<div class="liga-type-group">'
         +'<div id="btnTipeKlub" class="liga-type-card" onclick="pilihTipeLiga(\'klub\')">'
-        +'<span class="ltc-icon">\u26BD</span>'
+        +'<span class="ltc-icon">⚽</span>'
         +'<span class="ltc-label">Klub</span>'
         +'<span class="ltc-desc">Klub tetap per pemain</span>'
         +'</div>'
         +'<div id="btnTipeFT" class="liga-type-card" onclick="pilihTipeLiga(\'ft\')">'
-        +'<span class="ltc-icon">\uD83D\uDD00</span>'
+        +'<span class="ltc-icon">🔀</span>'
         +'<span class="ltc-label">Full Transfer</span>'
         +'<span class="ltc-desc">Bebas pilih klub manapun</span>'
         +'</div>'
         +'</div>'
         +'<div id="clubInputsAdmin" class="club-inputs-admin">'
-        +'<p style="font-size:0.7rem;font-weight:700;color:#2e7d32;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">\u26BD Nama Klub per Pemain:</p>'
+        +'<p style="font-size:0.7rem;font-weight:700;color:#2e7d32;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">⚽ Nama Klub per Pemain:</p>'
         +'<div id="clubInputRows"></div>'
         +'<p style="font-size:0.68rem;color:var(--sub);margin-top:6px;">* Boleh dikosongkan, bisa diisi nanti lewat klik nama pemain.</p>'
         +'</div>'
-        +'<button class="btn-adm btn-create" onclick="buatLiga()">\u2795 Buat Liga</button>'
-        +'<button class="btn-adm btn-off" onclick="matikanAdmin()" style="margin-top:6px;">\uD83D\uDD12 Log Out Admin</button>'
-        +'<p style="font-size:0.75rem;color:#999;margin-top:10px;">\uD83D\uDCA1 Klik nama player di tabel untuk edit info klub per liga.</p>'
+        +'<button class="btn-adm btn-create" onclick="buatLiga()">➕ Buat Liga</button>'
+        +'<button class="btn-adm btn-off" onclick="matikanAdmin()" style="margin-top:6px;">🔒 Log Out Admin</button>'
+        +'<p style="font-size:0.75rem;color:#999;margin-top:10px;">💡 Klik nama player di tabel untuk edit info klub per liga.</p>'
         +'</div>';
     tipeLiga=null;
 }
@@ -1005,7 +1634,7 @@ function buatLiga() {
     const sel=Array.from(document.querySelectorAll('.p-check:checked')).map(c=>c.value);
     const tgl=document.getElementById('newDate').value;
     if (sel.length!==parseInt(currentMode)) return alert('Mode '+currentMode+' Player: Centang TEPAT '+currentMode+' pemain!');
-    if (!tipeLiga) return alert('Pilih Tipe Liga terlebih dahulu:\n\u26BD Klub  atau  \uD83D\uDD00 Full Transfer');
+    if (!tipeLiga) return alert('Pilih Tipe Liga terlebih dahulu:\n⚽ Klub  atau  🔀 Full Transfer');
     const isFullTransfer=tipeLiga==='ft';
     const clubMap={};
     if (!isFullTransfer) sel.forEach(n=>{clubMap[n]=(document.getElementById('clubFor_'+n)?.value||'').trim();});
@@ -1016,8 +1645,8 @@ function buatLiga() {
           const infoUpdates={};
           sel.forEach(n=>{infoUpdates[dbPath+'/matchInfo/'+matchId+'/'+n]={club:isFullTransfer?'':(clubMap[n]||''),isFullTransfer};});
           return db.ref().update(infoUpdates);
-      }).then(()=>{tipeLiga=null;renderAdminArea();alert('\u2705 Liga berhasil dibuat!');})
-      .catch(e=>alert('\u274C Gagal: '+e.message));
+      }).then(()=>{tipeLiga=null;renderAdminArea();alert('✅ Liga berhasil dibuat!');})
+      .catch(e=>alert('❌ Gagal: '+e.message));
 }
 
 function cekAdmin() {
@@ -1028,9 +1657,9 @@ function tutupLogin() { document.getElementById('loginModal').classList.remove('
 function prosesLogin() {
     const email=document.getElementById('adminEmail').value; const pass=document.getElementById('adminPass').value;
     if (!email||!pass) return alert('Email dan password harus diisi!');
-    auth.signInWithEmailAndPassword(email,pass).then(()=>{alert('\u2705 Login Berhasil! Mode Admin Terbuka.');tutupLogin();}).catch(()=>alert('\u274C Gagal Login: Email/Password salah.'));
+    auth.signInWithEmailAndPassword(email,pass).then(()=>{alert('✅ Login Berhasil! Mode Admin Terbuka.');tutupLogin();}).catch(()=>alert('❌ Gagal Login: Email/Password salah.'));
 }
-function matikanAdmin() { auth.signOut().then(()=>{alert('\uD83D\uDD12 Berhasil keluar dari Mode Admin.');}); }
+function matikanAdmin() { auth.signOut().then(()=>{alert('🔒 Berhasil keluar dari Mode Admin.');}); }
 </script>
 </body>
 </html>
