@@ -934,6 +934,16 @@ let allMatchesCache = {};
 let matchInfoData   = {};
 let trophyManualOrder = {}; // { 'Mei': ['Alfa','Toxx','Stive','Kobe'] }
 
+/* DATABASE PEMAIN state */
+let dbData = {}; // { playerKey: { [uid]: {num, name, club, pos, note} } }
+let dbRef = null;
+let dbCurrentPlayer = null;
+let dbSortCol = 'num';
+let dbSortDir = 'asc';
+let dbSearchQ = '';
+let dbFilterPos = '';
+let dbEditUid = null;
+
 /* ===================== CLUB LOGO MAPPING ===================== */
 const CLUB_LOGO_MAP = {
     'real madrid': 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg',
@@ -2496,14 +2506,6 @@ function matikanAdmin() {
         .catch(e => alert('❌ Gagal logout: ' + e.message));
 }
 /* ===================== DATABASE PEMAIN ===================== */
-let dbData = {}; // { playerKey: { [uid]: {num, name, club, pos, note} } }
-let dbRef = null;
-let dbCurrentPlayer = null;
-let dbSortCol = 'num';
-let dbSortDir = 'asc';
-let dbSearchQ = '';
-let dbFilterPos = '';
-let dbEditUid = null;
 
 const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe', 'ALL PLAYER'];
 
@@ -3010,7 +3012,7 @@ function buildCmpRows(rows, realPlayers, PLAYER_COLOR, OWN_CLS) {
         const ownCls  = OWN_CLS[p._owner] || '';
         const logoUrl = getClubLogo(p.club || '');
         const logoHtml = logoUrl
-            ? '<img src="' + logoUrl + '" style="width:18px;height:18px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">'
+            ? '<img src="' + logoUrl + '" style="width:18px;height:18px;object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">' 
             : '';
         const noteBadge = p.note ? '<span class="db-trade-badge" style="margin-left:4px;">⚡ ' + escHtml(p.note) + '</span>' : '';
         return '<div class="cmp-row" style="grid-template-columns:48px 1fr 1fr 70px 80px;">'
