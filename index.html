@@ -254,6 +254,34 @@
         .db-pos-LWF { background: #f3e5f5; color: #4a148c; border: 1px solid #ce93d8; }
         .db-pos-RWF { background: #f3e5f5; color: #4a148c; border: 1px solid #ce93d8; }
         .db-pos-CF  { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+        .db-pos-SS  { background: #fce4ec; color: #880e4f; border: 1px solid #f48fb1; }
+        .db-pos-RMF { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+        .db-pos-LMF { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+
+        /* ===== TRADE MODAL ===== */
+        .trade-modal { display: none; position: fixed; inset: 0; background: rgba(15,5,30,0.88); z-index: 99999; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(8px); }
+        .trade-modal.on { display: flex; }
+        .trade-modal-box { background: white; width: 100%; max-width: 620px; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.55); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); max-height: 92vh; overflow-y: auto; }
+        .trade-modal-header { background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%); padding: 18px 22px; color: white; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 2; }
+        .trade-modal-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .trade-modal-close { background: rgba(255,255,255,0.15); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .trade-modal-close:hover { background: var(--pink); }
+        .trade-modal-body { padding: 20px 22px 24px; }
+        .trade-section { margin-bottom: 16px; }
+        .trade-section-label { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+        .trade-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 0.95rem; color: var(--purple); outline: none; background: white; }
+        .trade-select:focus { border-color: #283593; }
+        .trade-arrow { text-align: center; font-size: 1.8rem; margin: 8px 0; color: #283593; }
+        .trade-preview { background: #f0f4ff; border: 1.5px solid #c5cae9; border-radius: 10px; padding: 12px 14px; margin: 12px 0; min-height: 44px; font-size: 0.85rem; color: var(--purple); }
+        .trade-preview .tr-name { font-weight: 800; font-size: 1rem; }
+        .trade-preview .tr-detail { color: var(--sub); font-size: 0.78rem; margin-top: 2px; }
+        .trade-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .btn-trade-confirm { flex: 1; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #1a237e, #3949ab); color: white; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .btn-trade-confirm:hover { background: linear-gradient(135deg, #0d1666, #1a237e); }
+        .btn-trade-cancel { padding: 12px 18px; border-radius: 8px; border: none; background: #eee; color: #666; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .btn-trade-cancel:hover { background: #ddd; }
+        .btn-db-trade { padding: 7px 16px; border-radius: 20px; border: none; background: linear-gradient(135deg,#1a237e,#3949ab); color: white; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-db-trade:hover { background: linear-gradient(135deg,#0d1666,#1a237e); }
         .db-club-cell { display: flex; align-items: center; gap: 6px; }
         .db-club-logo { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
         .db-club-name { font-weight: 600; font-size: 0.85rem; }
@@ -757,8 +785,11 @@
                     <option value="DMF">DMF - Defensive Mid</option>
                     <option value="CMF">CMF - Central Mid</option>
                     <option value="AMF">AMF - Attacking Mid</option>
+                    <option value="RMF">RMF - Right Mid</option>
+                    <option value="LMF">LMF - Left Mid</option>
                     <option value="LWF">LWF - Left Wing</option>
                     <option value="RWF">RWF - Right Wing</option>
+                    <option value="SS">SS - Second Striker</option>
                     <option value="CF">CF - Centre Forward</option>
                 </select>
             </div>
@@ -769,6 +800,49 @@
             <div class="db-form-actions">
                 <button class="db-btn-cancel" onclick="tutupDbModal()">Batal</button>
                 <button class="db-btn-save" onclick="simpanDbPemain()">&#128190; Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODAL TRADE PEMAIN -->
+<div id="tradeModal" class="trade-modal" onclick="tutupTradeModalOutside(event)">
+    <div class="trade-modal-box">
+        <div class="trade-modal-header">
+            <h3>🔄 Trade Pemain</h3>
+            <button class="trade-modal-close" onclick="tutupTradeModal()">&times;</button>
+        </div>
+        <div class="trade-modal-body">
+            <p style="font-size:0.82rem;color:#666;margin-bottom:14px;">Pilih pemain dari dua player yang akan ditukar. Trade hanya berlaku di mode <strong id="tradeModeLabel">ini</strong>.</p>
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;">
+                <div>
+                    <span class="trade-section-label">Player A</span>
+                    <select id="tradePlayerA" class="trade-select" onchange="updateTradeSelects()">
+                        <option value="">-- Pilih Player --</option>
+                    </select>
+                    <div style="margin-top:8px;">
+                        <select id="tradePemainA" class="trade-select" onchange="updateTradePreview()">
+                            <option value="">-- Pilih Pemain --</option>
+                        </select>
+                    </div>
+                    <div class="trade-preview" id="tradePreviewA"><span style="color:#ccc;">Pilih pemain...</span></div>
+                </div>
+                <div class="trade-arrow">⇌</div>
+                <div>
+                    <span class="trade-section-label">Player B</span>
+                    <select id="tradePlayerB" class="trade-select" onchange="updateTradeSelects()">
+                        <option value="">-- Pilih Player --</option>
+                    </select>
+                    <div style="margin-top:8px;">
+                        <select id="tradePemainB" class="trade-select" onchange="updateTradePreview()">
+                            <option value="">-- Pilih Pemain --</option>
+                        </select>
+                    </div>
+                    <div class="trade-preview" id="tradePreviewB"><span style="color:#ccc;">Pilih pemain...</span></div>
+                </div>
+            </div>
+            <div class="trade-actions">
+                <button class="btn-trade-cancel" onclick="tutupTradeModal()">Batal</button>
+                <button class="btn-trade-confirm" onclick="konfirmasiTrade()">🔄 Konfirmasi Trade</button>
             </div>
         </div>
     </div>
@@ -1132,6 +1206,11 @@ function kembaliKeMenuAwal() {
 }
 
 function applyMode() {
+    /* FIX: detach old database listener before changing dbPath */
+    if (dbPath) db.ref(dbPath + '/database').off();
+    dbData = {};
+    dbCurrentPlayer = null;
+
     dbPath = currentMode === '3' ? 'liga3' : 'liga';
     document.getElementById('modeBadge').innerText = '🔥 ' + currentMode + ' Player Mode';
     editingId = null; editingStats = false; tipeLiga = null;
@@ -2173,10 +2252,12 @@ function pilihTipeLiga(tipe) {
 }
 
 function buatLiga() {
-    const sel = Array.from(document.querySelectorAll('.p-check:checked')).map(c => c.value);
+    /* FIX: only take checked players, limit to exactly currentMode count */
+    const allChecked = Array.from(document.querySelectorAll('.p-check:checked')).map(c => c.value);
+    const sel = allChecked.slice(0, parseInt(currentMode)); // safety: cap to mode
     const tgl = document.getElementById('newDate')?.value;
     if (!tgl) return alert('Tanggal tidak ditemukan!');
-    if (sel.length !== parseInt(currentMode)) {
+    if (allChecked.length !== parseInt(currentMode)) {
         return alert('Mode ' + currentMode + ' Player: Centang TEPAT ' + currentMode + ' pemain!');
     }
     if (!tipeLiga) {
@@ -2188,12 +2269,17 @@ function buatLiga() {
         sel.forEach(n => { clubMap[n] = (document.getElementById('clubFor_' + n)?.value || '').trim(); });
     }
 
+    /* FIX: standings array must have EXACTLY sel.length entries, no more */
+    const standingsPayload = sel.map((n, i) => ({
+        name: n, w:0, d:0, l:0, f:0, a:0, gd:0, pts:0, manualRank: i+1
+    }));
+
     const matchRef = db.ref(dbPath + '/' + currentMonth + '/matches').push();
     const matchId  = matchRef.key;
     matchRef.set({
         tanggal:    parseInt(tgl),
         timestamp:  Date.now(),
-        standings:  sel.map((n, i) => ({ name: n, w:0, d:0, l:0, f:0, a:0, gd:0, pts:0, manualRank: i+1 }))
+        standings:  standingsPayload
     }).then(() => {
         const infoUpdates = {};
         sel.forEach(n => {
@@ -2368,12 +2454,14 @@ const DB_DEFAULT = {
 
 function listenDatabase() {
     if (!dbPath) return;
+    /* FIX: database is now mode-specific — liga/database vs liga3/database */
     db.ref(dbPath + '/database').on('value', snap => {
         const raw = snap.val();
         if (!raw) {
-            // First time: seed with default data
+            // First time for this mode: seed with default data
             const updates = {};
-            DB_PLAYERS.forEach(pk => {
+            const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
+            realPlayers.forEach(pk => {
                 (DB_DEFAULT[pk] || []).forEach((p, i) => {
                     const uid = 'p' + (i+1).toString().padStart(3,'0');
                     updates[dbPath + '/database/' + pk + '/' + uid] = p;
@@ -2399,13 +2487,14 @@ function renderDatabasePage() {
         '<button class="db-player-tab' + (pk === dbCurrentPlayer ? ' on' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')">' + escHtml(pk) + '</button>'
     ).join('');
 
-    const allPositions = ['GK','CB','LB','RB','DMF','CMF','AMF','LWF','RWF','CF'];
+    const allPositions = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
     const posOptions = '<option value="">Semua Posisi</option>'
         + allPositions.map(p => '<option value="' + p + '"' + (dbFilterPos === p ? ' selected' : '') + '>' + p + '</option>').join('');
 
     const adminTools = modeAdmin
         ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
-        : '';
+          + '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>'
+        : '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>';
 
     el.innerHTML = `
         <div class="db-page">
@@ -2462,7 +2551,7 @@ function dbOnSearch(q) {
 function dbOnFilter(pos) {
     dbFilterPos = pos;
     if (pos) {
-        // Auto-sort by position ascending when a position filter is applied
+        // Sort by PES position order when a position filter is applied
         dbSortCol = 'pos';
         dbSortDir = 'asc';
         dbUpdateSortHeaders();
@@ -2522,10 +2611,16 @@ function dbRenderTable() {
     });
 
     // Sort
+    const POS_ORDER = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
     filtered.sort((a, b) => {
         let va = a[dbSortCol] || '';
         let vb = b[dbSortCol] || '';
         if (dbSortCol === 'num') { va = parseInt(va)||0; vb = parseInt(vb)||0; }
+        else if (dbSortCol === 'pos') {
+            const ia = POS_ORDER.indexOf(va) === -1 ? 99 : POS_ORDER.indexOf(va);
+            const ib = POS_ORDER.indexOf(vb) === -1 ? 99 : POS_ORDER.indexOf(vb);
+            return dbSortDir === 'asc' ? ia - ib : ib - ia;
+        }
         else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
         if (va < vb) return dbSortDir === 'asc' ? -1 : 1;
         if (va > vb) return dbSortDir === 'asc' ? 1 : -1;
@@ -2538,7 +2633,7 @@ function dbRenderTable() {
     if (statRow) {
         const posCounts = {};
         pkData.forEach(p => { const pos = p.pos || '?'; posCounts[pos] = (posCounts[pos]||0)+1; });
-        const posOrder = ['GK','CB','LB','RB','DMF','CMF','AMF','LWF','RWF','CF'];
+        const posOrder = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
         statRow.innerHTML = '<span class="db-stat-chip">Total <span>' + pkData.length + '</span></span>'
             + posOrder.filter(p => posCounts[p]).map(p =>
                 '<span class="db-stat-chip">' + p + ' <span>' + posCounts[p] + '</span></span>'
@@ -2632,6 +2727,99 @@ function hapusDbPemain(uid) {
     db.ref(dbPath + '/database/' + dbCurrentPlayer + '/' + uid)
         .remove()
         .catch(e => alert('❌ Gagal hapus: ' + e.message));
+}
+
+/* ===================== TRADE PEMAIN ===================== */
+function bukaTradePemain() {
+    document.getElementById('tradeModeLabel').textContent = currentMode + ' Player Mode';
+    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
+    const opts = '<option value="">-- Pilih Player --</option>'
+        + realPlayers.map(p => '<option value="' + escHtml(p) + '">' + escHtml(p) + '</option>').join('');
+    document.getElementById('tradePlayerA').innerHTML = opts;
+    document.getElementById('tradePlayerB').innerHTML = opts;
+    document.getElementById('tradePemainA').innerHTML = '<option value="">-- Pilih Pemain --</option>';
+    document.getElementById('tradePemainB').innerHTML = '<option value="">-- Pilih Pemain --</option>';
+    document.getElementById('tradePreviewA').innerHTML = '<span style="color:#ccc;">Pilih pemain...</span>';
+    document.getElementById('tradePreviewB').innerHTML = '<span style="color:#ccc;">Pilih pemain...</span>';
+    document.getElementById('tradeModal').classList.add('on');
+}
+
+function tutupTradeModal() { document.getElementById('tradeModal').classList.remove('on'); }
+function tutupTradeModalOutside(e) { if (e.target === document.getElementById('tradeModal')) tutupTradeModal(); }
+
+function updateTradeSelects() {
+    ['A','B'].forEach(side => {
+        const pk = document.getElementById('tradePlayer' + side).value;
+        const pemainSel = document.getElementById('tradePemain' + side);
+        if (!pk || !dbData[pk]) {
+            pemainSel.innerHTML = '<option value="">-- Pilih Pemain --</option>';
+            document.getElementById('tradePreview' + side).innerHTML = '<span style="color:#ccc;">Pilih pemain...</span>';
+            return;
+        }
+        const players = Object.entries(dbData[pk] || {})
+            .map(([uid, p]) => ({uid, ...p}))
+            .sort((a, b) => (parseInt(a.num)||0) - (parseInt(b.num)||0));
+        pemainSel.innerHTML = '<option value="">-- Pilih Pemain --</option>'
+            + players.map(p =>
+                '<option value="' + escHtml(p.uid) + '">'
+                + '#' + (p.num||'?') + ' ' + escHtml(p.name||'') + ' (' + escHtml(p.pos||'') + ')'
+                + '</option>'
+            ).join('');
+        document.getElementById('tradePreview' + side).innerHTML = '<span style="color:#ccc;">Pilih pemain...</span>';
+    });
+}
+
+function updateTradePreview() {
+    ['A','B'].forEach(side => {
+        const pk  = document.getElementById('tradePlayer' + side).value;
+        const uid = document.getElementById('tradePemain' + side).value;
+        const prev = document.getElementById('tradePreview' + side);
+        if (!pk || !uid || !dbData[pk] || !dbData[pk][uid]) {
+            prev.innerHTML = '<span style="color:#ccc;">Pilih pemain...</span>';
+            return;
+        }
+        const p = dbData[pk][uid];
+        prev.innerHTML = '<div class="tr-name">#' + (p.num||'') + ' ' + escHtml(p.name||'') + '</div>'
+            + '<div class="tr-detail">Klub: ' + escHtml(p.club||'-') + ' &nbsp;|&nbsp; Pos: ' + escHtml(p.pos||'-') + (p.note ? ' &nbsp;|&nbsp; ' + escHtml(p.note) : '') + '</div>';
+    });
+}
+
+function konfirmasiTrade() {
+    const pkA  = document.getElementById('tradePlayerA').value;
+    const pkB  = document.getElementById('tradePlayerB').value;
+    const uidA = document.getElementById('tradePemainA').value;
+    const uidB = document.getElementById('tradePemainB').value;
+
+    if (!pkA || !pkB || !uidA || !uidB) return alert('Pilih semua player dan pemain sebelum trade!');
+    if (pkA === pkB && uidA === uidB) return alert('Tidak bisa trade pemain yang sama!');
+
+    const pA = dbData[pkA] && dbData[pkA][uidA];
+    const pB = dbData[pkB] && dbData[pkB][uidB];
+    if (!pA || !pB) return alert('Data pemain tidak ditemukan!');
+
+    const konfirm = confirm(
+        '🔄 Konfirmasi Trade di ' + currentMode + ' Player Mode:\n\n'
+        + pkA + ': ' + (pA.name||'') + ' (#' + (pA.num||'') + ', ' + (pA.pos||'') + ')\n'
+        + '⬌\n'
+        + pkB + ': ' + (pB.name||'') + ' (#' + (pB.num||'') + ', ' + (pB.pos||'') + ')\n\n'
+        + 'Lanjutkan?'
+    );
+    if (!konfirm) return;
+
+    /* Swap: tukar data antar player, pertahankan num (nomor punggung) masing-masing */
+    const newA = { name: pB.name, club: pB.club, pos: pB.pos, note: 'Trade: ' + pA.name, num: pA.num };
+    const newB = { name: pA.name, club: pA.club, pos: pA.pos, note: 'Trade: ' + pB.name, num: pB.num };
+
+    const updates = {};
+    updates[dbPath + '/database/' + pkA + '/' + uidA] = newA;
+    updates[dbPath + '/database/' + pkB + '/' + uidB] = newB;
+
+    db.ref().update(updates)
+        .then(() => {
+            tutupTradeModal();
+            alert('✅ Trade berhasil!\n' + pkA + ' mendapat ' + pB.name + '\n' + pkB + ' mendapat ' + pA.name);
+        })
+        .catch(e => alert('❌ Gagal trade: ' + e.message));
 }
 
 </script>
