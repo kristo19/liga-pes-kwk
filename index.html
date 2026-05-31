@@ -1302,12 +1302,18 @@ function loadData() {
     if (matchesRef) { matchesRef.off(); matchesRef = null; }
     matchesRef = db.ref(dbPath + '/' + currentMonth + '/matches');
     matchesRef.on('value', snap => {
-        if (editingId) return; // FIX: skip re-render while editing
         localData = snap.val() || {};
+        if (editingId) return; // skip re-render while user is editing inputs
         const counters = {};
         allMatchesCache = {};
+        /* FIX: sort by tanggal first, then timestamp for correct liga numbering */
         Object.keys(localData)
-            .sort((a, b) => (localData[a].timestamp || 0) - (localData[b].timestamp || 0))
+            .sort((a, b) => {
+                const tglA = localData[a].tanggal || 0;
+                const tglB = localData[b].tanggal || 0;
+                if (tglA !== tglB) return tglA - tglB;
+                return (localData[a].timestamp || 0) - (localData[b].timestamp || 0);
+            })
             .forEach(id => {
                 const m = localData[id];
                 if (!m) return;
@@ -1485,7 +1491,14 @@ function renderMonthly(matches) {
         return el.innerHTML = '<div class="empty-state">Belum ada klasemen di bulan <strong>' + currentMonth + '</strong> untuk Mode <strong>' + currentMode + ' Player</strong>.</div>';
     }
 
-    const ids = Object.keys(matches).sort((a, b) => (matches[a].timestamp || 0) - (matches[b].timestamp || 0));
+    /* FIX: sort by tanggal (date) first, then by timestamp as tiebreaker
+       so liga on tanggal 15 appears after tanggal 1 regardless of push order */
+    const ids = Object.keys(matches).sort((a, b) => {
+        const tglA = matches[a].tanggal || 0;
+        const tglB = matches[b].tanggal || 0;
+        if (tglA !== tglB) return tglA - tglB;
+        return (matches[a].timestamp || 0) - (matches[b].timestamp || 0);
+    });
     const counters = {};
     let htmlAll = '';
 
@@ -1738,41 +1751,39 @@ function simpan(id) {
 
     const uniqueKey = id.replace(/[^a-zA-Z0-9]/g, '_');
 
-    /* FIX: Only read inputs from the DESKTOP table (.desktop-only) to avoid
-       duplicate entries caused by the mobile edit table having identical inputs */
-    const desktopBlock = document.querySelector('.desktop-only');
-    const scope = desktopBlock || document;
+    /* FIX: scope to the specific match block div, not document or .desktop-only
+       which could pick inputs from the wrong liga block */
+    const matchBlock = document.getElementById('mb-' + id);
+    if (!matchBlock) return alert('Block liga tidak ditemukan, coba refresh halaman.');
 
-    const wEls = scope.querySelectorAll('.w-in[data-key="' + uniqueKey + '"]');
-    const dEls = scope.querySelectorAll('.d-in[data-key="' + uniqueKey + '"]');
-    const lEls = scope.querySelectorAll('.l-in[data-key="' + uniqueKey + '"]');
-    const fEls = scope.querySelectorAll('.f-in[data-key="' + uniqueKey + '"]');
-    const aEls = scope.querySelectorAll('.a-in[data-key="' + uniqueKey + '"]');
-    const rEls = scope.querySelectorAll('.rank-in[data-key="' + uniqueKey + '"]');
+    const wEls = matchBlock.querySelectorAll('.w-in[data-key="' + uniqueKey + '"]');
+    const dEls = matchBlock.querySelectorAll('.d-in[data-key="' + uniqueKey + '"]');
+    const lEls = matchBlock.querySelectorAll('.l-in[data-key="' + uniqueKey + '"]');
+    const fEls = matchBlock.querySelectorAll('.f-in[data-key="' + uniqueKey + '"]');
+    const aEls = matchBlock.querySelectorAll('.a-in[data-key="' + uniqueKey + '"]');
+    const rEls = matchBlock.querySelectorAll('.rank-in[data-key="' + uniqueKey + '"]');
 
     if (!wEls.length) return alert('Data tidak ditemukan, coba refresh halaman.');
 
-    /* Extra safety: deduplicate by player name — only keep first occurrence */
-    const seen = new Set();
-    const standings = [];
+    /* Deduplicate by player name — desktop+mobile tables both have inputs,
+       keep the one with actual filled data (prefer non-zero) */
+    const nameMap = {};
     Array.from(wEls).forEach((el, i) => {
         const name = el.getAttribute('data-n');
-        if (seen.has(name)) return; // skip duplicate
-        seen.add(name);
         const w = parseInt(el.value) || 0;
         const d = parseInt(dEls[i]?.value) || 0;
         const l = parseInt(lEls[i]?.value) || 0;
         const f = parseInt(fEls[i]?.value) || 0;
         const a = parseInt(aEls[i]?.value) || 0;
-        standings.push({
-            name,
-            w, d, l, f, a,
-            gd: f - a,
-            pts: w * 3 + d,
-            manualRank: parseInt(rEls[i]?.value) || 1
-        });
+        const r = parseInt(rEls[i]?.value) || 1;
+        const entry = { name, w, d, l, f, a, gd: f-a, pts: w*3+d, manualRank: r };
+        /* prefer entry that has actual data over zero entry */
+        if (!nameMap[name] || (w+d+l+f+a) > 0) {
+            nameMap[name] = entry;
+        }
     });
 
+    const standings = Object.values(nameMap);
     if (!standings.length) return alert('Tidak ada data standings. Coba refresh halaman.');
 
     db.ref(dbPath + '/' + currentMonth + '/matches/' + id)
