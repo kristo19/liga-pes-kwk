@@ -2256,7 +2256,7 @@ let dbSearchQ = '';
 let dbFilterPos = '';
 let dbEditUid = null;
 
-const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe'];
+const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe', 'ALL PLAYER'];
 
 // Default data from the Excel sheet (Liga Mei)
 const DB_DEFAULT = {
@@ -2432,7 +2432,8 @@ function renderDatabasePage() {
                             <th onclick="dbSort('name')" id="dbTh-name">Nama Pemain</th>
                             <th onclick="dbSort('club')" id="dbTh-club">Klub</th>
                             <th onclick="dbSort('pos')" id="dbTh-pos">Pos</th>
-                            ${modeAdmin ? '<th class="no-sort">Aksi</th>' : ''}
+                            ${dbCurrentPlayer === 'ALL PLAYER' ? '<th onclick="dbSort(\'_owner\')" id="dbTh-_owner">Pemilik</th>' : ''}
+                            ${modeAdmin && dbCurrentPlayer !== 'ALL PLAYER' ? '<th class="no-sort">Aksi</th>' : ''}
                         </tr>
                     </thead>
                     <tbody id="dbTbody"></tbody>
@@ -2460,6 +2461,12 @@ function dbOnSearch(q) {
 
 function dbOnFilter(pos) {
     dbFilterPos = pos;
+    if (pos) {
+        // Auto-sort by position ascending when a position filter is applied
+        dbSortCol = 'pos';
+        dbSortDir = 'asc';
+        dbUpdateSortHeaders();
+    }
     dbRenderTable();
 }
 
@@ -2475,7 +2482,7 @@ function dbSort(col) {
 }
 
 function dbUpdateSortHeaders() {
-    ['num','name','club','pos'].forEach(col => {
+    ['num','name','club','pos','_owner'].forEach(col => {
         const th = document.getElementById('dbTh-' + col);
         if (!th) return;
         th.className = '';
@@ -2489,9 +2496,22 @@ function dbRenderTable() {
     const statRow = document.getElementById('dbStatRow');
     if (!tbody) return;
 
-    const pkData = (dbData[dbCurrentPlayer] && typeof dbData[dbCurrentPlayer] === 'object')
-        ? Object.entries(dbData[dbCurrentPlayer]).map(([uid, p]) => ({uid, ...p}))
-        : [];
+    let pkData;
+    if (dbCurrentPlayer === 'ALL PLAYER') {
+        const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
+        pkData = [];
+        realPlayers.forEach(pk => {
+            if (dbData[pk] && typeof dbData[pk] === 'object') {
+                Object.entries(dbData[pk]).forEach(([uid, p]) => {
+                    pkData.push({uid: pk + '_' + uid, _owner: pk, ...p});
+                });
+            }
+        });
+    } else {
+        pkData = (dbData[dbCurrentPlayer] && typeof dbData[dbCurrentPlayer] === 'object')
+            ? Object.entries(dbData[dbCurrentPlayer]).map(([uid, p]) => ({uid, ...p}))
+            : [];
+    }
 
     // Filter
     const q = dbSearchQ.toLowerCase();
@@ -2525,8 +2545,10 @@ function dbRenderTable() {
             ).join('');
     }
 
+    const isAll = dbCurrentPlayer === 'ALL PLAYER';
+    const totalCols = (modeAdmin && !isAll) ? 5 : (isAll ? 5 : 4);
     if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="' + (modeAdmin ? 5 : 4) + '" class="db-empty">Tidak ada pemain ditemukan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="' + totalCols + '" class="db-empty">Tidak ada pemain ditemukan.</td></tr>';
         return;
     }
 
@@ -2537,15 +2559,19 @@ function dbRenderTable() {
             ? '<img src="' + logoUrl + '" class="db-club-logo" onerror="this.style.display=\'none\'">'
             : '';
         const noteBadge = p.note ? '<span class="db-trade-badge">⚡ ' + escHtml(p.note) + '</span>' : '';
-        const adminCols = modeAdmin
+        const adminCols = (modeAdmin && !isAll)
             ? '<td><button class="db-action-btn db-edit-btn" onclick="bukaDbModalEdit(\'' + p.uid + '\')">✏️</button>'
               + '<button class="db-action-btn db-del-btn" onclick="hapusDbPemain(\'' + p.uid + '\')">🗑️</button></td>'
+            : '';
+        const ownerCol = isAll
+            ? '<td><span style="font-size:0.75rem;font-weight:800;color:#1565c0;background:#e3f2fd;padding:2px 8px;border-radius:6px;border:1px solid #90caf9;">' + escHtml(p._owner||'') + '</span></td>'
             : '';
         return '<tr>'
             + '<td><span class="db-num">' + (p.num||'') + '</span></td>'
             + '<td><strong>' + escHtml(p.name||'') + '</strong>' + noteBadge + '</td>'
             + '<td><div class="db-club-cell">' + logoHtml + '<span class="db-club-name">' + escHtml(p.club||'') + '</span></div></td>'
             + '<td><span class="db-pos-badge ' + posCls + '">' + escHtml(p.pos||'') + '</span></td>'
+            + ownerCol
             + adminCols
             + '</tr>';
     }).join('');
