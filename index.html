@@ -2318,8 +2318,12 @@ function renderAdminArea() {
     if (!modeAdmin) { adminArea.innerHTML = ''; return; }
 
     if (currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE') {
+        const resetBtn = (currentMonth === 'DATABASE')
+            ? '<button class="btn-adm" onclick="resetDatabaseKeDefault(true)" style="margin-bottom:8px;background:#e53935;color:white;">🔄 Reset Pemain ke Default</button><br>'
+            : '';
         adminArea.innerHTML = '<div class="admin-panel"><h3>⚙️ Admin Mode</h3>'
             + '<p style="font-size:0.85rem;color:#999;margin-bottom:12px;">Pilih bulan terlebih dahulu untuk membuat liga baru.</p>'
+            + resetBtn
             + '<button class="btn-adm btn-off" onclick="matikanAdmin()">🔒 Log Out Admin</button></div>';
         return;
     }
@@ -2691,26 +2695,37 @@ const DB_DEFAULT_4 = {
 
 function listenDatabase() {
     if (!dbPath) return;
-    /* FIX: database is now mode-specific — liga/database vs liga3/database */
     db.ref(dbPath + '/database').on('value', snap => {
         const raw = snap.val();
         if (!raw) {
             // First time for this mode: seed with default data
-            const DB_DEFAULT = dbPath === 'liga3' ? DB_DEFAULT_3 : DB_DEFAULT_4;
-            const updates = {};
-            const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
-            realPlayers.forEach(pk => {
-                (DB_DEFAULT[pk] || []).forEach((p, i) => {
-                    const uid = 'p' + (i+1).toString().padStart(3,'0');
-                    updates[dbPath + '/database/' + pk + '/' + uid] = p;
-                });
-            });
-            db.ref().update(updates).then(() => {});
+            resetDatabaseKeDefault(false);
             return;
         }
         dbData = raw;
         if (currentMonth === 'DATABASE') renderDatabasePage();
     });
+}
+
+function resetDatabaseKeDefault(konfirmasi) {
+    if (konfirmasi) {
+        if (!confirm('⚠️ Reset semua pemain ke data default?\nSemua data pemain yang ada akan diganti. Lanjutkan?')) return;
+    }
+    const DB_DEFAULT = dbPath === 'liga3' ? DB_DEFAULT_3 : DB_DEFAULT_4;
+    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
+    // Hapus dulu semua data lama, lalu isi ulang
+    db.ref(dbPath + '/database').remove().then(() => {
+        const updates = {};
+        realPlayers.forEach(pk => {
+            (DB_DEFAULT[pk] || []).forEach((p, i) => {
+                const uid = 'p' + (i+1).toString().padStart(3,'0');
+                updates[dbPath + '/database/' + pk + '/' + uid] = p;
+            });
+        });
+        return db.ref().update(updates);
+    }).then(() => {
+        alert('✅ Database berhasil di-reset ke data default!');
+    }).catch(e => alert('❌ Gagal reset: ' + e.message));
 }
 
 function renderDatabasePage() {
