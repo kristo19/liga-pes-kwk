@@ -729,7 +729,7 @@
             <div class="sb-card" id="sbTrophyAllCard" style="display:none;">
                 <div class="sb-head trophy">&#127942; Trophy &mdash; All Time</div>
                 <table class="sb-tbl">
-                    <thead><tr><th class="tl">Player</th><th>&#127942; Juara</th></tr></thead>
+                    <thead><tr><th class="tl">Player</th><th>&#127942; Juara</th><th style="width:28px;"></th></tr></thead>
                     <tbody id="sbTrophyAllBody"></tbody>
                 </table>
             </div>
@@ -2145,12 +2145,33 @@ function updateSidebarAllTime() {
 
         const list = modeAdmin ? ALL_PLAYERS : Array.from(activeSet);
 
-        document.getElementById('sbTrophyAllBody').innerHTML = list
-            .map(n => [n, trophyAll[n] || 0])
-            .sort((a, b) => b[1] - a[1])
-            .map(([n, t], i) => '<tr class="' + (i === 0 && t > 0 ? 'sb-r1' : '') + '">'
-                + '<td class="tl">' + (i === 0 && t > 0 ? '👑 ' : '') + '<strong>' + escHtml(n) + '</strong></td>'
-                + '<td class="trophy-count">' + (t > 0 ? t + 'x 🏆' : '—') + '</td></tr>')
+        const savedAllOrder = trophyManualOrder['ALL TIME'] || [];
+        let trophyAllList = list.map(n => [n, trophyAll[n] || 0]);
+        if (savedAllOrder.length) {
+            trophyAllList.sort((a, b) => {
+                const ia = savedAllOrder.indexOf(a[0]);
+                const ib = savedAllOrder.indexOf(b[0]);
+                if (ia === -1 && ib === -1) return 0;
+                if (ia === -1) return 1;
+                if (ib === -1) return -1;
+                return ia - ib;
+            });
+        } else {
+            trophyAllList.sort((a, b) => b[1] - a[1] || (ptsAll[b[0]]||0) - (ptsAll[a[0]]||0));
+        }
+        document.getElementById('sbTrophyAllBody').innerHTML = trophyAllList
+            .map(([n, t], i) => {
+                const moveBtns = modeAdmin
+                    ? '<td style="padding:4px 6px;"><div class="trophy-move-btns">'
+                      + '<button class="trophy-move-btn" ' + (i === 0 ? 'disabled' : '') + ' onclick="moveTrophyAllRow(' + i + ',-1)" title="Naik">\u25b2</button>'
+                      + '<button class="trophy-move-btn" ' + (i === trophyAllList.length-1 ? 'disabled' : '') + ' onclick="moveTrophyAllRow(' + i + ',1)" title="Turun">\u25bc</button>'
+                      + '</div></td>'
+                    : '';
+                return '<tr class="' + (i === 0 && t > 0 ? 'sb-r1' : '') + '">'
+                    + '<td class="tl">' + (i === 0 && t > 0 ? '👑 ' : '') + '<strong>' + escHtml(n) + '</strong></td>'
+                    + '<td class="trophy-count">' + (t > 0 ? t + 'x 🏆' : '—') + '</td>'
+                    + moveBtns + '</tr>';
+            })
             .join('');
 
         document.getElementById('sbAllTimeBody').innerHTML = list
@@ -2928,6 +2949,27 @@ function loadTrophyOrder() {
             updateSidebar(localData);
         }
     });
+}
+
+function moveTrophyAllRow(idx, dir) {
+    const rows = document.querySelectorAll('#sbTrophyAllBody tr');
+    let currentOrder = Array.from(rows).map(tr => {
+        const td = tr.querySelector('td.tl strong');
+        return td ? td.textContent.trim() : null;
+    }).filter(Boolean);
+
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= currentOrder.length) return;
+
+    const tmp = currentOrder[idx];
+    currentOrder[idx] = currentOrder[newIdx];
+    currentOrder[newIdx] = tmp;
+
+    trophyManualOrder['ALL TIME'] = currentOrder;
+    db.ref(dbPath + '/trophyOrder/ALL TIME').set(currentOrder)
+        .catch(e => console.error('Gagal simpan trophy order all time:', e));
+
+    updateSidebarAllTime();
 }
 
 function moveTrophyRow(bulan, idx, dir) {
