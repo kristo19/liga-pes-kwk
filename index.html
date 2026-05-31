@@ -1539,7 +1539,7 @@ function renderMonthly(matches) {
         const modeBadgeHtml = modeLabel ? '<span class="' + modeCls + '">' + modeIcon + ' ' + modeLabel + '</span>' : '';
 
         const heading = isEdit
-            ? '<select id="editTgl" style="padding:4px 8px;border-radius:6px;border:none;font-family:\'Barlow\',sans-serif;font-weight:700;">'
+            ? '<select id="editTgl_' + id + '" style="padding:4px 8px;border-radius:6px;border:none;font-family:\'Barlow\',sans-serif;font-weight:700;">'
               + Array.from({length:31}, (_, i) => '<option value="' + (i+1) + '" ' + (m.tanggal == i+1 ? 'selected' : '') + '> Tgl ' + (i+1) + '</option>').join('')
               + '</select>'
             : '📅 ' + getNamaHari(m.tanggal || 1, currentMonth) + ', ' + (m.tanggal || 1) + ' ' + currentMonth;
@@ -1758,7 +1758,7 @@ function recalc(el, key) {
 }
 
 function simpan(id) {
-    const tglEl = document.getElementById('editTgl');
+    const tglEl = document.getElementById('editTgl_' + id);
     if (!tglEl) return alert('Tanggal tidak ditemukan!');
     const tgl = tglEl.value;
 
