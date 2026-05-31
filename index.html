@@ -2041,7 +2041,10 @@ function updateSidebar(monthlyMatches) {
 
         document.getElementById('sbTrophyMonthBody').innerHTML = list
             .map(n => [n, trophyMonth[n] || 0])
-            .sort((a, b) => b[1] - a[1])
+            .sort((a, b) => {
+                if (b[1] !== a[1]) return b[1] - a[1]; // trophy terbanyak dulu
+                return (ptsMonth[b[0]] || 0) - (ptsMonth[a[0]] || 0); // tiebreaker: poin bulan ini
+            })
             .map(([n, t], i) => '<tr class="' + (i === 0 && t > 0 ? 'sb-r1' : '') + '">'
                 + '<td class="tl">' + (i === 0 && t > 0 ? '👑 ' : '') + ' <strong>' + escHtml(n) + '</strong></td>'
                 + '<td class="trophy-count">' + (t > 0 ? t + 'x 🏆' : '—') + '</td></tr>')
