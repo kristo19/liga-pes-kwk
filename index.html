@@ -2467,8 +2467,122 @@ let dbEditUid = null;
 
 const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe', 'ALL PLAYER'];
 
-// Default data from the Excel sheet (Liga Mei)
-const DB_DEFAULT = {
+const DB_DEFAULT_3 = {
+  'Toxx': [
+    {num:1,name:'Gianluigi Donnarumma',club:'',pos:'GK',note:''},
+    {num:2,name:'Ederson',club:'',pos:'GK',note:''},
+    {num:3,name:'Alphonso Davies',club:'',pos:'LB',note:''},
+    {num:4,name:'Achraf Hakimi',club:'',pos:'RB',note:''},
+    {num:5,name:'William Saliba',club:'',pos:'CB',note:''},
+    {num:6,name:'John Stones',club:'',pos:'CB',note:''},
+    {num:7,name:'Dayot Upamecano',club:'',pos:'CB',note:''},
+    {num:8,name:'Ronald Araújo',club:'',pos:'CB',note:''},
+    {num:9,name:'Alejandro Grimaldo',club:'',pos:'LB',note:''},
+    {num:10,name:'Trent Arnold',club:'',pos:'RB',note:''},
+    {num:11,name:'Aurélien Tchouaméni',club:'',pos:'DMF',note:''},
+    {num:12,name:'Paul Pogba',club:'',pos:'CMF',note:''},
+    {num:13,name:'Bruno Fernandes',club:'',pos:'AMF',note:''},
+    {num:14,name:'Bernardo Silva',club:'',pos:'AMF',note:''},
+    {num:15,name:'Federico Valverde',club:'',pos:'CMF',note:''},
+    {num:16,name:'Pedri',club:'',pos:'CMF',note:''},
+    {num:17,name:'Alexis Mac Allister',club:'',pos:'CMF',note:''},
+    {num:18,name:'Vitinha',club:'',pos:'CMF',note:''},
+    {num:19,name:'Vinícius Júnior',club:'',pos:'LWF',note:''},
+    {num:20,name:'Lionel Messi',club:'',pos:'RWF',note:''},
+    {num:21,name:'Cristiano Ronaldo',club:'',pos:'CF',note:''},
+    {num:22,name:'Kylian Mbappé',club:'',pos:'CF',note:''},
+    {num:23,name:'Ousmane Dembélé',club:'',pos:'CF',note:''},
+    {num:24,name:'Neymar',club:'',pos:'SS',note:''},
+    {num:25,name:'Khvicha Kvaratskhelia',club:'',pos:'LWF',note:''},
+    {num:26,name:'Jude Bellingham',club:'',pos:'AMF',note:''}
+  ],
+  'Stive': [
+    {num:1,name:'Manuel Neuer',club:'',pos:'GK',note:''},
+    {num:2,name:'Alisson Becker',club:'',pos:'GK',note:''},
+    {num:3,name:'Theo Hernández',club:'',pos:'LB',note:''},
+    {num:4,name:'Raphaël Guerreiro',club:'',pos:'LB',note:''},
+    {num:5,name:'Rúben Dias',club:'',pos:'CB',note:''},
+    {num:6,name:'Éder Militão',club:'',pos:'CB',note:''},
+    {num:7,name:'Alessandro Bastoni',club:'',pos:'CB',note:''},
+    {num:8,name:'Manuel Akanji',club:'',pos:'CB',note:''},
+    {num:9,name:'Riccardo Calafiori',club:'',pos:'CB',note:''},
+    {num:10,name:'Kim Min-jae',club:'',pos:'CB',note:''},
+    {num:11,name:'Declan Rice',club:'',pos:'DMF',note:''},
+    {num:12,name:'N\'Golo Kanté',club:'',pos:'DMF',note:''},
+    {num:13,name:'Kevin De Bruyne',club:'',pos:'AMF',note:''},
+    {num:14,name:'Jamal Musiala',club:'',pos:'AMF',note:''},
+    {num:15,name:'Martin Ødegaard',club:'',pos:'CMF',note:''},
+    {num:16,name:'Hakan Çalhanoğlu',club:'',pos:'CMF',note:''},
+    {num:17,name:'Joshua Kimmich',club:'',pos:'CMF',note:''},
+    {num:18,name:'Frenkie Kessié',club:'',pos:'CMF',note:''},
+    {num:19,name:'Victor Osimhen',club:'',pos:'CF',note:''},
+    {num:20,name:'Lautaro Martínez',club:'',pos:'CF',note:''},
+    {num:21,name:'Son Heung-min',club:'',pos:'LWF',note:''},
+    {num:22,name:'Sadio Mané',club:'',pos:'CF',note:''},
+    {num:23,name:'Julián Álvarez',club:'',pos:'CF',note:''},
+    {num:24,name:'Harry Kane',club:'',pos:'CF',note:''},
+    {num:25,name:'Nicolas Jackson',club:'',pos:'CF',note:''},
+    {num:26,name:'João Palhinha',club:'',pos:'DMF',note:''}
+  ],
+  'Alfa': [
+    {num:1,name:'Gregor Kobel',club:'',pos:'GK',note:''},
+    {num:2,name:'Thibaut Courtois',club:'',pos:'GK',note:''},
+    {num:3,name:'Nuno Mendes',club:'',pos:'LB',note:''},
+    {num:4,name:'Jordi Alba',club:'',pos:'LB',note:''},
+    {num:5,name:'Virgil van Dijk',club:'',pos:'CB',note:''},
+    {num:6,name:'Marquinhos',club:'',pos:'CB',note:''},
+    {num:7,name:'Gabriel Magalhães',club:'',pos:'CB',note:''},
+    {num:8,name:'Micky van de Ven',club:'',pos:'CB',note:''},
+    {num:9,name:'Piero Hincapié',club:'',pos:'CB',note:''},
+    {num:10,name:'Antonio Rüdiger',club:'',pos:'CB',note:''},
+    {num:11,name:'Rodri',club:'',pos:'DMF',note:''},
+    {num:12,name:'Fabinho',club:'',pos:'DMF',note:''},
+    {num:13,name:'Stephen Eustáquio',club:'',pos:'DMF',note:''},
+    {num:14,name:'Eduardo Camavinga',club:'',pos:'CMF',note:''},
+    {num:15,name:'Frenkie de Jong',club:'',pos:'CMF',note:''},
+    {num:16,name:'Ryan Gravenberch',club:'',pos:'DMF',note:''},
+    {num:17,name:'Nicolò Barella',club:'',pos:'CMF',note:''},
+    {num:18,name:'Omar Marmoush',club:'',pos:'CF',note:''},
+    {num:19,name:'Loïs Openda',club:'',pos:'CF',note:''},
+    {num:20,name:'Erling Haaland',club:'',pos:'CF',note:''},
+    {num:21,name:'Bukayo Saka',club:'',pos:'RWF',note:''},
+    {num:22,name:'Mohamed Salah',club:'',pos:'RWF',note:''},
+    {num:23,name:'Leroy Sané',club:'',pos:'RWF',note:''},
+    {num:24,name:'Alexander Isak',club:'',pos:'CF',note:''},
+    {num:25,name:'Viktor Gyökeres',club:'',pos:'CF',note:''},
+    {num:26,name:'Karim Benzema',club:'',pos:'CF',note:''}
+  ],
+  'Kobe': [
+    {num:1,name:'Thibaut Courtois',club:'Real Madrid',pos:'GK',note:''},
+    {num:2,name:'Emiliano Martínez',club:'Aston Villa',pos:'GK',note:''},
+    {num:3,name:'Trent Alexander-Arnold',club:'Liverpool',pos:'RB',note:''},
+    {num:4,name:'Theo Hernández',club:'Al Hillal',pos:'LB',note:''},
+    {num:5,name:'Antonio Rüdiger',club:'Real Madrid',pos:'CB',note:''},
+    {num:6,name:'Kim Min-jae',club:'Bayern Munich',pos:'CB',note:''},
+    {num:7,name:'Ibrahima Konaté',club:'Liverpool',pos:'CB',note:''},
+    {num:8,name:'Josko Gvardiol',club:'Manchester City',pos:'CB',note:''},
+    {num:9,name:'Jules Koundé',club:'Barcelona',pos:'LB',note:''},
+    {num:10,name:'Alejandro Balde',club:'Barcelona',pos:'RB',note:''},
+    {num:11,name:'Ryan Gravenberch',club:'Liverpool',pos:'DMF',note:''},
+    {num:12,name:'Bruno Guimarães',club:'Newcastle United',pos:'DMF',note:''},
+    {num:13,name:'Jude Bellingham',club:'Real Madrid',pos:'AMF',note:''},
+    {num:14,name:'Dominik Szoboszlai',club:'Liverpool',pos:'AMF',note:''},
+    {num:15,name:'Joshua Kimmich',club:'Bayern Munich',pos:'CMF',note:''},
+    {num:16,name:'Vitinha',club:'Paris Saint-Germain',pos:'CMF',note:''},
+    {num:17,name:'Nicolò Barella',club:'Inter Milan',pos:'CMF',note:''},
+    {num:18,name:'Fabián Ruiz',club:'Paris Saint-Germain',pos:'CMF',note:''},
+    {num:19,name:'Viktor Gyökeres',club:'Arsenal',pos:'CF',note:''},
+    {num:20,name:'Lautaro Martínez',club:'Inter Milan',pos:'CF',note:''},
+    {num:21,name:'Rodrygo',club:'Real Madrid',pos:'RWF',note:''},
+    {num:22,name:'Rafael Leão',club:'AC Milan',pos:'LWF',note:''},
+    {num:23,name:'Alexander Isak',club:'Newcastle United',pos:'CF',note:''},
+    {num:24,name:'Alexander Sørloth',club:'Atlético Madrid',pos:'CF',note:''}
+  ]
+};
+
+
+// Default data for 4-player mode (liga)
+const DB_DEFAULT_4 = {
   'Toxx': [
     {num:1,name:'Gianluigi Donnarumma',club:'Manchester City',pos:'GK',note:''},
     {num:2,name:'Ederson',club:'Fenerbahce',pos:'GK',note:''},
@@ -2582,6 +2696,7 @@ function listenDatabase() {
         const raw = snap.val();
         if (!raw) {
             // First time for this mode: seed with default data
+            const DB_DEFAULT = dbPath === 'liga3' ? DB_DEFAULT_3 : DB_DEFAULT_4;
             const updates = {};
             const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
             realPlayers.forEach(pk => {
