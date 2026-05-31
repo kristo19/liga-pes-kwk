@@ -1764,45 +1764,51 @@ function simpan(id) {
 
     const uniqueKey = id.replace(/[^a-zA-Z0-9]/g, '_');
 
-    /* FIX: scope to the specific match block div, not document or .desktop-only
-       which could pick inputs from the wrong liga block */
     const matchBlock = document.getElementById('mb-' + id);
     if (!matchBlock) return alert('Block liga tidak ditemukan, coba refresh halaman.');
 
-    const wEls = matchBlock.querySelectorAll('.w-in[data-key="' + uniqueKey + '"]');
-    const dEls = matchBlock.querySelectorAll('.d-in[data-key="' + uniqueKey + '"]');
-    const lEls = matchBlock.querySelectorAll('.l-in[data-key="' + uniqueKey + '"]');
-    const fEls = matchBlock.querySelectorAll('.f-in[data-key="' + uniqueKey + '"]');
-    const aEls = matchBlock.querySelectorAll('.a-in[data-key="' + uniqueKey + '"]');
-    const rEls = matchBlock.querySelectorAll('.rank-in[data-key="' + uniqueKey + '"]');
+    /* Collect unique player names from w-in inputs in this block */
+    const allWEls = matchBlock.querySelectorAll('.w-in[data-key="' + uniqueKey + '"]');
+    if (!allWEls.length) return alert('Data tidak ditemukan, coba refresh halaman.');
 
-    if (!wEls.length) return alert('Data tidak ditemukan, coba refresh halaman.');
-
-    /* Deduplicate by player name — desktop+mobile tables both have inputs,
-       keep the one with actual filled data (prefer non-zero) */
-    const nameMap = {};
-    Array.from(wEls).forEach((el, i) => {
-        const name = el.getAttribute('data-n');
-        const w = parseInt(el.value) || 0;
-        const d = parseInt(dEls[i]?.value) || 0;
-        const l = parseInt(lEls[i]?.value) || 0;
-        const f = parseInt(fEls[i]?.value) || 0;
-        const a = parseInt(aEls[i]?.value) || 0;
-        const r = parseInt(rEls[i]?.value) || 1;
-        const entry = { name, w, d, l, f, a, gd: f-a, pts: w*3+d, manualRank: r };
-        /* prefer entry that has actual data over zero entry */
-        if (!nameMap[name] || (w+d+l+f+a) > 0) {
-            nameMap[name] = entry;
-        }
+    const playerNames = [];
+    const seen = new Set();
+    allWEls.forEach(function(el) {
+        var n = el.getAttribute('data-n');
+        if (n && !seen.has(n)) { seen.add(n); playerNames.push(n); }
     });
 
-    const standings = Object.values(nameMap);
-    if (!standings.length) return alert('Tidak ada data standings. Coba refresh halaman.');
+    if (!playerNames.length) return alert('Tidak ada data pemain. Coba refresh halaman.');
+
+    /* For each player, read value by data-n selector — avoids index mismatch
+       between desktop and mobile duplicate inputs */
+    var standings = playerNames.map(function(name) {
+        var sel = '.w-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]';
+        var w = parseInt(matchBlock.querySelector('.w-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
+        var d = parseInt(matchBlock.querySelector('.d-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
+        var l = parseInt(matchBlock.querySelector('.l-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
+        var f = parseInt(matchBlock.querySelector('.f-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
+        var a = parseInt(matchBlock.querySelector('.a-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
+        var rankEl = matchBlock.querySelector('.rank-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]');
+        var r = rankEl ? (parseInt(rankEl.value) || 1) : 1;
+        return { name: name, w: w, d: d, l: l, f: f, a: a, gd: f - a, pts: w * 3 + d, manualRank: r };
+    });
 
     db.ref(dbPath + '/' + currentMonth + '/matches/' + id)
-        .update({ tanggal: parseInt(tgl), standings, manualJuara: null })
-        .then(() => { editingId = null; loadData(); })
-        .catch(e => alert('❌ Gagal simpan: ' + e.message));
+        .update({ tanggal: parseInt(tgl), standings: standings, manualJuara: null })
+        .then(function() {
+            editingId = null;
+            /* Update localData directly so re-render works immediately
+               without waiting for Firebase listener to re-fire */
+            if (localData[id]) {
+                localData[id].tanggal = parseInt(tgl);
+                localData[id].standings = standings;
+                localData[id].manualJuara = null;
+            }
+            renderMonthly(localData);
+            updateSidebar(localData);
+        })
+        .catch(function(e) { alert('Gagal simpan: ' + e.message); });
 }
 
 function hapus(id) {
