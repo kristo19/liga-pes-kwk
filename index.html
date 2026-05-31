@@ -1127,6 +1127,23 @@ function formCircles(arr) {
 function sortStandings(match) {
     if (!match || !match.standings) return [];
     let s = match.standings.map(p => ({...p, name: fix(p.name)}));
+
+    /* FIX: deduplicate — keep only first occurrence of each player name,
+       preferring the entry with actual data (pts > 0) over zero rows */
+    const nameMap = {};
+    s.forEach(p => {
+        if (!nameMap[p.name]) {
+            nameMap[p.name] = p;
+        } else {
+            // prefer entry with actual stats over zero entry
+            const existing = nameMap[p.name];
+            if ((p.pts || 0) > 0 || (p.w || 0) > 0 || (p.f || 0) > 0) {
+                nameMap[p.name] = p;
+            }
+        }
+    });
+    s = Object.values(nameMap);
+
     const j = fix(match.manualJuara);
     s.sort((a, b) => {
         if (j) { if (a.name === j) return -1; if (b.name === j) return 1; }
@@ -1720,29 +1737,43 @@ function simpan(id) {
     const tgl = tglEl.value;
 
     const uniqueKey = id.replace(/[^a-zA-Z0-9]/g, '_');
-    const wEls   = document.querySelectorAll('.w-in[data-key="' + uniqueKey + '"]');
-    const dEls   = document.querySelectorAll('.d-in[data-key="' + uniqueKey + '"]');
-    const lEls   = document.querySelectorAll('.l-in[data-key="' + uniqueKey + '"]');
-    const fEls   = document.querySelectorAll('.f-in[data-key="' + uniqueKey + '"]');
-    const aEls   = document.querySelectorAll('.a-in[data-key="' + uniqueKey + '"]');
-    const rEls   = document.querySelectorAll('.rank-in[data-key="' + uniqueKey + '"]');
+
+    /* FIX: Only read inputs from the DESKTOP table (.desktop-only) to avoid
+       duplicate entries caused by the mobile edit table having identical inputs */
+    const desktopBlock = document.querySelector('.desktop-only');
+    const scope = desktopBlock || document;
+
+    const wEls = scope.querySelectorAll('.w-in[data-key="' + uniqueKey + '"]');
+    const dEls = scope.querySelectorAll('.d-in[data-key="' + uniqueKey + '"]');
+    const lEls = scope.querySelectorAll('.l-in[data-key="' + uniqueKey + '"]');
+    const fEls = scope.querySelectorAll('.f-in[data-key="' + uniqueKey + '"]');
+    const aEls = scope.querySelectorAll('.a-in[data-key="' + uniqueKey + '"]');
+    const rEls = scope.querySelectorAll('.rank-in[data-key="' + uniqueKey + '"]');
 
     if (!wEls.length) return alert('Data tidak ditemukan, coba refresh halaman.');
 
-    const standings = Array.from(wEls).map((el, i) => {
+    /* Extra safety: deduplicate by player name — only keep first occurrence */
+    const seen = new Set();
+    const standings = [];
+    Array.from(wEls).forEach((el, i) => {
+        const name = el.getAttribute('data-n');
+        if (seen.has(name)) return; // skip duplicate
+        seen.add(name);
         const w = parseInt(el.value) || 0;
         const d = parseInt(dEls[i]?.value) || 0;
         const l = parseInt(lEls[i]?.value) || 0;
         const f = parseInt(fEls[i]?.value) || 0;
         const a = parseInt(aEls[i]?.value) || 0;
-        return {
-            name: el.getAttribute('data-n'),
+        standings.push({
+            name,
             w, d, l, f, a,
             gd: f - a,
             pts: w * 3 + d,
             manualRank: parseInt(rEls[i]?.value) || 1
-        };
+        });
     });
+
+    if (!standings.length) return alert('Tidak ada data standings. Coba refresh halaman.');
 
     db.ref(dbPath + '/' + currentMonth + '/matches/' + id)
         .update({ tanggal: parseInt(tgl), standings, manualJuara: null })
