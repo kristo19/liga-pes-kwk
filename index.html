@@ -2786,6 +2786,11 @@ function renderDatabasePage() {
           + '<button onclick="resetDatabaseKeDefault(true)" style="padding:7px 16px;border-radius:20px;border:none;background:#e53935;color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">🗑️ Reset ke Default</button>'
         : '';
 
+    if (dbCurrentPlayer === 'COMPARE') {
+        renderComparePage();
+        return;
+    }
+
     el.innerHTML = `
         <div class="db-page">
             <div class="db-page-header">
@@ -2820,10 +2825,6 @@ function renderDatabasePage() {
             </div>
         </div>
     `;
-    if (dbCurrentPlayer === 'COMPARE') {
-        renderComparePage();
-        return;
-    }
     dbRenderTable();
     dbUpdateSortHeaders();
 }
