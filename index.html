@@ -342,6 +342,10 @@
         .mob-tbl tbody tr:last-child td { border-bottom: none; }
         .mob-tbl tbody tr:hover { background: var(--hover); }
 
+        /* Mobile edit input styles */
+        .mob-tbl .tbl-in { width: 44px; padding: 4px 2px; font-size: 0.8rem; text-align: center; border: 1.5px solid var(--border); border-radius: 5px; font-family: 'Barlow', sans-serif; font-weight: 700; color: var(--purple); }
+        .mob-tbl .rank-in { width: 44px; padding: 3px 2px; font-size: 0.8rem; border: 1.5px solid var(--border); border-radius: 5px; font-family: 'Barlow', sans-serif; }
+
         .match-block { border-top: 1px solid var(--border); }
         .match-block:first-child { border-top: none; }
 
@@ -1429,11 +1433,37 @@ function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matc
         + (isEdit     ? '<th>Rank</th>'  : '')
         + '</tr></thead><tbody>' + dRows + '</tbody></table></div>'
         + '<div class="mob-tabs"><div class="mob-tab-btns">'
-        + '<button class="mob-tab-btn on" onclick="swTab(this,\'' + tid + '\',\'short\')">Short</button>'
+        + (isEdit
+            ? '<button class="mob-tab-btn on" onclick="swTab(this,\'' + tid + '\',\'edit\')">✏️ Edit</button>'
+              + '<button class="mob-tab-btn" onclick="swTab(this,\'' + tid + '\',\'short\')">Short</button>'
+            : '<button class="mob-tab-btn on" onclick="swTab(this,\'' + tid + '\',\'short\')">Short</button>'
+          )
         + '<button class="mob-tab-btn" onclick="swTab(this,\'' + tid + '\',\'full\')">Full</button>'
         + (showForm ? '<button class="mob-tab-btn" onclick="swTab(this,\'' + tid + '\',\'form\')">Form</button>' : '')
         + '</div>'
-        + '<table class="mob-tbl' + tblCls + ' on" id="' + tid + '-short"><thead><tr>'
+        + (isEdit
+            ? '<table class="mob-tbl' + tblCls + ' on" id="' + tid + '-edit"><thead><tr>'
+              + '<th style="width:32px;">Pos</th><th class="tl">Player</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th><th>Rank</th>'
+              + '</tr></thead><tbody>'
+              + rowData.map((p, i) => {
+                  const n = escHtml(p.name);
+                  return '<tr class="' + (p.isWin ? winRowCls : '') + '">'
+                    + '<td><div class="pos-wrap"><div class="pos-bar ' + (i < topN ? barTopCls : barMidCls) + '"></div><span class="pos-num ' + (i < topN ? topNumCls : '') + '">' + (i+1) + '</span></div></td>'
+                    + '<td class="tl" style="font-size:0.8rem;font-weight:800;">' + n + '</td>'
+                    + '<td><input type="number" class="tbl-in w-in" data-n="' + n + '" data-key="' + uniqueKey + '" min="0" value="' + (p.w||0) + '" oninput="recalc(this,\'' + uniqueKey + '\')"></td>'
+                    + '<td><input type="number" class="tbl-in d-in" data-n="' + n + '" data-key="' + uniqueKey + '" min="0" value="' + (p.d||0) + '" oninput="recalc(this,\'' + uniqueKey + '\')"></td>'
+                    + '<td><input type="number" class="tbl-in l-in" data-n="' + n + '" data-key="' + uniqueKey + '" min="0" value="' + (p.l||0) + '"></td>'
+                    + '<td><input type="number" class="tbl-in f-in" data-n="' + n + '" data-key="' + uniqueKey + '" min="0" value="' + (p.gf||0) + '"></td>'
+                    + '<td><input type="number" class="tbl-in a-in" data-n="' + n + '" data-key="' + uniqueKey + '" min="0" value="' + (p.ga||0) + '"></td>'
+                    + '<td><input class="tbl-in tbl-in-pts pts-in" data-n="' + n + '" data-key="' + uniqueKey + '" value="' + p.pts + '" readonly style="width:36px;"></td>'
+                    + '<td><select class="tbl-in rank-in" data-n="' + n + '" data-key="' + uniqueKey + '">'
+                      + [1,2,3,4].map(nv => '<option value="' + nv + '" ' + ((rawStandings[i]||{}).manualRank == nv ? 'selected' : '') + '>' + nv + '</option>').join('')
+                      + '</select></td>'
+                    + '</tr>';
+              }).join('')
+              + '</tbody></table>'
+            : '')
+        + '<table class="mob-tbl' + tblCls + (isEdit ? '' : ' on') + '" id="' + tid + '-short"><thead><tr>'
         + '<th style="width:38px;">Pos</th><th class="tl">Player</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>Pts</th>'
         + (showWinPct ? '<th>WINS%</th>' : '')
         + '</tr></thead><tbody>' + shortRows + '</tbody></table>'
@@ -1557,8 +1587,9 @@ function bukaInfoPlayerAllTime(nama) {
                 const st = match.standings.find(p => fix(p.name) === nama);
                 if (!st) return;
                 const mi   = (matchInfoData[id] || {})[nama] || {};
-                const club = (mi.club || '').trim() || '(Tidak Diisi)';
                 const isFT = mi.isFullTransfer || false;
+                // FIX: Semua liga Full Transfer digabung ke satu bucket, liga Klub per nama klub
+                const club = isFT ? '__FULL_TRANSFER__' : ((mi.club || '').trim() || '(Tidak Diisi)');
                 const w    = parseInt(st.w) || 0;
                 const d    = parseInt(st.d) || 0;
                 const l    = parseInt(st.l) || 0;
@@ -1573,7 +1604,6 @@ function bukaInfoPlayerAllTime(nama) {
                 clubStats[club].w     += w; clubStats[club].d += d; clubStats[club].l += l;
                 clubStats[club].pl    += pl; clubStats[club].pts += pts;
                 clubStats[club].juara += isJuara ? 1 : 0;
-                if (isFT) clubStats[club].isFT = true;
 
                 grandTotalW  += w; grandTotalD += d; grandTotalL += l; grandTotalPl += pl;
                 grandLiga    += 1; if (isJuara) grandJuara += 1;
@@ -1586,6 +1616,9 @@ function bukaInfoPlayerAllTime(nama) {
                 '<div class="no-club" style="text-align:center;padding:20px;">Belum ada data klub untuk ' + escHtml(nama) + '.</div>';
         }
         clubs.sort((a, b) => {
+            // Full Transfer selalu di atas jika ada
+            if (a === '__FULL_TRANSFER__') return -1;
+            if (b === '__FULL_TRANSFER__') return 1;
             if (clubStats[b].liga !== clubStats[a].liga) return clubStats[b].liga - clubStats[a].liga;
             const wrA = clubStats[a].pl > 0 ? clubStats[a].w / clubStats[a].pl : 0;
             const wrB = clubStats[b].pl > 0 ? clubStats[b].w / clubStats[b].pl : 0;
@@ -1611,12 +1644,13 @@ function bukaInfoPlayerAllTime(nama) {
             const cs       = clubStats[club];
             const pct      = winPct(cs.w, cs.pl);
             const isUnknown = club === '(Tidak Diisi)';
-            const isBest   = idx === 0 && !isUnknown;
-            const logoUrl  = getClubLogo(club);
-            const logoHtml = (!cs.isFT && logoUrl)
+            const isFTBucket = club === '__FULL_TRANSFER__';
+            const isBest   = idx === 0 && !isUnknown && !isFTBucket;
+            const logoUrl  = !isFTBucket ? getClubLogo(club) : null;
+            const logoHtml = (!isFTBucket && !isUnknown && logoUrl)
                 ? '<img src="' + logoUrl + '" style="width:32px;height:32px;object-fit:contain;vertical-align:middle;margin-right:8px;" onerror="this.style.display=\'none\'" title="' + escHtml(club) + '">'
                 : '';
-            const clubDisplayName = cs.isFT ? '🔀 Full Transfer' : ('⚽ ' + escHtml(club));
+            const clubDisplayName = isFTBucket ? '🔀 Full Transfer' : (isUnknown ? '(Tidak Diisi)' : ('⚽ ' + escHtml(club)));
             const barColor = pct >= 60
                 ? 'linear-gradient(90deg,var(--win),#00e676)'
                 : pct >= 40
@@ -1625,9 +1659,9 @@ function bukaInfoPlayerAllTime(nama) {
             const badgeBg  = pct >= 60 ? 'var(--win)' : pct >= 40 ? '#888' : 'var(--loss)';
 
             html += '<div class="league-card" style="margin-bottom:10px;">'
-                + '<div class="league-card-head" style="' + (isBest ? 'background:linear-gradient(90deg,#fff9c4,#fff3e0);' : '') + '">'
+                + '<div class="league-card-head" style="' + (isBest ? 'background:linear-gradient(90deg,#fff9c4,#fff3e0);' : isFTBucket ? 'background:linear-gradient(90deg,#fff0f3,#ffe8ed);' : '') + '">'
                 + '<div style="display:flex;align-items:center;">' + logoHtml
-                + '<div><span class="lc-title" style="' + (isUnknown ? 'color:#aaa;font-style:italic;' : '') + '">' + (isBest ? '🥇 ' : '') + clubDisplayName + '</span>'
+                + '<div><span class="lc-title" style="' + (isUnknown ? 'color:#aaa;font-style:italic;' : isFTBucket ? 'color:#c62828;' : '') + '">' + (isBest ? '🥇 ' : '') + clubDisplayName + '</span>'
                 + '<div style="font-size:0.68rem;color:var(--sub);margin-top:2px;">' + cs.liga + 'x Liga dipakai</div>'
                 + '</div></div>'
                 + '<span class="lc-badge" style="background:' + badgeBg + ';">' + pct + '% WR</span>'
