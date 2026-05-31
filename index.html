@@ -209,6 +209,81 @@
         .btn-stats-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #ff6b35, #f7c59f); color: #7f0000; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
         .btn-stats-menu:hover { background: linear-gradient(135deg, #ff4500, #ff6b35); color: white; }
         .btn-stats-menu.active { background: linear-gradient(135deg, #b8360b, #e84c00); color: white; box-shadow: 0 4px 14px rgba(232,76,0,0.4); }
+        .btn-db-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #1565c0, #90caf9); color: #003c8f; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
+        .btn-db-menu:hover { background: linear-gradient(135deg, #003c8f, #1565c0); color: white; }
+        .btn-db-menu.active { background: linear-gradient(135deg, #003c8f, #1565c0); color: white; box-shadow: 0 4px 14px rgba(21,101,192,0.4); }
+
+        /* ===== DATABASE PEMAIN PAGE ===== */
+        .db-page { padding: 0; }
+        .db-page-header { background: linear-gradient(135deg, #003c8f 0%, #1565c0 50%, #1976d2 100%); padding: 24px 28px 20px; color: white; }
+        .db-page-header h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .db-page-header p { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+        .db-accent { background: linear-gradient(90deg, #1565c0, #90caf9, #1565c0); background-size: 200% 100%; animation: shimBar 2s linear infinite; height: 3px; }
+        .db-player-tabs { display: flex; border-bottom: 2px solid var(--border); background: white; overflow-x: auto; }
+        .db-player-tab { flex-shrink: 0; padding: 12px 20px; font-size: 0.82rem; font-weight: 800; color: var(--sub); border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.15s; font-family: 'Barlow', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+        .db-player-tab.on { color: #1565c0; border-bottom-color: #1565c0; }
+        .db-player-tab:hover:not(.on) { color: var(--purple); background: var(--hover); }
+        .db-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 20px; background: #f8f5ff; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .db-toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .db-search { padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-family: 'Barlow', sans-serif; font-size: 0.85rem; color: var(--purple); outline: none; min-width: 160px; }
+        .db-search:focus { border-color: #1565c0; }
+        .db-filter-pos { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-family: 'Barlow', sans-serif; font-size: 0.82rem; color: var(--purple); background: white; outline: none; cursor: pointer; }
+        .db-count { font-size: 0.72rem; font-weight: 700; color: var(--sub); }
+        .btn-db-add { padding: 7px 16px; border-radius: 20px; border: none; background: #1565c0; color: white; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-db-add:hover { background: #003c8f; }
+        .db-table-wrap { overflow-x: auto; }
+        .db-tbl { width: 100%; border-collapse: collapse; min-width: 440px; }
+        .db-tbl thead th { padding: 10px 12px; font-size: 0.68rem; font-weight: 700; color: var(--sub); text-align: left; border-bottom: 2px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; background: white; white-space: nowrap; cursor: pointer; user-select: none; }
+        .db-tbl thead th:hover { color: #1565c0; }
+        .db-tbl thead th.sort-asc::after { content: ' \25B2'; font-size: 0.6rem; }
+        .db-tbl thead th.sort-desc::after { content: ' \25BC'; font-size: 0.6rem; }
+        .db-tbl thead th.no-sort { cursor: default; }
+        .db-tbl tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+        .db-tbl tbody tr:hover { background: #e8f4ff; }
+        .db-tbl tbody tr:last-child { border-bottom: none; }
+        .db-tbl tbody td { padding: 9px 12px; font-size: 0.88rem; color: #37003c; vertical-align: middle; }
+        .db-num { font-weight: 900; font-size: 0.78rem; color: #1565c0; width: 28px; text-align: center; }
+        .db-pos-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px; }
+        .db-pos-GK  { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+        .db-pos-CB  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .db-pos-LB  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .db-pos-RB  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .db-pos-DMF { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+        .db-pos-CMF { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+        .db-pos-AMF { background: #fce4ec; color: #880e4f; border: 1px solid #f48fb1; }
+        .db-pos-LWF { background: #f3e5f5; color: #4a148c; border: 1px solid #ce93d8; }
+        .db-pos-RWF { background: #f3e5f5; color: #4a148c; border: 1px solid #ce93d8; }
+        .db-pos-CF  { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+        .db-club-cell { display: flex; align-items: center; gap: 6px; }
+        .db-club-logo { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
+        .db-club-name { font-weight: 600; font-size: 0.85rem; }
+        .db-action-btn { padding: 3px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 700; font-family: 'Barlow', sans-serif; transition: 0.15s; }
+        .db-edit-btn  { background: #e3f2fd; color: #1565c0; }
+        .db-edit-btn:hover  { background: #1565c0; color: white; }
+        .db-del-btn   { background: #ffebee; color: #c62828; margin-left: 4px; }
+        .db-del-btn:hover   { background: #c62828; color: white; }
+        .db-modal { display: none; position: fixed; inset: 0; background: rgba(15,5,30,0.85); z-index: 99999; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(6px); }
+        .db-modal.on { display: flex; }
+        .db-modal-box { background: white; width: 100%; max-width: 480px; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.5); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); max-height: 90vh; overflow-y: auto; }
+        .db-modal-header { background: linear-gradient(135deg, #003c8f, #1565c0); padding: 18px 22px; color: white; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1; }
+        .db-modal-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .db-modal-close { background: rgba(255,255,255,0.15); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .db-modal-close:hover { background: var(--pink); }
+        .db-modal-body { padding: 18px 22px 22px; }
+        .db-form-row { margin-bottom: 13px; }
+        .db-form-label { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+        .db-form-input, .db-form-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 0.95rem; color: var(--purple); outline: none; background: white; }
+        .db-form-input:focus, .db-form-select:focus { border-color: #1565c0; }
+        .db-form-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .db-btn-save { flex: 1; padding: 11px; border-radius: 8px; border: none; background: #1565c0; color: white; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .db-btn-save:hover { background: #003c8f; }
+        .db-btn-cancel { padding: 11px 18px; border-radius: 8px; border: none; background: #eee; color: #666; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .db-btn-cancel:hover { background: #ddd; }
+        .db-empty { padding: 40px; text-align: center; color: #999; font-size: 0.9rem; }
+        .db-stat-row { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 20px 12px; background: #f8f5ff; border-bottom: 1px solid var(--border); }
+        .db-stat-chip { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; font-weight: 700; color: var(--sub); }
+        .db-stat-chip span { color: var(--purple); font-size: 0.9rem; }
+        .db-trade-badge { display: inline-block; padding: 1px 6px; border-radius: 5px; font-size: 0.62rem; font-weight: 700; background: #fff9c4; color: #f57f17; border: 1px solid #ffe082; margin-left: 4px; }
 
         .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
         .content-panel { background: white; border-radius: 14px; overflow: hidden; }
@@ -592,6 +667,7 @@
         <select id="monthSelect" class="nav-select" onchange="gantiBulan(this.value)"></select>
         <button id="btnAllTime" class="btn-alltime" onclick="gantiBulan('ALL TIME STANDING')">&#127942; All Time Standing</button>
         <button id="btnStats" class="btn-stats-menu" onclick="gantiBulan('STATS')">&#128202; Stats</button>
+        <button id="btnDB" class="btn-db-menu" onclick="gantiBulan('DATABASE')">&#128101; Database Pemain</button>
     </div>
 
     <div class="main-layout">
@@ -649,6 +725,54 @@
     </div>
 </div>
 
+
+<!-- MODAL DATABASE PEMAIN -->
+<div id="dbModal" class="db-modal" onclick="tutupDbModalOutside(event)">
+    <div class="db-modal-box">
+        <div class="db-modal-header">
+            <h3 id="dbModalTitle">Tambah Pemain</h3>
+            <button class="db-modal-close" onclick="tutupDbModal()">&times;</button>
+        </div>
+        <div class="db-modal-body">
+            <div class="db-form-row">
+                <label class="db-form-label">Nomor</label>
+                <input type="number" id="dbFormNum" class="db-form-input" placeholder="1" min="1" max="99">
+            </div>
+            <div class="db-form-row">
+                <label class="db-form-label">Nama Pemain</label>
+                <input type="text" id="dbFormName" class="db-form-input" placeholder="contoh: Erling Haaland">
+            </div>
+            <div class="db-form-row">
+                <label class="db-form-label">Nama Klub</label>
+                <input type="text" id="dbFormClub" class="db-form-input" placeholder="contoh: Manchester City">
+            </div>
+            <div class="db-form-row">
+                <label class="db-form-label">Posisi</label>
+                <select id="dbFormPos" class="db-form-select">
+                    <option value="">-- Pilih Posisi --</option>
+                    <option value="GK">GK - Goalkeeper</option>
+                    <option value="CB">CB - Centre Back</option>
+                    <option value="LB">LB - Left Back</option>
+                    <option value="RB">RB - Right Back</option>
+                    <option value="DMF">DMF - Defensive Mid</option>
+                    <option value="CMF">CMF - Central Mid</option>
+                    <option value="AMF">AMF - Attacking Mid</option>
+                    <option value="LWF">LWF - Left Wing</option>
+                    <option value="RWF">RWF - Right Wing</option>
+                    <option value="CF">CF - Centre Forward</option>
+                </select>
+            </div>
+            <div class="db-form-row">
+                <label class="db-form-label">Catatan (opsional)</label>
+                <input type="text" id="dbFormNote" class="db-form-input" placeholder="cth: Trade, Injured, dll.">
+            </div>
+            <div class="db-form-actions">
+                <button class="db-btn-cancel" onclick="tutupDbModal()">Batal</button>
+                <button class="db-btn-save" onclick="simpanDbPemain()">&#128190; Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- MODAL LOGIN -->
 <div id="loginModal" class="login-modal">
     <div class="login-box">
@@ -1018,6 +1142,7 @@ function applyMode() {
     loadData();
     listenStats();
     listenMatchInfo();
+    listenDatabase();
 }
 
 function buildMonthSelect() {
@@ -1031,11 +1156,12 @@ function buildMonthSelect() {
 
 function gantiBulan(m) {
     currentMonth = m;
-    if (m !== 'ALL TIME STANDING' && m !== 'STATS') {
+    if (m !== 'ALL TIME STANDING' && m !== 'STATS' && m !== 'DATABASE') {
         document.getElementById('monthSelect').value = m;
     }
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
     document.getElementById('btnStats').classList.toggle('active', m === 'STATS');
+    document.getElementById('btnDB').classList.toggle('active', m === 'DATABASE');
     editingId = null; tipeLiga = null;
     loadData();
     renderAdminArea();
@@ -1045,6 +1171,14 @@ function loadData() {
     if (!currentMode) return; // FIX: guard — don't run before mode selected
     const banner = document.getElementById('champBanner');
 
+    if (currentMonth === 'DATABASE') {
+        banner.classList.add('hidden');
+        toggleSidebarMode(false, true);
+        if (matchesRef) { matchesRef.off(); matchesRef = null; }
+        renderDatabasePage();
+        renderAdminArea();
+        return;
+    }
     if (currentMonth === 'STATS') {
         banner.classList.add('hidden');
         toggleSidebarMode(false, true);
@@ -1983,7 +2117,7 @@ function renderAdminArea() {
     if (!adminArea) return;
     if (!modeAdmin) { adminArea.innerHTML = ''; return; }
 
-    if (currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS') {
+    if (currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE') {
         adminArea.innerHTML = '<div class="admin-panel"><h3>⚙️ Admin Mode</h3>'
             + '<p style="font-size:0.85rem;color:#999;margin-bottom:12px;">Pilih bulan terlebih dahulu untuk membuat liga baru.</p>'
             + '<button class="btn-adm btn-off" onclick="matikanAdmin()">🔒 Log Out Admin</button></div>';
@@ -2112,6 +2246,368 @@ function matikanAdmin() {
         .then(() => { alert('🔒 Berhasil keluar dari Mode Admin.'); })
         .catch(e => alert('❌ Gagal logout: ' + e.message));
 }
+/* ===================== DATABASE PEMAIN ===================== */
+let dbData = {}; // { playerKey: { [uid]: {num, name, club, pos, note} } }
+let dbRef = null;
+let dbCurrentPlayer = null;
+let dbSortCol = 'num';
+let dbSortDir = 'asc';
+let dbSearchQ = '';
+let dbFilterPos = '';
+let dbEditUid = null;
+
+const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe'];
+
+// Default data from the Excel sheet (Liga Mei)
+const DB_DEFAULT = {
+  'Toxx': [
+    {num:1,name:'Gianluigi Donnarumma',club:'Manchester City',pos:'GK',note:''},
+    {num:2,name:'Ederson',club:'Fenerbahce',pos:'GK',note:''},
+    {num:3,name:'Alphonso Davies',club:'Bayern Munich',pos:'LB',note:''},
+    {num:4,name:'Achraf Hakimi',club:'Paris Saint-Germain',pos:'RB',note:''},
+    {num:5,name:'William Saliba',club:'Arsenal',pos:'CB',note:''},
+    {num:6,name:'John Stones',club:'Manchester City',pos:'CB',note:''},
+    {num:7,name:'Dayot Upamecano',club:'Bayern Munich',pos:'CB',note:''},
+    {num:8,name:'Ronald Araujo',club:'Barcelona',pos:'CB',note:''},
+    {num:9,name:'Jeremie Frimpong',club:'Liverpool',pos:'RB',note:''},
+    {num:10,name:'Andrew Robertson',club:'Liverpool',pos:'LB',note:''},
+    {num:11,name:'Aurélien Tchouaméni',club:'Real Madrid',pos:'DMF',note:''},
+    {num:12,name:'Casemiro',club:'Manchester United',pos:'DMF',note:''},
+    {num:13,name:'Bruno Fernandes',club:'Manchester United',pos:'AMF',note:''},
+    {num:14,name:'Bernardo Silva',club:'Manchester City',pos:'AMF',note:''},
+    {num:15,name:'Federico Valverde',club:'Real Madrid',pos:'CMF',note:''},
+    {num:16,name:'Pedri',club:'Barcelona',pos:'CMF',note:''},
+    {num:17,name:'Luka Modric',club:'Real Madrid',pos:'CMF',note:''},
+    {num:18,name:'Alexis Mac Allister',club:'Liverpool',pos:'CMF',note:''},
+    {num:19,name:'Vinícius Júnior',club:'Real Madrid',pos:'LWF',note:''},
+    {num:20,name:'Lionel Messi',club:'Inter Miami',pos:'RWF',note:''},
+    {num:21,name:'Cristiano Ronaldo',club:'Al-Nassr',pos:'LWF',note:''},
+    {num:22,name:'Kai Havertz',club:'Arsenal',pos:'CF',note:''},
+    {num:23,name:'Kylian Mbappé',club:'Real Madrid',pos:'CF',note:''},
+    {num:24,name:'Ousmane Dembélé',club:'Paris Saint-Germain',pos:'CF',note:''}
+  ],
+  'Stive': [
+    {num:1,name:'Manuel Neuer',club:'Bayern Munich',pos:'GK',note:''},
+    {num:2,name:'Alisson Becker',club:'Liverpool',pos:'GK',note:''},
+    {num:3,name:'Ferland Mendy',club:'Real Madrid',pos:'LB',note:''},
+    {num:4,name:'Ben White',club:'Arsenal',pos:'LB',note:''},
+    {num:5,name:'Rúben Dias',club:'Manchester City',pos:'CB',note:''},
+    {num:6,name:'Éder Militão',club:'Real Madrid',pos:'CB',note:''},
+    {num:7,name:'Alessandro Bastoni',club:'Inter Milan',pos:'CB',note:''},
+    {num:8,name:'Jonathan Tah',club:'Bayer Leverkusen',pos:'CB',note:''},
+    {num:9,name:'Raphaël Guerreiro',club:'Bayern Munich',pos:'RB',note:''},
+    {num:10,name:'Sacha Boey',club:'Bayern Munich',pos:'RB',note:''},
+    {num:11,name:'Declan Rice',club:'Arsenal',pos:'DMF',note:''},
+    {num:12,name:'João Palhinha',club:'Tottenham Hotspur',pos:'DMF',note:''},
+    {num:13,name:'Kevin De Bruyne',club:'Napoli',pos:'AMF',note:''},
+    {num:14,name:'Cole Palmer',club:'Chelsea',pos:'AMF',note:''},
+    {num:15,name:'Martin Ødegaard',club:'Arsenal',pos:'CMF',note:''},
+    {num:16,name:'Enzo Fernández',club:'Chelsea',pos:'CMF',note:''},
+    {num:17,name:'Hakan Çalhanoğlu',club:'Inter Milan',pos:'CMF',note:''},
+    {num:18,name:'Jamal Musiala',club:'Bayern Munich',pos:'CMF',note:''},
+    {num:19,name:'Victor Osimhen',club:'Galatasaray',pos:'CF',note:''},
+    {num:20,name:'Karim Benzema',club:'Al-Ittihad',pos:'CF',note:''},
+    {num:21,name:'Leroy Sané',club:'Bayern Munich',pos:'RWF',note:''},
+    {num:22,name:'Son Heung-min',club:'LA FC',pos:'LWF',note:''},
+    {num:23,name:'Julián Álvarez',club:'Atlético Madrid',pos:'CF',note:''},
+    {num:24,name:'Harry Kane',club:'Bayern Munich',pos:'CF',note:''}
+  ],
+  'Alfa': [
+    {num:1,name:'Gregor Kobel',club:'Borussia Dortmund',pos:'GK',note:''},
+    {num:2,name:'David Raya',club:'Arsenal',pos:'GK',note:''},
+    {num:3,name:'Nuno Mendes',club:'Paris Saint-Germain',pos:'LB',note:''},
+    {num:4,name:'Jordi Alba',club:'Inter Miami',pos:'LB',note:''},
+    {num:5,name:'Virgil van Dijk',club:'Liverpool',pos:'CB',note:''},
+    {num:6,name:'Marquinhos',club:'Paris Saint-Germain',pos:'CB',note:''},
+    {num:7,name:'Gabriel Magalhães',club:'Arsenal',pos:'CB',note:''},
+    {num:8,name:'Micky van de Ven',club:'Tottenham Hotspur',pos:'CB',note:''},
+    {num:9,name:'Alejandro Grimaldo',club:'Bayer Leverkusen',pos:'LB',note:''},
+    {num:10,name:'Reece James',club:'Chelsea',pos:'RB',note:'Trade: Marmoush'},
+    {num:11,name:'Rodri',club:'Manchester City',pos:'DMF',note:''},
+    {num:12,name:'Stephen Eustáquio',club:'FC Porto',pos:'DMF',note:''},
+    {num:13,name:'Matheus Cunha',club:'Manchester United',pos:'AMF',note:'Trade: Hincapie'},
+    {num:14,name:'Florian Wirtz',club:'Liverpool',pos:'AMF',note:''},
+    {num:15,name:'Eduardo Camavinga',club:'Real Madrid',pos:'CMF',note:''},
+    {num:16,name:'Frenkie de Jong',club:'Barcelona',pos:'CMF',note:''},
+    {num:17,name:'Sandro Tonali',club:'Newcastle United',pos:'CMF',note:''},
+    {num:18,name:'Joelinton',club:'Newcastle United',pos:'CMF',note:''},
+    {num:19,name:'Loïs Openda',club:'Juventus',pos:'CF',note:''},
+    {num:20,name:'Erling Haaland',club:'Manchester City',pos:'CF',note:''},
+    {num:21,name:'Bukayo Saka',club:'Arsenal',pos:'RWF',note:''},
+    {num:22,name:'Mohamed Salah',club:'Liverpool',pos:'RWF',note:''},
+    {num:23,name:'Marcus Thuram',club:'Inter Milan',pos:'CF',note:''},
+    {num:24,name:'Serhou Guirassy',club:'Borussia Dortmund',pos:'CF',note:''}
+  ],
+  'Kobe': [
+    {num:1,name:'Thibaut Courtois',club:'Real Madrid',pos:'GK',note:''},
+    {num:2,name:'Emiliano Martínez',club:'Aston Villa',pos:'GK',note:''},
+    {num:3,name:'Trent Alexander-Arnold',club:'Liverpool',pos:'RB',note:''},
+    {num:4,name:'Theo Hernández',club:'Al Hillal',pos:'LB',note:''},
+    {num:5,name:'Antonio Rüdiger',club:'Real Madrid',pos:'CB',note:''},
+    {num:6,name:'Kim Min-jae',club:'Bayern Munich',pos:'CB',note:''},
+    {num:7,name:'Ibrahima Konaté',club:'Liverpool',pos:'CB',note:''},
+    {num:8,name:'Josko Gvardiol',club:'Manchester City',pos:'CB',note:''},
+    {num:9,name:'Jules Koundé',club:'Barcelona',pos:'LB',note:''},
+    {num:10,name:'Alejandro Balde',club:'Barcelona',pos:'RB',note:''},
+    {num:11,name:'Ryan Gravenberch',club:'Liverpool',pos:'DMF',note:''},
+    {num:12,name:'Bruno Guimarães',club:'Newcastle United',pos:'DMF',note:''},
+    {num:13,name:'Jude Bellingham',club:'Real Madrid',pos:'AMF',note:''},
+    {num:14,name:'Dominik Szoboszlai',club:'Liverpool',pos:'AMF',note:''},
+    {num:15,name:'Joshua Kimmich',club:'Bayern Munich',pos:'CMF',note:''},
+    {num:16,name:'Vitinha',club:'Paris Saint-Germain',pos:'CMF',note:''},
+    {num:17,name:'Nicolò Barella',club:'Inter Milan',pos:'CMF',note:''},
+    {num:18,name:'Fabián Ruiz',club:'Paris Saint-Germain',pos:'CMF',note:''},
+    {num:19,name:'Viktor Gyökeres',club:'Arsenal',pos:'CF',note:''},
+    {num:20,name:'Lautaro Martínez',club:'Inter Milan',pos:'CF',note:''},
+    {num:21,name:'Rodrygo',club:'Real Madrid',pos:'RWF',note:''},
+    {num:22,name:'Rafael Leão',club:'AC Milan',pos:'LWF',note:''},
+    {num:23,name:'Alexander Isak',club:'Newcastle United',pos:'CF',note:''},
+    {num:24,name:'Alexander Sørloth',club:'Atlético Madrid',pos:'CF',note:''}
+  ]
+};
+
+function listenDatabase() {
+    if (!dbPath) return;
+    db.ref(dbPath + '/database').on('value', snap => {
+        const raw = snap.val();
+        if (!raw) {
+            // First time: seed with default data
+            const updates = {};
+            DB_PLAYERS.forEach(pk => {
+                (DB_DEFAULT[pk] || []).forEach((p, i) => {
+                    const uid = 'p' + (i+1).toString().padStart(3,'0');
+                    updates[dbPath + '/database/' + pk + '/' + uid] = p;
+                });
+            });
+            db.ref().update(updates).then(() => {});
+            return;
+        }
+        dbData = raw;
+        if (currentMonth === 'DATABASE') renderDatabasePage();
+    });
+}
+
+function renderDatabasePage() {
+    const el = document.getElementById('mainContent');
+    if (!el) return;
+    const banner = document.getElementById('champBanner');
+    banner.classList.add('hidden');
+
+    if (!dbCurrentPlayer) dbCurrentPlayer = DB_PLAYERS[0];
+
+    const tabsHtml = DB_PLAYERS.map(pk =>
+        '<button class="db-player-tab' + (pk === dbCurrentPlayer ? ' on' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')">' + escHtml(pk) + '</button>'
+    ).join('');
+
+    const allPositions = ['GK','CB','LB','RB','DMF','CMF','AMF','LWF','RWF','CF'];
+    const posOptions = '<option value="">Semua Posisi</option>'
+        + allPositions.map(p => '<option value="' + p + '"' + (dbFilterPos === p ? ' selected' : '') + '>' + p + '</option>').join('');
+
+    const adminTools = modeAdmin
+        ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
+        : '';
+
+    el.innerHTML = `
+        <div class="db-page">
+            <div class="db-page-header">
+                <h2>👥 DATABASE PEMAIN</h2>
+                <p>Skuad aktif &mdash; ${escHtml(currentMode)} Player Mode</p>
+            </div>
+            <div class="db-accent"></div>
+            <div class="db-player-tabs">${tabsHtml}</div>
+            <div id="dbStatRow" class="db-stat-row"></div>
+            <div class="db-toolbar">
+                <div class="db-toolbar-left">
+                    <input class="db-search" placeholder="🔍 Cari nama / klub..." value="${escHtml(dbSearchQ)}" oninput="dbOnSearch(this.value)">
+                    <select class="db-filter-pos" onchange="dbOnFilter(this.value)">${posOptions}</select>
+                    <span class="db-count" id="dbCount"></span>
+                </div>
+                ${adminTools}
+            </div>
+            <div class="db-table-wrap">
+                <table class="db-tbl">
+                    <thead>
+                        <tr>
+                            <th onclick="dbSort('num')" id="dbTh-num">#</th>
+                            <th onclick="dbSort('name')" id="dbTh-name">Nama Pemain</th>
+                            <th onclick="dbSort('club')" id="dbTh-club">Klub</th>
+                            <th onclick="dbSort('pos')" id="dbTh-pos">Pos</th>
+                            ${modeAdmin ? '<th class="no-sort">Aksi</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody id="dbTbody"></tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    dbRenderTable();
+    dbUpdateSortHeaders();
+}
+
+function dbSwitchPlayer(pk) {
+    dbCurrentPlayer = pk;
+    dbSearchQ = '';
+    dbFilterPos = '';
+    dbSortCol = 'num';
+    dbSortDir = 'asc';
+    renderDatabasePage();
+}
+
+function dbOnSearch(q) {
+    dbSearchQ = q;
+    dbRenderTable();
+}
+
+function dbOnFilter(pos) {
+    dbFilterPos = pos;
+    dbRenderTable();
+}
+
+function dbSort(col) {
+    if (dbSortCol === col) {
+        dbSortDir = dbSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        dbSortCol = col;
+        dbSortDir = col === 'num' ? 'asc' : 'asc';
+    }
+    dbRenderTable();
+    dbUpdateSortHeaders();
+}
+
+function dbUpdateSortHeaders() {
+    ['num','name','club','pos'].forEach(col => {
+        const th = document.getElementById('dbTh-' + col);
+        if (!th) return;
+        th.className = '';
+        if (col === dbSortCol) th.className = 'sort-' + dbSortDir;
+    });
+}
+
+function dbRenderTable() {
+    const tbody = document.getElementById('dbTbody');
+    const countEl = document.getElementById('dbCount');
+    const statRow = document.getElementById('dbStatRow');
+    if (!tbody) return;
+
+    const pkData = (dbData[dbCurrentPlayer] && typeof dbData[dbCurrentPlayer] === 'object')
+        ? Object.entries(dbData[dbCurrentPlayer]).map(([uid, p]) => ({uid, ...p}))
+        : [];
+
+    // Filter
+    const q = dbSearchQ.toLowerCase();
+    let filtered = pkData.filter(p => {
+        const matchQ = !q || (p.name||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q);
+        const matchPos = !dbFilterPos || p.pos === dbFilterPos;
+        return matchQ && matchPos;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+        let va = a[dbSortCol] || '';
+        let vb = b[dbSortCol] || '';
+        if (dbSortCol === 'num') { va = parseInt(va)||0; vb = parseInt(vb)||0; }
+        else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+        if (va < vb) return dbSortDir === 'asc' ? -1 : 1;
+        if (va > vb) return dbSortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    if (countEl) countEl.textContent = filtered.length + ' pemain';
+
+    // Stats row
+    if (statRow) {
+        const posCounts = {};
+        pkData.forEach(p => { const pos = p.pos || '?'; posCounts[pos] = (posCounts[pos]||0)+1; });
+        const posOrder = ['GK','CB','LB','RB','DMF','CMF','AMF','LWF','RWF','CF'];
+        statRow.innerHTML = '<span class="db-stat-chip">Total <span>' + pkData.length + '</span></span>'
+            + posOrder.filter(p => posCounts[p]).map(p =>
+                '<span class="db-stat-chip">' + p + ' <span>' + posCounts[p] + '</span></span>'
+            ).join('');
+    }
+
+    if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="' + (modeAdmin ? 5 : 4) + '" class="db-empty">Tidak ada pemain ditemukan.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(p => {
+        const posCls = 'db-pos-' + (p.pos || 'CF').replace(/[^A-Z]/g,'');
+        const logoUrl = getClubLogo(p.club || '');
+        const logoHtml = logoUrl
+            ? '<img src="' + logoUrl + '" class="db-club-logo" onerror="this.style.display=\'none\'">'
+            : '';
+        const noteBadge = p.note ? '<span class="db-trade-badge">⚡ ' + escHtml(p.note) + '</span>' : '';
+        const adminCols = modeAdmin
+            ? '<td><button class="db-action-btn db-edit-btn" onclick="bukaDbModalEdit(\'' + p.uid + '\')">✏️</button>'
+              + '<button class="db-action-btn db-del-btn" onclick="hapusDbPemain(\'' + p.uid + '\')">🗑️</button></td>'
+            : '';
+        return '<tr>'
+            + '<td><span class="db-num">' + (p.num||'') + '</span></td>'
+            + '<td><strong>' + escHtml(p.name||'') + '</strong>' + noteBadge + '</td>'
+            + '<td><div class="db-club-cell">' + logoHtml + '<span class="db-club-name">' + escHtml(p.club||'') + '</span></div></td>'
+            + '<td><span class="db-pos-badge ' + posCls + '">' + escHtml(p.pos||'') + '</span></td>'
+            + adminCols
+            + '</tr>';
+    }).join('');
+}
+
+function bukaDbModalTambah() {
+    dbEditUid = null;
+    document.getElementById('dbModalTitle').textContent = '➕ Tambah Pemain — ' + dbCurrentPlayer;
+    document.getElementById('dbFormNum').value = '';
+    document.getElementById('dbFormName').value = '';
+    document.getElementById('dbFormClub').value = '';
+    document.getElementById('dbFormPos').value = '';
+    document.getElementById('dbFormNote').value = '';
+    document.getElementById('dbModal').classList.add('on');
+}
+
+function bukaDbModalEdit(uid) {
+    const pkData = dbData[dbCurrentPlayer] || {};
+    const p = pkData[uid];
+    if (!p) return;
+    dbEditUid = uid;
+    document.getElementById('dbModalTitle').textContent = '✏️ Edit Pemain — ' + dbCurrentPlayer;
+    document.getElementById('dbFormNum').value = p.num || '';
+    document.getElementById('dbFormName').value = p.name || '';
+    document.getElementById('dbFormClub').value = p.club || '';
+    document.getElementById('dbFormPos').value = p.pos || '';
+    document.getElementById('dbFormNote').value = p.note || '';
+    document.getElementById('dbModal').classList.add('on');
+}
+
+function tutupDbModal() { document.getElementById('dbModal').classList.remove('on'); }
+function tutupDbModalOutside(e) { if (e.target === document.getElementById('dbModal')) tutupDbModal(); }
+
+function simpanDbPemain() {
+    const num  = parseInt(document.getElementById('dbFormNum').value) || 0;
+    const name = document.getElementById('dbFormName').value.trim();
+    const club = document.getElementById('dbFormClub').value.trim();
+    const pos  = document.getElementById('dbFormPos').value;
+    const note = document.getElementById('dbFormNote').value.trim();
+
+    if (!name) return alert('Nama pemain wajib diisi!');
+    if (!pos)  return alert('Posisi wajib dipilih!');
+
+    const payload = { num, name, club, pos, note };
+    let ref;
+    if (dbEditUid) {
+        ref = db.ref(dbPath + '/database/' + dbCurrentPlayer + '/' + dbEditUid);
+    } else {
+        ref = db.ref(dbPath + '/database/' + dbCurrentPlayer).push();
+    }
+    ref.set(payload)
+        .then(() => { tutupDbModal(); })
+        .catch(e => alert('❌ Gagal simpan: ' + e.message));
+}
+
+function hapusDbPemain(uid) {
+    if (!confirm('Hapus pemain ini dari database?')) return;
+    db.ref(dbPath + '/database/' + dbCurrentPlayer + '/' + uid)
+        .remove()
+        .catch(e => alert('❌ Gagal hapus: ' + e.message));
+}
+
 </script>
 </body>
 </html>
