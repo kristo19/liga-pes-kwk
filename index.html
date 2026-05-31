@@ -2747,6 +2747,7 @@ function renderDatabasePage() {
     const adminTools = modeAdmin
         ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
           + '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>'
+          + '<button onclick="resetDatabaseKeDefault(true)" style="padding:7px 16px;border-radius:20px;border:none;background:#e53935;color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">🗑️ Reset ke Default</button>'
         : '';
 
     el.innerHTML = `
