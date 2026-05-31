@@ -2058,9 +2058,19 @@ function updateSidebar(monthlyMatches) {
         const tList  = Object.entries(trophyMonth).sort((a, b) => b[1] - a[1]);
         const banner = document.getElementById('champBanner');
         if (tList.length > 0 && tList[0][1] > 0) {
-            banner.innerHTML = '🌟 CHAMPION ' + currentMonth.toUpperCase() + ': '
-                + tList.filter(t => t[1] === tList[0][1]).map(t => t[0] + ' (' + t[1] + 'x🏆)').join(' & ')
-                + ' 🌟';
+            const maxTrophy = tList[0][1];
+            const tied = tList.filter(t => t[1] === maxTrophy);
+            let champList;
+            if (tied.length > 1) {
+                /* Tiebreaker: siapa yang punya poin terbanyak di bulan ini */
+                tied.sort((a, b) => (ptsMonth[b[0]] || 0) - (ptsMonth[a[0]] || 0));
+                const maxPts = ptsMonth[tied[0][0]] || 0;
+                const finalChamps = tied.filter(t => (ptsMonth[t[0]] || 0) === maxPts);
+                champList = finalChamps.map(t => t[0] + ' (' + t[1] + 'x🏆)').join(' & ');
+            } else {
+                champList = tied.map(t => t[0] + ' (' + t[1] + 'x🏆)').join(' & ');
+            }
+            banner.innerHTML = '🌟 CHAMPION ' + currentMonth.toUpperCase() + ': ' + champList + ' 🌟';
         } else {
             banner.innerHTML = 'Belum ada juara di bulan ' + currentMonth;
         }
@@ -2536,7 +2546,7 @@ function renderDatabasePage() {
     const adminTools = modeAdmin
         ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
           + '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>'
-        : '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>';
+        : '';
 
     el.innerHTML = `
         <div class="db-page">
