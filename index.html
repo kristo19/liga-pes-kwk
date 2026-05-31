@@ -313,6 +313,42 @@
         .db-stat-chip span { color: var(--purple); font-size: 0.9rem; }
         .db-trade-badge { display: inline-block; padding: 1px 6px; border-radius: 5px; font-size: 0.62rem; font-weight: 700; background: #fff9c4; color: #f57f17; border: 1px solid #ffe082; margin-left: 4px; }
 
+        /* ===== COMPARE PAGE ===== */
+        .cmp-page { padding: 0; }
+        .cmp-controls { padding: 16px 20px; background: #f8f5ff; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .cmp-controls label { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; }
+        .cmp-select { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-family: 'Barlow', sans-serif; font-size: 0.85rem; color: var(--purple); background: white; outline: none; cursor: pointer; }
+        .cmp-select:focus { border-color: #1565c0; }
+        .btn-cmp-run { padding: 8px 20px; border-radius: 20px; border: none; background: linear-gradient(135deg,#37003c,#6a0dad); color: white; font-family: 'Barlow', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-cmp-run:hover { background: var(--pink); }
+        .cmp-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 900; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; padding: 16px 20px 8px; border-top: 2px solid var(--border); margin-top: 4px; }
+        .cmp-section-title:first-child { border-top: none; margin-top: 0; }
+        .cmp-grid { display: grid; gap: 0; }
+        .cmp-row { display: grid; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+        .cmp-row:hover { background: #f3eaff; }
+        .cmp-row.cmp-header { background: #f8f5ff; border-bottom: 2px solid var(--border); }
+        .cmp-row.cmp-header .cmp-cell { font-size: 0.7rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; }
+        .cmp-cell { padding: 9px 12px; font-size: 0.85rem; color: var(--purple); display: flex; align-items: center; gap: 6px; overflow: hidden; }
+        .cmp-cell.pos-col { min-width: 60px; }
+        .cmp-cell.name-col { font-weight: 700; }
+        .cmp-owner-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; white-space: nowrap; }
+        .cmp-own-Toxx  { background: #fce4ec; color: #880e4f; border: 1px solid #f48fb1; }
+        .cmp-own-Stive { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+        .cmp-own-Alfa  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .cmp-own-Kobe  { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+        .cmp-empty { padding: 40px; text-align: center; color: #aaa; font-size: 0.9rem; }
+        .cmp-summary { display: flex; gap: 10px; flex-wrap: wrap; padding: 14px 20px; background: white; border-bottom: 1px solid var(--border); }
+        .cmp-sum-card { flex: 1; min-width: 90px; background: linear-gradient(135deg, #37003c, #6a0dad); border-radius: 10px; padding: 10px 14px; color: white; text-align: center; }
+        .cmp-sum-card .sv { font-family: 'Barlow Condensed', sans-serif; font-size: 1.8rem; font-weight: 900; line-height: 1; }
+        .cmp-sum-card .sl { font-size: 0.62rem; font-weight: 700; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .cmp-sum-card.c-toxx  { background: linear-gradient(135deg,#880e4f,#e91e63); }
+        .cmp-sum-card.c-stive { background: linear-gradient(135deg,#0d47a1,#1976d2); }
+        .cmp-sum-card.c-alfa  { background: linear-gradient(135deg,#1b5e20,#388e3c); }
+        .cmp-sum-card.c-kobe  { background: linear-gradient(135deg,#e65100,#f57c00); }
+        .cmp-pos-group { background: white; }
+        .cmp-pos-header { display: flex; align-items: center; gap: 8px; padding: 8px 20px 6px; }
+
+
         .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
         .content-panel { background: white; border-radius: 14px; overflow: hidden; }
         .champ-banner { background: linear-gradient(135deg, var(--purple) 0%, #6a0dad 100%); color: white; text-align: center; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; }
@@ -2738,7 +2774,7 @@ function renderDatabasePage() {
 
     const tabsHtml = DB_PLAYERS.map(pk =>
         '<button class="db-player-tab' + (pk === dbCurrentPlayer ? ' on' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')">' + escHtml(pk) + '</button>'
-    ).join('');
+    ).join('') + '<button class="db-player-tab' + (dbCurrentPlayer === 'COMPARE' ? ' on' : '') + '" onclick="dbSwitchPlayer(\'COMPARE\')" style="color:#e90052;">⚔️ Compare</button>';
 
     const allPositions = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
     const posOptions = '<option value="">Semua Posisi</option>'
@@ -2784,8 +2820,208 @@ function renderDatabasePage() {
             </div>
         </div>
     `;
+    if (dbCurrentPlayer === 'COMPARE') {
+        renderComparePage();
+        return;
+    }
     dbRenderTable();
     dbUpdateSortHeaders();
+}
+
+function renderComparePage() {
+    const el = document.getElementById('mainContent');
+    if (!el) return;
+
+    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
+    const POS_ORDER = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
+    const allPositions = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
+    const posOptions = '<option value="">Semua Posisi</option>'
+        + allPositions.map(p => '<option value="' + p + '">' + p + '</option>').join('');
+
+    // Color per player
+    const PLAYER_COLORS = { Toxx:'#e91e63', Stive:'#1976d2', Alfa:'#388e3c', Kobe:'#f57c00' };
+    const PLAYER_BG     = { Toxx:'#fce4ec', Stive:'#e3f2fd', Alfa:'#e8f5e9',  Kobe:'#fff3e0' };
+
+    const tabsHtml = DB_PLAYERS.map(pk =>
+        '<button class="db-player-tab' + (pk === 'COMPARE' ? ' on' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')">' + escHtml(pk) + '</button>'
+    ).join('') + '<button class="db-player-tab on" style="color:#e90052;">⚔️ Compare</button>';
+
+    el.innerHTML = `
+        <div class="db-page">
+            <div class="db-page-header" style="background:linear-gradient(135deg,#37003c 0%,#6a0dad 50%,#1a0535 100%);">
+                <h2>⚔️ COMPARE PEMAIN</h2>
+                <p>Bandingkan skuad antar player &mdash; ${escHtml(currentMode)} Player Mode</p>
+            </div>
+            <div class="db-accent"></div>
+            <div class="db-player-tabs" id="cmpTabsWrap"></div>
+            <div class="cmp-controls">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <label>Filter Posisi:</label>
+                    <select class="cmp-select" id="cmpPosFilter" onchange="renderCompareTable()">${posOptions}</select>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <label>Urutkan:</label>
+                    <select class="cmp-select" id="cmpSort" onchange="renderCompareTable()">
+                        <option value="pos">Posisi</option>
+                        <option value="owner">Player</option>
+                        <option value="name">Nama A-Z</option>
+                        <option value="club">Klub</option>
+                    </select>
+                </div>
+            </div>
+            <div id="cmpSummary" class="cmp-summary"></div>
+            <div id="cmpBody" class="cmp-pos-group"></div>
+        </div>
+    `;
+
+    // Rebuild tabs in cmpTabsWrap
+    const tw = document.getElementById('cmpTabsWrap');
+    if (tw) {
+        tw.innerHTML = DB_PLAYERS.map(pk =>
+            '<button class="db-player-tab' + (pk === 'COMPARE' ? '' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')">' + escHtml(pk) + '</button>'
+        ).join('') + '<button class="db-player-tab on" style="color:#e90052;border-bottom-color:#e90052;">⚔️ Compare</button>';
+    }
+
+    renderCompareTable();
+}
+
+function renderCompareTable() {
+    const summaryEl = document.getElementById('cmpSummary');
+    const bodyEl    = document.getElementById('cmpBody');
+    if (!bodyEl) return;
+
+    const posFilter = (document.getElementById('cmpPosFilter') || {}).value || '';
+    const sortBy    = (document.getElementById('cmpSort') || {}).value || 'pos';
+
+    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
+    const POS_ORDER   = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
+    const PLAYER_COLOR = { Toxx:'#e91e63', Stive:'#1976d2', Alfa:'#388e3c', Kobe:'#f57c00' };
+    const PLAYER_CLS   = { Toxx:'c-toxx',  Stive:'c-stive',  Alfa:'c-alfa',  Kobe:'c-kobe'  };
+    const OWN_CLS      = { Toxx:'cmp-own-Toxx', Stive:'cmp-own-Stive', Alfa:'cmp-own-Alfa', Kobe:'cmp-own-Kobe' };
+
+    // Flatten all players
+    let allRows = [];
+    realPlayers.forEach(pk => {
+        if (!dbData[pk]) return;
+        Object.values(dbData[pk]).forEach(p => {
+            allRows.push({ ...p, _owner: pk });
+        });
+    });
+
+    // Filter by position
+    const filtered = posFilter
+        ? allRows.filter(p => p.pos === posFilter)
+        : allRows;
+
+    // Summary cards
+    if (summaryEl) {
+        const counts = {};
+        realPlayers.forEach(pk => { counts[pk] = filtered.filter(p => p._owner === pk).length; });
+        summaryEl.innerHTML = realPlayers.map(pk =>
+            '<div class="cmp-sum-card ' + PLAYER_CLS[pk] + '">'
+            + '<div class="sv">' + (counts[pk] || 0) + '</div>'
+            + '<div class="sl">' + escHtml(pk) + '</div>'
+            + '</div>'
+        ).join('');
+    }
+
+    if (!filtered.length) {
+        bodyEl.innerHTML = '<div class="cmp-empty">Tidak ada pemain untuk posisi ini.</div>';
+        return;
+    }
+
+    // Sort
+    const sorted = [...filtered].sort((a, b) => {
+        if (sortBy === 'pos') {
+            const ia = POS_ORDER.indexOf(a.pos) === -1 ? 99 : POS_ORDER.indexOf(a.pos);
+            const ib = POS_ORDER.indexOf(b.pos) === -1 ? 99 : POS_ORDER.indexOf(b.pos);
+            if (ia !== ib) return ia - ib;
+            // secondary sort: owner
+            if (a._owner !== b._owner) return realPlayers.indexOf(a._owner) - realPlayers.indexOf(b._owner);
+            return (parseInt(a.num)||0) - (parseInt(b.num)||0);
+        }
+        if (sortBy === 'owner') {
+            if (a._owner !== b._owner) return realPlayers.indexOf(a._owner) - realPlayers.indexOf(b._owner);
+            const ia = POS_ORDER.indexOf(a.pos) === -1 ? 99 : POS_ORDER.indexOf(a.pos);
+            const ib = POS_ORDER.indexOf(b.pos) === -1 ? 99 : POS_ORDER.indexOf(b.pos);
+            return ia - ib;
+        }
+        if (sortBy === 'name') return (a.name||'').localeCompare(b.name||'');
+        if (sortBy === 'club') return (a.club||'').localeCompare(b.club||'');
+        return 0;
+    });
+
+    // Group by position (if sort=pos) or owner (if sort=owner), else flat list
+    if (sortBy === 'pos' && !posFilter) {
+        // Group by position
+        const groups = {};
+        POS_ORDER.forEach(pos => { groups[pos] = []; });
+        sorted.forEach(p => {
+            const pos = p.pos || '?';
+            if (!groups[pos]) groups[pos] = [];
+            groups[pos].push(p);
+        });
+
+        let html = '';
+        POS_ORDER.forEach(pos => {
+            const rows = groups[pos];
+            if (!rows.length) return;
+            const posCls = 'db-pos-' + pos.replace(/[^A-Z]/g,'');
+            html += '<div class="cmp-pos-group">'
+                + '<div class="cmp-section-title"><span class="db-pos-badge ' + posCls + '" style="font-size:0.75rem;padding:3px 10px;">' + pos + '</span>'
+                + ' <span style="font-size:0.8rem;font-weight:600;color:var(--sub);">' + rows.length + ' pemain</span></div>'
+                + buildCmpRows(rows, realPlayers, PLAYER_COLOR, OWN_CLS)
+                + '</div>';
+        });
+        bodyEl.innerHTML = html;
+
+    } else if (sortBy === 'owner' && !posFilter) {
+        // Group by owner
+        let html = '';
+        realPlayers.forEach(pk => {
+            const rows = sorted.filter(p => p._owner === pk);
+            if (!rows.length) return;
+            html += '<div class="cmp-pos-group">'
+                + '<div class="cmp-section-title" style="color:' + PLAYER_COLOR[pk] + ';">👤 ' + escHtml(pk)
+                + ' <span style="font-size:0.8rem;font-weight:600;color:var(--sub);">' + rows.length + ' pemain</span></div>'
+                + buildCmpRows(rows, realPlayers, PLAYER_COLOR, OWN_CLS)
+                + '</div>';
+        });
+        bodyEl.innerHTML = html;
+
+    } else {
+        // Flat list
+        bodyEl.innerHTML = '<div class="cmp-pos-group">' + buildCmpRows(sorted, realPlayers, PLAYER_COLOR, OWN_CLS) + '</div>';
+    }
+}
+
+function buildCmpRows(rows, realPlayers, PLAYER_COLOR, OWN_CLS) {
+    const header = '<div class="cmp-row cmp-header" style="grid-template-columns:48px 1fr 1fr 70px 80px;">'
+        + '<div class="cmp-cell">#</div>'
+        + '<div class="cmp-cell">Nama Pemain</div>'
+        + '<div class="cmp-cell">Klub</div>'
+        + '<div class="cmp-cell">Pos</div>'
+        + '<div class="cmp-cell">Player</div>'
+        + '</div>';
+
+    const rowsHtml = rows.map(p => {
+        const posCls  = 'db-pos-' + (p.pos||'CF').replace(/[^A-Z]/g,'');
+        const ownCls  = OWN_CLS[p._owner] || '';
+        const logoUrl = getClubLogo(p.club || '');
+        const logoHtml = logoUrl
+            ? '<img src="' + logoUrl + '" style="width:18px;height:18px;object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">'
+            : '';
+        const noteBadge = p.note ? '<span class="db-trade-badge" style="margin-left:4px;">⚡ ' + escHtml(p.note) + '</span>' : '';
+        return '<div class="cmp-row" style="grid-template-columns:48px 1fr 1fr 70px 80px;">'
+            + '<div class="cmp-cell" style="font-weight:900;color:#1565c0;font-size:0.78rem;">' + (p.num||'') + '</div>'
+            + '<div class="cmp-cell name-col">' + escHtml(p.name||'') + noteBadge + '</div>'
+            + '<div class="cmp-cell">' + logoHtml + '<span style="font-size:0.82rem;">' + escHtml(p.club||'—') + '</span></div>'
+            + '<div class="cmp-cell"><span class="db-pos-badge ' + posCls + '">' + escHtml(p.pos||'') + '</span></div>'
+            + '<div class="cmp-cell"><span class="cmp-owner-badge ' + ownCls + '">' + escHtml(p._owner||'') + '</span></div>'
+            + '</div>';
+    }).join('');
+
+    return '<div class="cmp-grid">' + header + rowsHtml + '</div>';
 }
 
 function dbSwitchPlayer(pk) {
@@ -2794,7 +3030,11 @@ function dbSwitchPlayer(pk) {
     dbFilterPos = '';
     dbSortCol = 'num';
     dbSortDir = 'asc';
-    renderDatabasePage();
+    if (pk === 'COMPARE') {
+        renderDatabasePage(); // will render compare UI via renderDatabasePage check
+    } else {
+        renderDatabasePage();
+    }
 }
 
 function dbOnSearch(q) {
