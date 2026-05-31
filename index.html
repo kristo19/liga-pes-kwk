@@ -1148,6 +1148,13 @@ function sortStandings(match) {
     s.sort((a, b) => {
         if (j) { if (a.name === j) return -1; if (b.name === j) return 1; }
         if ((b.pts || 0) !== (a.pts || 0)) return (b.pts || 0) - (a.pts || 0);
+        // Tiebreaker 1: GD
+        const gdA = (parseInt(a.f)||0) - (parseInt(a.a)||0);
+        const gdB = (parseInt(b.f)||0) - (parseInt(b.a)||0);
+        if (gdB !== gdA) return gdB - gdA;
+        // Tiebreaker 2: GF
+        if ((parseInt(b.f)||0) !== (parseInt(a.f)||0)) return (parseInt(b.f)||0) - (parseInt(a.f)||0);
+        // Tiebreaker 3: manualRank
         return (a.manualRank || 99) - (b.manualRank || 99);
     });
     return s;
@@ -2280,6 +2287,8 @@ function renderAdminArea() {
         + '<p style="font-size:0.68rem;color:var(--sub);margin-top:6px;">* Boleh dikosongkan, bisa diisi nanti lewat klik nama pemain.</p>'
         + '</div>'
         + '<button class="btn-adm btn-create" onclick="buatLiga()">➕ Buat Liga</button>'
+        + '<button class="btn-adm" onclick="cekManualJuara()" style="margin-top:6px;background:#ff6b35;color:white;">🔍 Cek ManualJuara</button>'
+        + '<button class="btn-adm" onclick="resetSemuaManualJuara()" style="margin-top:6px;background:#c62828;color:white;">⚠️ Reset ManualJuara Bulan Ini</button>'
         + '<button class="btn-adm btn-off" onclick="matikanAdmin()" style="margin-top:6px;">🔒 Log Out Admin</button>'
         + '<p style="font-size:0.75rem;color:#999;margin-top:10px;">💡 Klik nama player di tabel untuk edit info klub per liga.</p>'
         + '</div>';
@@ -2875,6 +2884,48 @@ function konfirmasiTrade() {
             alert('✅ Trade berhasil!\n' + pkA + ' mendapat ' + pB.name + '\n' + pkB + ' mendapat ' + pA.name);
         })
         .catch(e => alert('❌ Gagal trade: ' + e.message));
+}
+
+
+/* ===================== CEK & RESET MANUAL JUARA ===================== */
+function cekManualJuara() {
+    if (!currentMonth || currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE') {
+        return alert('Pilih bulan dulu!');
+    }
+    db.ref(dbPath + '/' + currentMonth + '/matches').once('value', snap => {
+        const matches = snap.val() || {};
+        let hasil = 'ManualJuara di bulan ' + currentMonth + ':\n\n';
+        let ada = false;
+        Object.entries(matches).forEach(([id, m]) => {
+            if (m && m.manualJuara) {
+                ada = true;
+                hasil += 'ID: ' + id + ' => manualJuara: "' + m.manualJuara + '"\n';
+            }
+        });
+        if (!ada) hasil += '(Tidak ada manualJuara yang terisi)';
+        alert(hasil);
+    });
+}
+
+function resetSemuaManualJuara() {
+    if (!currentMonth || currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE') {
+        return alert('Pilih bulan dulu!');
+    }
+    if (!confirm('Reset semua manualJuara di bulan ' + currentMonth + '? Juara akan ditentukan otomatis berdasarkan poin/GD/GF.')) return;
+    db.ref(dbPath + '/' + currentMonth + '/matches').once('value', snap => {
+        const matches = snap.val() || {};
+        const updates = {};
+        Object.keys(matches).forEach(id => {
+            updates[dbPath + '/' + currentMonth + '/matches/' + id + '/manualJuara'] = null;
+        });
+        if (!Object.keys(updates).length) return alert('Tidak ada data match ditemukan.');
+        db.ref().update(updates)
+            .then(() => {
+                alert('\u2705 Semua manualJuara di bulan ' + currentMonth + ' berhasil di-reset! Juara sekarang ditentukan otomatis.');
+                loadData();
+            })
+            .catch(e => alert('\u274c Gagal: ' + e.message));
+    });
 }
 
 </script>
