@@ -819,89 +819,122 @@
         .lineup-pitch-lines svg { width: 100%; height: 100%; }
         .lineup-slots-layer { position: absolute; inset: 0; }
 
-        /* Slot on pitch — show pos label + name+rating BELOW circle */
-        .lineup-slot { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: grab; z-index: 5; user-select: none; }
-        .lineup-slot:hover { z-index: 10; }
-        .lineup-slot.is-moving { cursor: grabbing; z-index: 50; opacity: 0.85; }
+        /* Slot on pitch */
+        .lineup-slot { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 5; user-select: none; transition: transform 0.1s; }
+        .lineup-slot:hover { z-index: 10; transform: translate(-50%, -50%) scale(1.08); }
+        .lineup-slot.selected-slot .slot-circle { border-color: #ffd700 !important; background: rgba(255,200,0,0.35) !important; box-shadow: 0 0 20px rgba(255,215,0,0.7) !important; }
         .lineup-slot .slot-circle {
-            width: 44px; height: 44px; border-radius: 50%;
+            width: 48px; height: 48px; border-radius: 50%;
             border: 2.5px solid rgba(255,255,255,0.5);
-            background: rgba(20,20,60,0.75);
+            background: rgba(20,20,60,0.82);
             display: flex; align-items: center; justify-content: center; flex-direction: column;
-            transition: border-color 0.15s, background 0.15s;
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
             position: relative; overflow: visible;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
         }
-        .lineup-slot.filled .slot-circle { border-color: var(--cyan); background: rgba(0,110,55,0.82); }
+        .lineup-slot.filled .slot-circle { border-color: var(--cyan); background: rgba(0,110,55,0.85); }
+        .lineup-slot:hover .slot-circle { box-shadow: 0 4px 16px rgba(0,255,133,0.4); }
         .lineup-slot .slot-pos-label {
-            font-size: 0.62rem; font-weight: 900; color: rgba(255,255,255,0.75);
+            font-size: 0.65rem; font-weight: 900; color: #ffffff;
             text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
         }
-        .lineup-slot.filled .slot-pos-label { color: #ffffff; font-size: 0.65rem; }
         .lineup-slot .slot-rating-label {
             font-size: 0.58rem; font-weight: 900; color: #ffd700;
             line-height: 1; margin-top: 1px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.9);
         }
-        /* below-circle info row */
-        .lineup-slot .slot-info-row {
-            display: flex; flex-direction: column; align-items: center;
-            margin-top: 3px; pointer-events: none;
-        }
+        /* below-circle info */
+        .lineup-slot .slot-info-row { display: flex; flex-direction: column; align-items: center; margin-top: 4px; pointer-events: none; }
         .lineup-slot .slot-pname {
-            font-size: 0.58rem; font-weight: 800; color: #ffffff;
-            text-align: center; max-width: 58px;
+            font-size: 0.6rem; font-weight: 800; color: #ffffff;
+            text-align: center; max-width: 62px;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.95);
+            text-shadow: 0 1px 5px rgba(0,0,0,1);
             line-height: 1.2;
         }
         /* remove button */
         .lineup-slot .slot-remove {
-            position: absolute; top: -7px; right: -7px;
-            width: 17px; height: 17px; border-radius: 50%;
+            position: absolute; top: -8px; right: -8px;
+            width: 18px; height: 18px; border-radius: 50%;
             background: var(--pink); border: none; color: white;
-            font-size: 0.58rem; cursor: pointer;
+            font-size: 0.6rem; cursor: pointer;
             display: none; align-items: center; justify-content: center; z-index: 20;
         }
         .lineup-slot:hover .slot-remove { display: flex; }
         /* edit-pos button */
         .lineup-slot .slot-editpos {
-            position: absolute; top: -7px; left: -7px;
-            width: 17px; height: 17px; border-radius: 50%;
+            position: absolute; top: -8px; left: -8px;
+            width: 18px; height: 18px; border-radius: 50%;
             background: #f57c00; border: none; color: white;
             font-size: 0.55rem; cursor: pointer;
             display: none; align-items: center; justify-content: center; z-index: 20;
             font-weight: 900;
         }
         .lineup-slot:hover .slot-editpos { display: flex; }
-        /* drop highlight */
-        .lineup-slot.drop-target-active .slot-circle { border-color: #ffd700 !important; background: rgba(255,215,0,0.3) !important; box-shadow: 0 0 18px rgba(255,215,0,0.6); }
+        /* click highlight for empty slot */
+        .lineup-slot.slot-highlight .slot-circle { border-color: var(--cyan) !important; box-shadow: 0 0 18px rgba(0,255,133,0.6) !important; animation: slotPulse 0.6s ease-in-out 3; }
+        @keyframes slotPulse { 0%,100%{box-shadow:0 0 8px rgba(0,255,133,0.4)} 50%{box-shadow:0 0 22px rgba(0,255,133,0.9)} }
 
-        /* Pos edit popup */
-        .slot-pos-popup {
+        /* ---- UNIFIED CLICK POPUP (pemain + posisi) ---- */
+        .lup-popup {
             position: fixed; z-index: 999999;
-            background: #1e1e40; border: 1.5px solid var(--cyan);
-            border-radius: 10px; padding: 8px 6px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-            display: none;
-            flex-direction: column; gap: 2px;
-            min-width: 80px;
+            background: #1a1a38; border: 1.5px solid var(--cyan);
+            border-radius: 12px; padding: 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            display: none; flex-direction: column;
+            min-width: 200px; max-width: 260px;
+            max-height: 360px; overflow: hidden;
         }
-        .slot-pos-popup.on { display: flex; }
-        .slot-pos-popup-title { font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 4px 4px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2px; }
-        .slot-pos-btn { padding: 4px 10px; border-radius: 5px; border: none; background: transparent; color: white; font-family: 'Barlow', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-align: left; transition: 0.12s; }
-        .slot-pos-btn:hover { background: rgba(0,255,133,0.2); color: var(--cyan); }
-        .slot-pos-btn.active { background: rgba(0,255,133,0.25); color: var(--cyan); }
+        .lup-popup.on { display: flex; }
+        .lup-popup-header {
+            padding: 8px 12px 6px;
+            background: rgba(0,255,133,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.65rem; font-weight: 700; color: var(--cyan);
+            text-transform: uppercase; letter-spacing: 1px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .lup-popup-close { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 0.9rem; line-height: 1; padding: 0 2px; }
+        .lup-popup-close:hover { color: white; }
+        .lup-popup-tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .lup-tab-btn { flex: 1; padding: 6px; font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.45); background: none; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: 0.15s; font-family: 'Barlow', sans-serif; }
+        .lup-tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+        .lup-popup-body { overflow-y: auto; flex: 1; padding: 4px 0; }
+        .lup-section-title { font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px 2px; }
+        .lup-player-row {
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 10px; cursor: pointer; transition: background 0.1s;
+        }
+        .lup-player-row:hover { background: rgba(0,255,133,0.12); }
+        .lup-player-row.suggested { background: rgba(0,255,133,0.07); }
+        .lup-player-row.suggested:hover { background: rgba(0,255,133,0.18); }
+        .lup-player-num { font-size: 0.65rem; font-weight: 900; color: rgba(255,255,255,0.4); min-width: 18px; }
+        .lup-player-pos { font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; flex-shrink: 0; }
+        .lup-player-name { font-size: 0.75rem; font-weight: 700; color: white; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .lup-player-rating { font-size: 0.7rem; font-weight: 900; color: #ffd700; flex-shrink: 0; }
+        .lup-player-row.in-lineup .lup-player-name { color: var(--cyan); }
+        .lup-player-row.in-lineup .lup-player-num { color: var(--cyan); }
+        /* Pos selector tab */
+        .lup-pos-grid { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px; }
+        .lup-pos-btn { padding: 4px 8px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; color: white; font-family: 'Barlow', sans-serif; font-size: 0.72rem; font-weight: 800; cursor: pointer; transition: 0.12s; }
+        .lup-pos-btn:hover { background: rgba(0,255,133,0.2); border-color: var(--cyan); color: var(--cyan); }
+        .lup-pos-btn.active { background: rgba(0,255,133,0.25); border-color: var(--cyan); color: var(--cyan); }
+
+        /* Pos edit popup (keep for backward compat but now inside lup-popup) */
+        .slot-pos-popup { display: none; }
+        .slot-pos-popup.on { display: none; }
 
         /* Bench / Squad panel */
         .lineup-panel { background: #12122a; border-left: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; }
         .lineup-panel-head { background: rgba(255,255,255,0.05); padding: 10px 14px; font-size: 0.72rem; font-weight: 800; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
         .lineup-panel-section { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
         .lineup-panel-section-title { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .lineup-bench-item { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 8px; cursor: grab; transition: 0.15s; border: 1px solid transparent; }
-        .lineup-bench-item:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
-        .lineup-bench-item.in-lineup { opacity: 0.35; cursor: default; }
+        .lineup-bench-item { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 8px; cursor: pointer; transition: 0.15s; border: 1px solid transparent; }
+        .lineup-bench-item:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.15); }
+        .lineup-bench-item.in-lineup { opacity: 0.4; cursor: default; }
         .lineup-bench-item.in-lineup:hover { background: none; border-color: transparent; }
+        .lineup-bench-item.bench-highlight { background: rgba(0,255,133,0.15) !important; border-color: var(--cyan) !important; }
         .lineup-bench-pos { width: 32px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 900; flex-shrink: 0; }
         .lineup-bench-name { flex: 1; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.85); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .lineup-bench-rating { font-size: 0.7rem; font-weight: 900; color: #ffd700; flex-shrink: 0; }
@@ -1143,7 +1176,7 @@
             </select>
             <button class="lineup-autoset-btn" onclick="autoSetLineup()">⚡ Auto Set</button>
             <button class="lineup-save-btn" onclick="simpanLineup()">💾 Simpan</button>
-            <span class="lineup-hint">🟠 Ganti posisi &nbsp;|&nbsp; Tahan+geser bulatan bebas</span>
+            <span class="lineup-hint">💡 Klik bulatan untuk pilih pemain &nbsp;|&nbsp; Klik pemain untuk pilih posisi &nbsp;|&nbsp; ✎ untuk ganti posisi</span>
         </div>
         <div class="lineup-body">
             <div class="lineup-pitch-wrap" id="lineupPitchWrap">
@@ -1164,8 +1197,19 @@
 </div>
 
 <!-- SLOT POS POPUP -->
-<div id="slotPosPopup" class="slot-pos-popup">
-    <div class="slot-pos-popup-title">Ganti Posisi</div>
+<div id="slotPosPopup" class="slot-pos-popup"></div>
+
+<!-- UNIFIED LINEUP CLICK POPUP -->
+<div id="lupPopup" class="lup-popup" onclick="event.stopPropagation()">
+    <div class="lup-popup-header">
+        <span id="lupPopupTitle">Pilih</span>
+        <button class="lup-popup-close" onclick="closeLupPopup()">✕</button>
+    </div>
+    <div class="lup-popup-tabs" id="lupPopupTabs">
+        <button class="lup-tab-btn active" id="lupTabPlayer" onclick="switchLupTab('player')">👤 Pemain</button>
+        <button class="lup-tab-btn" id="lupTabPos" onclick="switchLupTab('pos')">📍 Ganti Posisi</button>
+    </div>
+    <div class="lup-popup-body" id="lupPopupBody"></div>
 </div>
 
 <!-- MODAL LOGIN -->
@@ -3890,9 +3934,14 @@ function konfirmasiTrade() {
 let lineupCurrentPlayer = null;
 let lineupFormation = '4-3-3';
 let lineupAssignments = {}; // slotId -> {uid, name, pos, rating, num, club}
-let lineupSlotPositions = {}; // slotId -> {x, y}  — custom positions (% of pitch)
 let lineupSlotCustomPos = {}; // slotId -> overridden position label (e.g. 'CF')
 let lineupSavedData = {};
+
+// Popup state
+let lupPopupMode = null;   // 'slot' or 'bench'
+let lupPopupSlotId = null; // active slot
+let lupPopupUid = null;    // active bench uid
+let lupCurrentTab = 'player';
 
 const ALL_POSITIONS = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
 
@@ -3961,43 +4010,260 @@ function getSlotEffectivePos(slotId, defPos) {
     return lineupSlotCustomPos[slotId] || defPos;
 }
 
+/* ============================================================
+   MODAL OPEN / CLOSE
+   ============================================================ */
 function bukaLineupModal(pk) {
     lineupCurrentPlayer = pk;
     document.getElementById('lineupModalPlayerName').textContent = pk;
     const saved = lineupSavedData[pk] || {};
-    lineupFormation = saved.formation || '4-3-3';
-    lineupAssignments   = JSON.parse(JSON.stringify(saved.assignments   || {}));
-    lineupSlotPositions = JSON.parse(JSON.stringify(saved.slotPositions || {}));
+    lineupFormation    = saved.formation    || '4-3-3';
+    lineupAssignments  = JSON.parse(JSON.stringify(saved.assignments  || {}));
     lineupSlotCustomPos = JSON.parse(JSON.stringify(saved.slotCustomPos || {}));
     document.getElementById('lineupFormationSelect').value = lineupFormation;
     document.getElementById('lineupModal').classList.add('on');
     renderLineupPitch();
     renderLineupBench();
-    document.addEventListener('click', closeSlotPosPopup, true);
+    document.addEventListener('click', handleOutsideLupClick, true);
 }
 
 function tutupLineupModal() {
     document.getElementById('lineupModal').classList.remove('on');
-    document.removeEventListener('click', closeSlotPosPopup, true);
-    closeSlotPosPopup();
+    document.removeEventListener('click', handleOutsideLupClick, true);
+    closeLupPopup();
 }
-function tutupLineupModalOutside(e) { if (e.target === document.getElementById('lineupModal')) tutupLineupModal(); }
+function tutupLineupModalOutside(e) {
+    if (e.target === document.getElementById('lineupModal')) tutupLineupModal();
+}
 
 function onFormationChange(val) {
     lineupFormation = val;
-    // Remove assignments for slots no longer valid
     const def = FORMATION_DEFS[lineupFormation];
     if (def) {
         const validIds = def.slots.map(s => s.id);
-        [lineupAssignments, lineupSlotPositions, lineupSlotCustomPos].forEach(obj => {
+        [lineupAssignments, lineupSlotCustomPos].forEach(obj => {
             Object.keys(obj).forEach(id => { if (!validIds.includes(id)) delete obj[id]; });
         });
     }
+    closeLupPopup();
     renderLineupPitch();
     renderLineupBench();
 }
 
-/* ---- RENDER PITCH ---- */
+/* ============================================================
+   UNIFIED POPUP (click-based)
+   ============================================================ */
+const posColorMap = {
+    GK:'#fff3e0,#e65100', CB:'#e8f5e9,#1b5e20', LB:'#e8f5e9,#1b5e20', RB:'#e8f5e9,#1b5e20',
+    DMF:'#e3f2fd,#0d47a1', CMF:'#e3f2fd,#0d47a1', AMF:'#fce4ec,#880e4f',
+    LWF:'#f3e5f5,#4a148c', RWF:'#f3e5f5,#4a148c', CF:'#ffebee,#b71c1c',
+    SS:'#fce4ec,#880e4f', RMF:'#e3f2fd,#0d47a1', LMF:'#e3f2fd,#0d47a1'
+};
+
+function posStyle(pos) {
+    const c = (posColorMap[pos] || '#eee,#333').split(',');
+    return 'background:' + c[0] + ';color:' + c[1] + ';';
+}
+
+function openLupPopupForSlot(e, slotId, effPos) {
+    e.stopPropagation();
+    // Deselect any previous
+    document.querySelectorAll('.lineup-slot.selected-slot').forEach(s => s.classList.remove('selected-slot'));
+    const slotEl = document.querySelector('[data-slot-id="' + slotId + '"]');
+    if (slotEl) slotEl.classList.add('selected-slot');
+
+    lupPopupMode  = 'slot';
+    lupPopupSlotId = slotId;
+    lupCurrentTab = 'player';
+    positionLupPopup(e);
+    document.getElementById('lupPopupTitle').textContent = '⬜ Slot: ' + effPos;
+    document.getElementById('lupTabPlayer').textContent = '👤 Pemain';
+    document.getElementById('lupTabPos').textContent = '📍 Ganti Posisi';
+    document.getElementById('lupTabPlayer').classList.add('active');
+    document.getElementById('lupTabPos').classList.remove('active');
+    renderLupPlayerTab(slotId, effPos);
+    document.getElementById('lupPopup').classList.add('on');
+}
+
+function openLupPopupForBench(e, uid, pos) {
+    e.stopPropagation();
+    lupPopupMode = 'bench';
+    lupPopupUid  = uid;
+    lupCurrentTab = 'player';
+    positionLupPopup(e);
+    const playerData = dbData[lineupCurrentPlayer] || {};
+    const p = playerData[uid];
+    const name = p ? p.name.split(' ').slice(0,2).join(' ') : uid;
+    document.getElementById('lupPopupTitle').textContent = '👤 ' + name;
+    document.getElementById('lupTabPlayer').textContent = '🏟️ Pilih Slot';
+    document.getElementById('lupTabPos').classList.add('d-none');
+    document.getElementById('lupTabPos').style.display = 'none';
+    document.getElementById('lupTabPlayer').classList.add('active');
+    document.getElementById('lupTabPos').classList.remove('active');
+    renderLupSlotTab(uid, pos);
+    document.getElementById('lupPopup').classList.add('on');
+}
+
+function positionLupPopup(e) {
+    const popup = document.getElementById('lupPopup');
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const pw = 260, ph = 340;
+    let left = e.clientX + 12;
+    let top  = e.clientY - 10;
+    if (left + pw > vw - 8) left = e.clientX - pw - 12;
+    if (top  + ph > vh - 8) top  = vh - ph - 8;
+    if (top < 8) top = 8;
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
+}
+
+function switchLupTab(tab) {
+    lupCurrentTab = tab;
+    document.getElementById('lupTabPlayer').classList.toggle('active', tab === 'player');
+    document.getElementById('lupTabPos').classList.toggle('active', tab === 'pos');
+
+    if (lupPopupMode === 'slot') {
+        const def = FORMATION_DEFS[lineupFormation];
+        const slotDef = def ? def.slots.find(s => s.id === lupPopupSlotId) : null;
+        const effPos = getSlotEffectivePos(lupPopupSlotId, slotDef ? slotDef.pos : '');
+        if (tab === 'player') {
+            renderLupPlayerTab(lupPopupSlotId, effPos);
+        } else {
+            renderLupPosTab(lupPopupSlotId, effPos);
+        }
+    }
+}
+
+function renderLupPlayerTab(slotId, effPos) {
+    const playerData = dbData[lineupCurrentPlayer] || {};
+    const assignedUids = new Set(Object.values(lineupAssignments).map(a => a && a.uid).filter(Boolean));
+    const POS_ORDER = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
+
+    // Build sorted list: matching pos first, then others
+    const all = Object.entries(playerData).map(([uid, p]) => ({uid, ...p}));
+    const matching = all.filter(p => p.pos === effPos && !assignedUids.has(p.uid)).sort((a,b) => (parseInt(b.rating)||0)-(parseInt(a.rating)||0));
+    const others   = all.filter(p => p.pos !== effPos && !assignedUids.has(p.uid)).sort((a,b) => (parseInt(b.rating)||0)-(parseInt(a.rating)||0));
+    const inLineup = all.filter(p => assignedUids.has(p.uid)).sort((a,b) => (parseInt(b.rating)||0)-(parseInt(a.rating)||0));
+
+    let html = '';
+    if (matching.length) {
+        html += '<div class="lup-section-title">✅ Cocok (' + effPos + ')</div>';
+        html += matching.map(p => lupPlayerRow(p, slotId, true)).join('');
+    }
+    if (others.length) {
+        html += '<div class="lup-section-title">Posisi lain</div>';
+        html += others.slice(0,20).map(p => lupPlayerRow(p, slotId, false)).join('');
+    }
+    if (inLineup.length) {
+        html += '<div class="lup-section-title" style="color:rgba(0,255,133,0.5);">Sudah di lineup (klik untuk swap)</div>';
+        html += inLineup.map(p => lupPlayerRowInLineup(p, slotId)).join('');
+    }
+    if (!html) html = '<div style="padding:12px;color:rgba(255,255,255,0.3);font-size:0.8rem;text-align:center;">Tidak ada pemain</div>';
+    document.getElementById('lupPopupBody').innerHTML = html;
+}
+
+function lupPlayerRow(p, slotId, suggested) {
+    const c = (posColorMap[p.pos] || '#eee,#333').split(',');
+    return '<div class="lup-player-row' + (suggested ? ' suggested' : '') + '" onclick="pickPlayerForSlot(\'' + slotId + '\',\'' + p.uid + '\')">'
+        + '<span class="lup-player-num">' + (p.num||'') + '</span>'
+        + '<span class="lup-player-pos" style="background:' + c[0] + ';color:' + c[1] + ';">' + escHtml(p.pos||'') + '</span>'
+        + '<span class="lup-player-name">' + escHtml(p.name||'') + '</span>'
+        + (p.rating ? '<span class="lup-player-rating">' + p.rating + '</span>' : '')
+        + '</div>';
+}
+
+function lupPlayerRowInLineup(p, targetSlotId) {
+    const c = (posColorMap[p.pos] || '#eee,#333').split(',');
+    // Find which slot this player is in
+    const inSlot = Object.entries(lineupAssignments).find(([,a]) => a && a.uid === p.uid);
+    const fromSlotId = inSlot ? inSlot[0] : null;
+    return '<div class="lup-player-row in-lineup" onclick="swapSlotPlayer(\'' + targetSlotId + '\',\'' + p.uid + '\',\'' + (fromSlotId||'') + '\')">'
+        + '<span class="lup-player-num">' + (p.num||'') + '</span>'
+        + '<span class="lup-player-pos" style="background:' + c[0] + ';color:' + c[1] + ';">' + escHtml(p.pos||'') + '</span>'
+        + '<span class="lup-player-name">' + escHtml(p.name||'') + '</span>'
+        + (p.rating ? '<span class="lup-player-rating">' + p.rating + '</span>' : '')
+        + '</div>';
+}
+
+function renderLupPosTab(slotId, currentPos) {
+    const html = '<div class="lup-pos-grid">'
+        + ALL_POSITIONS.map(pos =>
+            '<button class="lup-pos-btn' + (pos === currentPos ? ' active' : '') + '" onclick="setSlotPos(\'' + slotId + '\',\'' + pos + '\')">' + pos + '</button>'
+        ).join('')
+        + '</div>';
+    document.getElementById('lupPopupBody').innerHTML = html;
+}
+
+function renderLupSlotTab(uid, uidPos) {
+    const def = FORMATION_DEFS[lineupFormation];
+    if (!def) return;
+    let html = '<div class="lup-section-title">Pilih slot untuk ' + escHtml(uidPos) + '</div>';
+    const POS_ORDER_LABEL = ['GK','DEF','MID','ATK'];
+    def.slots.forEach(slotDef => {
+        const effPos = getSlotEffectivePos(slotDef.id, slotDef.pos);
+        const assigned = lineupAssignments[slotDef.id];
+        const isSuggested = effPos === uidPos;
+        const c = (posColorMap[effPos] || '#eee,#333').split(',');
+        html += '<div class="lup-player-row' + (isSuggested ? ' suggested' : '') + '" onclick="pickSlotForPlayer(\'' + uid + '\',\'' + slotDef.id + '\')">'
+            + '<span class="lup-player-pos" style="background:' + c[0] + ';color:' + c[1] + ';">' + escHtml(effPos) + '</span>'
+            + '<span class="lup-player-name">' + (assigned ? '🔄 ' + escHtml(assigned.name.split(' ').pop()) : '⬜ Kosong') + '</span>'
+            + '</div>';
+    });
+    document.getElementById('lupPopupBody').innerHTML = html;
+    // Show tab for bench mode (no pos-change tab)
+    document.getElementById('lupTabPos').style.display = 'none';
+}
+
+function pickPlayerForSlot(slotId, uid) {
+    assignToSlot(slotId, uid, null);
+    closeLupPopup();
+}
+
+function swapSlotPlayer(targetSlotId, uid, fromSlotId) {
+    assignToSlot(targetSlotId, uid, fromSlotId || null);
+    closeLupPopup();
+}
+
+function pickSlotForPlayer(uid, slotId) {
+    const fromSlot = Object.entries(lineupAssignments).find(([,a]) => a && a.uid === uid);
+    assignToSlot(slotId, uid, fromSlot ? fromSlot[0] : null);
+    closeLupPopup();
+}
+
+function closeLupPopup() {
+    const popup = document.getElementById('lupPopup');
+    if (popup) popup.classList.remove('on');
+    document.querySelectorAll('.lineup-slot.selected-slot').forEach(s => s.classList.remove('selected-slot'));
+    lupPopupMode = null; lupPopupSlotId = null; lupPopupUid = null;
+    // Reset tab visibility
+    const tabPos = document.getElementById('lupTabPos');
+    if (tabPos) tabPos.style.display = '';
+}
+
+function handleOutsideLupClick(e) {
+    const popup = document.getElementById('lupPopup');
+    if (popup && popup.contains(e.target)) return;
+    if (e.target.closest && e.target.closest('.lineup-slot')) return;
+    if (e.target.closest && e.target.closest('.lineup-bench-item')) return;
+    closeLupPopup();
+}
+
+/* ---- old slot-pos popup compat (not used but kept to avoid errors) ---- */
+function openSlotPosPopup(e, slotId, currentPos) {
+    openLupPopupForSlot(e, slotId, currentPos);
+    switchLupTab('pos');
+}
+function setSlotPos(slotId, newPos) {
+    lineupSlotCustomPos[slotId] = newPos;
+    closeLupPopup();
+    renderLineupPitch();
+    renderLineupBench();
+}
+function closeSlotPosPopup() { closeLupPopup(); }
+
+/* ============================================================
+   RENDER PITCH
+   ============================================================ */
 function renderLineupPitch() {
     const def = FORMATION_DEFS[lineupFormation];
     if (!def) return;
@@ -4025,25 +4291,18 @@ function renderLineupPitch() {
         const effPos  = getSlotEffectivePos(slotId, defPos);
         const assigned = lineupAssignments[slotId];
 
-        // Position: use custom if dragged, else formation default
-        const xPct = (lineupSlotPositions[slotId] || {}).x ?? slotDef.x;
-        const yPct = (lineupSlotPositions[slotId] || {}).y ?? slotDef.y;
-
         const el = document.createElement('div');
         el.className = 'lineup-slot' + (assigned ? ' filled' : '');
-        el.dataset.slotId = slotId;
+        el.dataset.slotId  = slotId;
         el.dataset.slotPos = effPos;
-        el.style.left = xPct + '%';
-        el.style.top  = yPct + '%';
+        el.style.left = slotDef.x + '%';
+        el.style.top  = slotDef.y + '%';
 
-        // Circle content: always show pos label + rating if filled
-        let circlePosLabel = effPos;
         let ratingLine = '';
         if (assigned && assigned.rating) {
             ratingLine = '<div class="slot-rating-label">' + assigned.rating + '</div>';
         }
 
-        // Below-circle name
         let nameBelow = '';
         if (assigned) {
             const lastName = assigned.name.split(' ').pop();
@@ -4052,17 +4311,22 @@ function renderLineupPitch() {
 
         el.innerHTML =
             '<div class="slot-circle">'
-            + '<div class="slot-pos-label">' + circlePosLabel + '</div>'
+            + '<div class="slot-pos-label">' + effPos + '</div>'
             + ratingLine
             + (assigned
                 ? '<button class="slot-remove" onclick="removeFromSlot(\'' + slotId + '\');event.stopPropagation();" title="Lepas pemain">✕</button>'
-                  + '<button class="slot-editpos" onclick="openSlotPosPopup(event,\'' + slotId + '\',\'' + effPos + '\');event.stopPropagation();" title="Ganti posisi">✎</button>'
-                : '<button class="slot-editpos" onclick="openSlotPosPopup(event,\'' + slotId + '\',\'' + effPos + '\');event.stopPropagation();" title="Ganti posisi">✎</button>'
-            )
+                : '')
+            + '<button class="slot-editpos" onclick="openSlotPosPopup(event,\'' + slotId + '\',\'' + effPos + '\');event.stopPropagation();" title="Ganti posisi">✎</button>'
             + '</div>'
             + nameBelow;
 
-        /* ---- DROP (from bench) ---- */
+        /* Click on slot → open unified popup */
+        el.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') return;
+            openLupPopupForSlot(e, slotId, effPos);
+        });
+
+        /* Drop support (still works) */
         el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drop-target-active'); });
         el.addEventListener('dragleave', () => el.classList.remove('drop-target-active'));
         el.addEventListener('drop', e => {
@@ -4073,138 +4337,94 @@ function renderLineupPitch() {
             if (uid) assignToSlot(slotId, uid, fromSlot || null);
         });
 
-        /* ---- CLICK on empty slot: highlight bench ---- */
-        el.addEventListener('click', () => {
-            if (!lineupAssignments[slotId]) highlightBenchForSlot(slotId, effPos);
-        });
-
-        /* ---- FREE DRAG of slot itself on pitch (pointer events) ---- */
-        attachSlotFreeDrag(el, slotId);
-
         slotsEl.appendChild(el);
     });
 
-    // Update count
     const filled = Object.keys(lineupAssignments).length;
     const cnt = document.getElementById('lineupPanelCount');
     if (cnt) cnt.textContent = filled + '/' + def.slots.length + ' diisi';
 }
 
-/* ---- FREE DRAG: move slot anywhere on pitch ---- */
-function attachSlotFreeDrag(el, slotId) {
-    let isDragging = false;
-    let startX, startY, origLeft, origTop;
-    const pitch = document.getElementById('lineupPitchInner');
+/* ============================================================
+   RENDER BENCH PANEL
+   ============================================================ */
+function renderLineupBench() {
+    const benchEl = document.getElementById('lineupBenchList');
+    if (!benchEl || !lineupCurrentPlayer) return;
 
-    el.addEventListener('mousedown', e => {
-        // Only drag on the circle itself, not the buttons
-        if (e.target.tagName === 'BUTTON') return;
-        isDragging = true;
-        el.classList.add('is-moving');
-        startX = e.clientX; startY = e.clientY;
-        const rect = pitch.getBoundingClientRect();
-        origLeft = parseFloat(el.style.left);
-        origTop  = parseFloat(el.style.top);
-        e.preventDefault();
+    const playerData = dbData[lineupCurrentPlayer] || {};
+    const POS_ORDER  = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
+
+    const groups = {};
+    POS_ORDER.forEach(p => groups[p] = []);
+    Object.entries(playerData).forEach(([uid, p]) => {
+        const pos = p.pos || '?';
+        if (!groups[pos]) groups[pos] = [];
+        groups[pos].push({uid, ...p});
     });
+    POS_ORDER.forEach(pos => groups[pos].sort((a,b) => (parseInt(a.num)||0)-(parseInt(b.num)||0)));
 
-    document.addEventListener('mousemove', e => {
-        if (!isDragging) return;
-        const rect = pitch.getBoundingClientRect();
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        const newX = Math.max(4, Math.min(96, origLeft  + (dx / rect.width)  * 100));
-        const newY = Math.max(4, Math.min(96, origTop   + (dy / rect.height) * 100));
-        el.style.left = newX + '%';
-        el.style.top  = newY + '%';
+    const assignedUids = new Set(Object.values(lineupAssignments).map(a => a && a.uid).filter(Boolean));
+
+    let html = '';
+
+    // Starting XI
+    const starting = Object.entries(lineupAssignments).filter(([,a]) => a);
+    if (starting.length > 0) {
+        html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">⚽ STARTING XI (' + starting.length + ')</div>';
+        starting.forEach(([slotId, a]) => {
+            const c = (posColorMap[a.pos] || '#eee,#333').split(',');
+            const effPos = getSlotEffectivePos(slotId, a.pos);
+            html += '<div class="lineup-bench-item in-lineup" data-uid="' + a.uid + '" data-pos="' + effPos + '">'
+                + '<span class="lineup-bench-num">' + (a.num||'') + '</span>'
+                + '<span class="lineup-bench-pos" style="background:' + c[0] + ';color:' + c[1] + ';">' + escHtml(effPos) + '</span>'
+                + '<span class="lineup-bench-name" style="color:var(--cyan);">' + escHtml(a.name) + '</span>'
+                + (a.rating ? '<span class="lineup-bench-rating">' + a.rating + '</span>' : '')
+                + '</div>';
+        });
+        html += '</div>';
+    }
+
+    // Bench / Squad
+    html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">📋 BENCH / SQUAD (klik untuk pilih posisi)</div>';
+    let hasBench = false;
+    POS_ORDER.forEach(pos => {
+        (groups[pos] || []).forEach(p => {
+            if (assignedUids.has(p.uid)) return;
+            hasBench = true;
+            const c = (posColorMap[pos] || '#eee,#333').split(',');
+            html += '<div class="lineup-bench-item" data-uid="' + p.uid + '" data-pos="' + pos + '">'
+                + '<span class="lineup-bench-num">' + (p.num||'') + '</span>'
+                + '<span class="lineup-bench-pos" style="background:' + c[0] + ';color:' + c[1] + ';">' + escHtml(pos) + '</span>'
+                + '<span class="lineup-bench-name">' + escHtml(p.name||'') + '</span>'
+                + (p.rating ? '<span class="lineup-bench-rating">' + p.rating + '</span>' : '')
+                + '</div>';
+        });
     });
+    if (!hasBench) html += '<div style="color:rgba(255,255,255,0.25);font-size:0.78rem;padding:8px;">Semua pemain sudah di lineup.</div>';
+    html += '</div>';
 
-    document.addEventListener('mouseup', e => {
-        if (!isDragging) return;
-        isDragging = false;
-        el.classList.remove('is-moving');
-        const rect = pitch.getBoundingClientRect();
-        // Save new position
-        lineupSlotPositions[slotId] = {
-            x: parseFloat(el.style.left),
-            y: parseFloat(el.style.top)
-        };
-    });
+    benchEl.innerHTML = html;
 
-    // Touch support
-    el.addEventListener('touchstart', e => {
-        if (e.target.tagName === 'BUTTON') return;
-        isDragging = true;
-        el.classList.add('is-moving');
-        startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-        origLeft = parseFloat(el.style.left);
-        origTop  = parseFloat(el.style.top);
-        e.preventDefault();
-    }, {passive: false});
-
-    el.addEventListener('touchmove', e => {
-        if (!isDragging) return;
-        const rect = pitch.getBoundingClientRect();
-        const dx = e.touches[0].clientX - startX;
-        const dy = e.touches[0].clientY - startY;
-        const newX = Math.max(4, Math.min(96, origLeft  + (dx / rect.width)  * 100));
-        const newY = Math.max(4, Math.min(96, origTop   + (dy / rect.height) * 100));
-        el.style.left = newX + '%';
-        el.style.top  = newY + '%';
-        e.preventDefault();
-    }, {passive: false});
-
-    el.addEventListener('touchend', () => {
-        if (!isDragging) return;
-        isDragging = false;
-        el.classList.remove('is-moving');
-        lineupSlotPositions[slotId] = {
-            x: parseFloat(el.style.left),
-            y: parseFloat(el.style.top)
-        };
-    });
-}
-
-/* ---- SLOT POS POPUP ---- */
-let slotPosPopupTarget = null;
-function openSlotPosPopup(e, slotId, currentPos) {
-    e.stopPropagation();
-    slotPosPopupTarget = slotId;
-    const popup = document.getElementById('slotPosPopup');
-    // Build buttons
-    popup.innerHTML = '<div class="slot-pos-popup-title">Ganti Posisi Slot</div>'
-        + ALL_POSITIONS.map(p =>
-            '<button class="slot-pos-btn' + (p === currentPos ? ' active' : '') + '" onclick="setSlotPos(\'' + slotId + '\',\'' + p + '\')">' + p + '</button>'
-        ).join('');
-    // Position near click
-    popup.style.left = (e.clientX + 8) + 'px';
-    popup.style.top  = (e.clientY - 10) + 'px';
-    popup.classList.add('on');
-}
-function setSlotPos(slotId, newPos) {
-    lineupSlotCustomPos[slotId] = newPos;
-    closeSlotPosPopup();
-    renderLineupPitch();
-    renderLineupBench();
-}
-function closeSlotPosPopup(e) {
-    const popup = document.getElementById('slotPosPopup');
-    if (!popup) return;
-    if (e && popup.contains(e.target)) return;
-    popup.classList.remove('on');
-    slotPosPopupTarget = null;
-}
-
-function highlightBenchForSlot(slotId, pos) {
-    document.querySelectorAll('.lineup-bench-item').forEach(el => {
-        if (el.dataset.pos === pos && !el.classList.contains('in-lineup')) {
-            el.style.background = 'rgba(0,255,133,0.15)';
-            el.style.border = '1px solid var(--cyan)';
-            setTimeout(() => { el.style.background = ''; el.style.border = '1px solid transparent'; }, 1500);
-        }
+    // Attach click events to bench items
+    benchEl.querySelectorAll('.lineup-bench-item:not(.in-lineup)').forEach(el => {
+        el.addEventListener('click', function(e) {
+            const uid = el.dataset.uid;
+            const pos = el.dataset.pos;
+            openLupPopupForBench(e, uid, pos);
+        });
+        // Keep drag support
+        el.setAttribute('draggable', 'true');
+        el.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/uid', el.dataset.uid);
+            e.dataTransfer.setData('text/fromSlot', '');
+        });
     });
 }
 
+/* ============================================================
+   ASSIGN / REMOVE
+   ============================================================ */
 function removeFromSlot(slotId) {
     delete lineupAssignments[slotId];
     renderLineupPitch();
@@ -4218,7 +4438,6 @@ function assignToSlot(slotId, uid, fromSlot) {
     if (fromSlot && fromSlot !== slotId) {
         const prevInTarget = lineupAssignments[slotId];
         if (prevInTarget && lineupAssignments[fromSlot]) {
-            // swap
             const tmp = lineupAssignments[fromSlot];
             lineupAssignments[slotId]   = lineupAssignments[fromSlot];
             lineupAssignments[fromSlot] = prevInTarget;
@@ -4236,101 +4455,9 @@ function assignToSlot(slotId, uid, fromSlot) {
     renderLineupBench();
 }
 
-function renderLineupBench() {
-    const benchEl = document.getElementById('lineupBenchList');
-    if (!benchEl || !lineupCurrentPlayer) return;
-
-    const playerData = dbData[lineupCurrentPlayer] || {};
-    const POS_ORDER  = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
-    const posColorMap = {GK:'#fff3e0,#e65100',CB:'#e8f5e9,#1b5e20',LB:'#e8f5e9,#1b5e20',RB:'#e8f5e9,#1b5e20',
-        DMF:'#e3f2fd,#0d47a1',CMF:'#e3f2fd,#0d47a1',AMF:'#fce4ec,#880e4f',
-        LWF:'#f3e5f5,#4a148c',RWF:'#f3e5f5,#4a148c',CF:'#ffebee,#b71c1c',
-        SS:'#fce4ec,#880e4f',RMF:'#e3f2fd,#0d47a1',LMF:'#e3f2fd,#0d47a1'};
-
-    const groups = {};
-    POS_ORDER.forEach(p => groups[p] = []);
-    Object.entries(playerData).forEach(([uid, p]) => {
-        const pos = p.pos || '?';
-        if (!groups[pos]) groups[pos] = [];
-        groups[pos].push({uid, ...p});
-    });
-    POS_ORDER.forEach(pos => groups[pos].sort((a,b) => (parseInt(a.num)||0)-(parseInt(b.num)||0)));
-
-    const assignedUids = new Set(Object.values(lineupAssignments).map(a => a && a.uid).filter(Boolean));
-    const def = FORMATION_DEFS[lineupFormation];
-
-    let html = '';
-
-    // Starting XI
-    const starting = Object.entries(lineupAssignments).filter(([,a]) => a);
-    if (starting.length > 0) {
-        html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">⚽ STARTING XI (' + starting.length + ')</div>';
-        starting.forEach(([slotId, a]) => {
-            const colors = (posColorMap[a.pos] || '#eee,#333').split(',');
-            const effPos = getSlotEffectivePos(slotId, a.pos);
-            html += '<div class="lineup-bench-item in-lineup" data-uid="' + a.uid + '" data-pos="' + effPos + '">'
-                + '<span class="lineup-bench-num">' + (a.num||'') + '</span>'
-                + '<span class="lineup-bench-pos" style="background:' + colors[0] + ';color:' + colors[1] + ';">' + escHtml(effPos) + '</span>'
-                + '<span class="lineup-bench-name" style="color:var(--cyan);">' + escHtml(a.name) + '</span>'
-                + (a.rating ? '<span class="lineup-bench-rating">' + a.rating + '</span>' : '')
-                + '</div>';
-        });
-        html += '</div>';
-    }
-
-    // Bench
-    html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">📋 BENCH / SQUAD</div>';
-    let hasBench = false;
-    POS_ORDER.forEach(pos => {
-        (groups[pos] || []).forEach(p => {
-            if (assignedUids.has(p.uid)) return;
-            hasBench = true;
-            const colors = (posColorMap[pos] || '#eee,#333').split(',');
-            html += '<div class="lineup-bench-item" data-uid="' + p.uid + '" data-pos="' + pos + '" draggable="true">'
-                + '<span class="lineup-bench-num">' + (p.num||'') + '</span>'
-                + '<span class="lineup-bench-pos" style="background:' + colors[0] + ';color:' + colors[1] + ';">' + escHtml(pos) + '</span>'
-                + '<span class="lineup-bench-name">' + escHtml(p.name||'') + '</span>'
-                + (p.rating ? '<span class="lineup-bench-rating">' + p.rating + '</span>' : '')
-                + '</div>';
-        });
-    });
-    if (!hasBench) html += '<div style="color:rgba(255,255,255,0.25);font-size:0.78rem;padding:8px;">Semua pemain sudah di lineup.</div>';
-    html += '</div>';
-
-    benchEl.innerHTML = html;
-
-    // Drag events for bench items
-    benchEl.querySelectorAll('.lineup-bench-item:not(.in-lineup)').forEach(el => {
-        el.addEventListener('dragstart', e => {
-            e.dataTransfer.setData('text/uid', el.dataset.uid);
-            e.dataTransfer.setData('text/fromSlot', '');
-        });
-        el.addEventListener('click', () => {
-            const uid = el.dataset.uid;
-            const pos = el.dataset.pos;
-            const def2 = FORMATION_DEFS[lineupFormation];
-            if (!def2) return;
-            // Find slot matching effective pos (custom or default)
-            const emptySlot = def2.slots.find(s => getSlotEffectivePos(s.id, s.pos) === pos && !lineupAssignments[s.id])
-                || def2.slots.find(s => !lineupAssignments[s.id]);
-            if (emptySlot) assignToSlot(emptySlot.id, uid, null);
-        });
-    });
-
-    // Slot drag from pitch
-    document.querySelectorAll('.lineup-slot.filled').forEach(slotEl => {
-        slotEl.setAttribute('draggable', 'true');
-        slotEl.addEventListener('dragstart', e => {
-            const sid = slotEl.dataset.slotId;
-            const a = lineupAssignments[sid];
-            if (a) {
-                e.dataTransfer.setData('text/uid', a.uid);
-                e.dataTransfer.setData('text/fromSlot', sid);
-            }
-        });
-    });
-}
-
+/* ============================================================
+   AUTO SET & SAVE
+   ============================================================ */
 function autoSetLineup() {
     const def = FORMATION_DEFS[lineupFormation];
     if (!def) return;
@@ -4359,17 +4486,16 @@ function autoSetLineup() {
 function simpanLineup() {
     if (!lineupCurrentPlayer) return;
     lineupSavedData[lineupCurrentPlayer] = {
-        formation:      lineupFormation,
-        assignments:    JSON.parse(JSON.stringify(lineupAssignments)),
-        slotPositions:  JSON.parse(JSON.stringify(lineupSlotPositions)),
-        slotCustomPos:  JSON.parse(JSON.stringify(lineupSlotCustomPos)),
+        formation:    lineupFormation,
+        assignments:  JSON.parse(JSON.stringify(lineupAssignments)),
+        slotCustomPos: JSON.parse(JSON.stringify(lineupSlotCustomPos)),
     };
     db.ref(dbPath + '/lineup/' + lineupCurrentPlayer).set(lineupSavedData[lineupCurrentPlayer])
         .then(() => {
             const btn = document.querySelector('.lineup-save-btn');
             if (btn) { btn.textContent = '✅ Tersimpan!'; setTimeout(() => btn.textContent = '💾 Simpan', 1500); }
         })
-        .catch(() => alert('❌ Gagal simpan lineup ke Firebase. Data disimpan lokal.'));
+        .catch(() => alert('❌ Gagal simpan lineup ke Firebase.'));
 }
 
 function loadLineupData() {
@@ -4379,303 +4505,6 @@ function loadLineupData() {
         Object.entries(data).forEach(([pk, ld]) => { lineupSavedData[pk] = ld; });
     });
 }
-function bukaLineupModal(pk) {
-    lineupCurrentPlayer = pk;
-    document.getElementById('lineupModalPlayerName').textContent = pk;
-    // Load saved
-    const saved = lineupSavedData[pk] || {};
-    lineupFormation = saved.formation || '4-3-3';
-    lineupAssignments = JSON.parse(JSON.stringify(saved.assignments || {}));
-    document.getElementById('lineupFormationSelect').value = lineupFormation;
-    document.getElementById('lineupModal').classList.add('on');
-    renderLineupPitch();
-    renderLineupBench();
-}
-
-function tutupLineupModal() { document.getElementById('lineupModal').classList.remove('on'); }
-function tutupLineupModalOutside(e) { if (e.target === document.getElementById('lineupModal')) tutupLineupModal(); }
-
-function onFormationChange(val) {
-    lineupFormation = val;
-    // Keep assignments that still have valid slots
-    const def = FORMATION_DEFS[lineupFormation];
-    if (def) {
-        const validIds = def.slots.map(s => s.id);
-        Object.keys(lineupAssignments).forEach(id => {
-            if (!validIds.includes(id)) delete lineupAssignments[id];
-        });
-    }
-    renderLineupPitch();
-    renderLineupBench();
-}
-
-function renderLineupPitch() {
-    const def = FORMATION_DEFS[lineupFormation];
-    if (!def) return;
-    const inner = document.getElementById('lineupPitchInner');
-    const linesEl = document.getElementById('lineupPitchLines');
-    const slotsEl = document.getElementById('lineupSlotsLayer');
-
-    // Draw pitch lines SVG
-    linesEl.innerHTML = `<svg viewBox="0 0 100 135" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="3" width="90" height="129" rx="2" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.8"/>
-        <line x1="5" y1="67.5" x2="95" y2="67.5" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
-        <circle cx="50" cy="67.5" r="12" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
-        <rect x="27" y="3" width="46" height="18" rx="1" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
-        <rect x="35" y="3" width="30" height="9" rx="1" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
-        <rect x="27" y="114" width="46" height="18" rx="1" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
-        <rect x="35" y="123" width="30" height="9" rx="1" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
-        <circle cx="50" cy="67.5" r="0.8" fill="rgba(255,255,255,0.3)"/>
-        <circle cx="50" cy="10" r="0.8" fill="rgba(255,255,255,0.2)"/>
-        <circle cx="50" cy="125" r="0.8" fill="rgba(255,255,255,0.2)"/>
-    </svg>`;
-
-    // Render slots
-    slotsEl.innerHTML = '';
-    def.slots.forEach(slot => {
-        const assigned = lineupAssignments[slot.id];
-        const el = document.createElement('div');
-        el.className = 'lineup-slot' + (assigned ? ' filled' : '');
-        el.dataset.slotId = slot.id;
-        el.dataset.slotPos = slot.pos;
-        el.style.left = slot.x + '%';
-        el.style.top = slot.y + '%';
-
-        const posColorMap = {GK:'#e65100',CB:'#1b5e20',LB:'#1b5e20',RB:'#1b5e20',DMF:'#0d47a1',CMF:'#0d47a1',AMF:'#880e4f',LWF:'#4a148c',RWF:'#4a148c',CF:'#b71c1c',SS:'#880e4f',RMF:'#0d47a1',LMF:'#0d47a1'};
-        const posColor = posColorMap[slot.pos] || '#333';
-
-        let circleContent = '';
-        if (assigned) {
-            const ratingStr = assigned.rating ? '<div class="slot-rating">' + assigned.rating + '</div>' : '';
-            const shortName = assigned.name.split(' ').pop();
-            circleContent = '<div class="slot-main-name">' + escHtml(shortName) + '</div>' + ratingStr;
-        } else {
-            circleContent = '<div class="slot-pos">' + slot.pos + '</div>';
-        }
-
-        el.innerHTML = '<div class="slot-circle" style="background:' + (assigned ? 'rgba(0,120,60,0.75)' : 'rgba(0,0,0,0.55)') + ';border-color:' + (assigned ? 'var(--cyan)' : 'rgba(255,255,255,0.4)') + ';">'
-            + circleContent
-            + (assigned ? '<button class="slot-remove" onclick="removeFromSlot(\'' + slot.id + '\');event.stopPropagation();">✕</button>' : '')
-            + '</div>'
-            + '<div class="slot-name">' + (assigned ? escHtml(assigned.name.split(' ').slice(0,2).join(' ')) : '') + '</div>';
-
-        // Drag over
-        el.addEventListener('dragover', e => {
-            e.preventDefault();
-            el.classList.add('drop-target-active');
-        });
-        el.addEventListener('dragleave', () => el.classList.remove('drop-target-active'));
-        el.addEventListener('drop', e => {
-            e.preventDefault();
-            el.classList.remove('drop-target-active');
-            const uid = e.dataTransfer.getData('text/uid');
-            const fromSlot = e.dataTransfer.getData('text/fromSlot');
-            if (uid) assignToSlot(slot.id, uid, fromSlot);
-        });
-        // Click to pick if empty
-        el.addEventListener('click', () => {
-            if (!lineupAssignments[slot.id]) highlightBenchForSlot(slot.id, slot.pos);
-        });
-        slotsEl.appendChild(el);
-    });
-    // update bench count
-    const filled = Object.keys(lineupAssignments).length;
-    const el2 = document.getElementById('lineupPanelCount');
-    if (el2) el2.textContent = filled + '/' + def.slots.length + ' diisi';
-}
-
-function highlightBenchForSlot(slotId, pos) {
-    // Flash bench items matching position
-    document.querySelectorAll('.lineup-bench-item').forEach(el => {
-        if (el.dataset.pos === pos && !el.classList.contains('in-lineup')) {
-            el.style.background = 'rgba(0,255,133,0.15)';
-            el.style.border = '1px solid var(--cyan)';
-            setTimeout(() => { el.style.background = ''; el.style.border = '1px solid transparent'; }, 1500);
-        }
-    });
-}
-
-function removeFromSlot(slotId) {
-    delete lineupAssignments[slotId];
-    renderLineupPitch();
-    renderLineupBench();
-}
-
-function assignToSlot(slotId, uid, fromSlot) {
-    const playerData = dbData[lineupCurrentPlayer] || {};
-    const p = playerData[uid];
-    if (!p) return;
-    // If dragged from another slot, swap or clear
-    if (fromSlot && fromSlot !== slotId) {
-        const prevInTarget = lineupAssignments[slotId];
-        if (prevInTarget && lineupAssignments[fromSlot]) {
-            // swap
-            lineupAssignments[slotId] = lineupAssignments[fromSlot];
-            lineupAssignments[fromSlot] = prevInTarget;
-        } else {
-            if (lineupAssignments[fromSlot]) delete lineupAssignments[fromSlot];
-            lineupAssignments[slotId] = {uid, name: p.name, pos: p.pos, rating: parseInt(p.rating)||0, num: p.num, club: p.club};
-        }
-    } else {
-        // Remove from any existing slot first
-        Object.keys(lineupAssignments).forEach(sid => {
-            if (lineupAssignments[sid] && lineupAssignments[sid].uid === uid) delete lineupAssignments[sid];
-        });
-        lineupAssignments[slotId] = {uid, name: p.name, pos: p.pos, rating: parseInt(p.rating)||0, num: p.num, club: p.club};
-    }
-    renderLineupPitch();
-    renderLineupBench();
-}
-
-function renderLineupBench() {
-    const benchEl = document.getElementById('lineupBenchList');
-    if (!benchEl || !lineupCurrentPlayer) return;
-
-    const playerData = dbData[lineupCurrentPlayer] || {};
-    const POS_ORDER = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
-    const posColorMap = {GK:'#fff3e0,#e65100',CB:'#e8f5e9,#1b5e20',LB:'#e8f5e9,#1b5e20',RB:'#e8f5e9,#1b5e20',DMF:'#e3f2fd,#0d47a1',CMF:'#e3f2fd,#0d47a1',AMF:'#fce4ec,#880e4f',LWF:'#f3e5f5,#4a148c',RWF:'#f3e5f5,#4a148c',CF:'#ffebee,#b71c1c',SS:'#fce4ec,#880e4f',RMF:'#e3f2fd,#0d47a1',LMF:'#e3f2fd,#0d47a1'};
-
-    // Group by pos
-    const groups = {};
-    POS_ORDER.forEach(p => groups[p] = []);
-    Object.entries(playerData).forEach(([uid, p]) => {
-        const pos = p.pos || '?';
-        if (!groups[pos]) groups[pos] = [];
-        groups[pos].push({uid, ...p});
-    });
-    POS_ORDER.forEach(pos => groups[pos].sort((a,b) => (parseInt(a.num)||0)-(parseInt(b.num)||0)));
-
-    // Assigned uids
-    const assignedUids = new Set(Object.values(lineupAssignments).map(a => a && a.uid).filter(Boolean));
-
-    let html = '';
-    const def = FORMATION_DEFS[lineupFormation];
-    // Bench = not in lineup
-    const inLineupUids = assignedUids;
-
-    // Show starting 11 section
-    const starting = Object.entries(lineupAssignments).filter(([sid, a]) => a);
-    if (starting.length > 0) {
-        html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">⚽ STARTING XI (' + starting.length + ')</div>';
-        starting.forEach(([slotId, a]) => {
-            const colors = (posColorMap[a.pos] || '#eee,#333').split(',');
-            html += '<div class="lineup-bench-item in-lineup" data-uid="' + a.uid + '" data-pos="' + a.pos + '">'
-                + '<span class="lineup-bench-num">' + (a.num||'') + '</span>'
-                + '<span class="lineup-bench-pos" style="background:' + colors[0] + ';color:' + colors[1] + ';">' + escHtml(a.pos) + '</span>'
-                + '<span class="lineup-bench-name" style="color:var(--cyan);">' + escHtml(a.name) + '</span>'
-                + (a.rating ? '<span class="lineup-bench-rating">' + a.rating + '</span>' : '')
-                + '</div>';
-        });
-        html += '</div>';
-    }
-
-    // Bench section (not assigned)
-    html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">📋 BENCH / SQUAD</div>';
-    let hasBench = false;
-    POS_ORDER.forEach(pos => {
-        (groups[pos] || []).forEach(p => {
-            if (inLineupUids.has(p.uid)) return;
-            hasBench = true;
-            const colors = (posColorMap[pos] || '#eee,#333').split(',');
-            html += '<div class="lineup-bench-item" data-uid="' + p.uid + '" data-pos="' + pos + '" draggable="true">'
-                + '<span class="lineup-bench-num">' + (p.num||'') + '</span>'
-                + '<span class="lineup-bench-pos" style="background:' + colors[0] + ';color:' + colors[1] + ';">' + escHtml(pos) + '</span>'
-                + '<span class="lineup-bench-name">' + escHtml(p.name||'') + '</span>'
-                + (p.rating ? '<span class="lineup-bench-rating">' + p.rating + '</span>' : '')
-                + '</div>';
-        });
-    });
-    if (!hasBench) html += '<div style="color:rgba(255,255,255,0.25);font-size:0.78rem;padding:8px;">Semua pemain sudah di lineup.</div>';
-    html += '</div>';
-
-    benchEl.innerHTML = html;
-
-    // Attach drag events to bench items
-    benchEl.querySelectorAll('.lineup-bench-item:not(.in-lineup)').forEach(el => {
-        el.addEventListener('dragstart', e => {
-            e.dataTransfer.setData('text/uid', el.dataset.uid);
-            e.dataTransfer.setData('text/fromSlot', '');
-        });
-        // Click to assign to best matching empty slot
-        el.addEventListener('click', () => {
-            const uid = el.dataset.uid;
-            const pos = el.dataset.pos;
-            const def2 = FORMATION_DEFS[lineupFormation];
-            if (!def2) return;
-            const emptySlot = def2.slots.find(s => s.pos === pos && !lineupAssignments[s.id])
-                || def2.slots.find(s => !lineupAssignments[s.id]);
-            if (emptySlot) assignToSlot(emptySlot.id, uid, null);
-        });
-    });
-
-    // Slot drag from pitch (allow re-dragging slot items)
-    document.querySelectorAll('.lineup-slot.filled').forEach(slotEl => {
-        slotEl.setAttribute('draggable', 'true');
-        slotEl.addEventListener('dragstart', e => {
-            const slotId = slotEl.dataset.slotId;
-            const assigned = lineupAssignments[slotId];
-            if (assigned) {
-                e.dataTransfer.setData('text/uid', assigned.uid);
-                e.dataTransfer.setData('text/fromSlot', slotId);
-            }
-        });
-    });
-}
-
-function autoSetLineup() {
-    const def = FORMATION_DEFS[lineupFormation];
-    if (!def) return;
-    const playerData = dbData[lineupCurrentPlayer] || {};
-    const allPemain = Object.entries(playerData).map(([uid, p]) => ({uid, ...p}));
-    
-    lineupAssignments = {};
-    const used = new Set();
-
-    def.slots.forEach(slot => {
-        // Find best match: same pos, highest rating, not used
-        const candidates = allPemain
-            .filter(p => p.pos === slot.pos && !used.has(p.uid))
-            .sort((a,b) => (parseInt(b.rating)||0) - (parseInt(a.rating)||0));
-        // Fallback: any not used
-        const pick = candidates[0] || allPemain.filter(p => !used.has(p.uid)).sort((a,b) => (parseInt(b.rating)||0)-(parseInt(a.rating)||0))[0];
-        if (pick) {
-            lineupAssignments[slot.id] = {uid: pick.uid, name: pick.name, pos: pick.pos, rating: parseInt(pick.rating)||0, num: pick.num, club: pick.club};
-            used.add(pick.uid);
-        }
-    });
-    renderLineupPitch();
-    renderLineupBench();
-}
-
-function simpanLineup() {
-    if (!lineupCurrentPlayer) return;
-    lineupSavedData[lineupCurrentPlayer] = {
-        formation: lineupFormation,
-        assignments: JSON.parse(JSON.stringify(lineupAssignments))
-    };
-    // Save to Firebase
-    db.ref(dbPath + '/lineup/' + lineupCurrentPlayer).set({
-        formation: lineupFormation,
-        assignments: lineupAssignments
-    }).then(() => {
-        const btn = document.querySelector('.lineup-save-btn');
-        if (btn) { btn.textContent = '✅ Tersimpan!'; setTimeout(() => btn.textContent = '💾 Simpan', 1500); }
-    }).catch(() => {
-        alert('❌ Gagal simpan lineup ke Firebase. Data disimpan lokal saja.');
-    });
-}
-
-// Load lineup data from Firebase when database loads
-function loadLineupData() {
-    if (!dbPath) return;
-    db.ref(dbPath + '/lineup').once('value', snap => {
-        const data = snap.val() || {};
-        Object.entries(data).forEach(([pk, ld]) => {
-            lineupSavedData[pk] = ld;
-        });
-    });
-}
-
 
 function loadTrophyOrder() {
     db.ref(dbPath + '/trophyOrder').on('value', snap => {
