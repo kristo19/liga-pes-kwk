@@ -2625,7 +2625,7 @@ function matikanAdmin() {
 }
 /* ===================== DATABASE PEMAIN ===================== */
 
-const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe', 'ALL PLAYER'];
+const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe', 'NON USER', 'ALL PLAYER'];
 
 const DB_DEFAULT_3 = {
   'Toxx': [
@@ -2868,7 +2868,7 @@ function resetDatabaseKeDefault(konfirmasi) {
         if (!confirm('⚠️ Reset semua pemain ke data default?\nSemua data pemain yang ada akan diganti. Lanjutkan?')) return;
     }
     const DB_DEFAULT = dbPath === 'liga3' ? DB_DEFAULT_3 : DB_DEFAULT_4;
-    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
+    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER');
     // Hapus dulu semua data lama, lalu isi ulang
     db.ref(dbPath + '/database').remove().then(() => {
         const updates = {};
@@ -2892,18 +2892,24 @@ function renderDatabasePage() {
 
     if (!dbCurrentPlayer) dbCurrentPlayer = DB_PLAYERS[0];
 
-    const tabsHtml = DB_PLAYERS.map(pk =>
-        '<button class="db-player-tab' + (pk === dbCurrentPlayer ? ' on' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')">' + escHtml(pk) + '</button>'
-    ).join('') + '<button class="db-player-tab' + (dbCurrentPlayer === 'COMPARE' ? ' on' : '') + '" onclick="dbSwitchPlayer(\'COMPARE\')" style="color:#e90052;">⚔️ Compare</button>';
+    const tabsHtml = DB_PLAYERS.map(pk => {
+        let style = '';
+        if (pk === 'NON USER') style = ' style="color:#ff8f00;border-bottom-color:' + (pk === dbCurrentPlayer ? '#ff8f00' : 'transparent') + ';"';
+        return '<button class="db-player-tab' + (pk === dbCurrentPlayer ? ' on' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')"' + style + '>' + (pk === 'NON USER' ? '📦 ' : '') + escHtml(pk) + '</button>';
+    }).join('') + '<button class="db-player-tab' + (dbCurrentPlayer === 'COMPARE' ? ' on' : '') + '" onclick="dbSwitchPlayer(\'COMPARE\')" style="color:#e90052;">⚔️ Compare</button>';
 
     const allPositions = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
     const posOptions = '<option value="">Semua Posisi</option>'
         + allPositions.map(p => '<option value="' + p + '"' + (dbFilterPos === p ? ' selected' : '') + '>' + p + '</option>').join('');
 
+    const isNonUser = dbCurrentPlayer === 'NON USER';
     const adminTools = modeAdmin
-        ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
-          + '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>'
-          + '<button onclick="resetDatabaseKeDefault(true)" style="padding:7px 16px;border-radius:20px;border:none;background:#e53935;color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">🗑️ Reset ke Default</button>'
+        ? (isNonUser
+            ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah ke Non User</button>'
+            : '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
+              + '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>'
+              + '<button onclick="resetDatabaseKeDefault(true)" style="padding:7px 16px;border-radius:20px;border:none;background:#e53935;color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">🗑️ Reset ke Default</button>'
+          )
         : '';
 
     if (dbCurrentPlayer === 'COMPARE') {
@@ -2913,9 +2919,9 @@ function renderDatabasePage() {
 
     el.innerHTML = `
         <div class="db-page">
-            <div class="db-page-header">
-                <h2>👥 DATABASE PEMAIN</h2>
-                <p>Skuad aktif &mdash; ${escHtml(currentMode)} Player Mode</p>
+            <div class="db-page-header" style="${isNonUser ? 'background:linear-gradient(135deg,#e65100 0%,#ff8f00 50%,#bf360c 100%);' : ''}">
+                <h2>${isNonUser ? '📦 NON USER — Gudang Pemain' : '👥 DATABASE PEMAIN'}</h2>
+                <p>${isNonUser ? 'Pemain yang tidak terpakai / tidak di-trade — tersimpan sebagai arsip' : 'Skuad aktif &mdash; ' + escHtml(currentMode) + ' Player Mode'}</p>
             </div>
             <div class="db-accent"></div>
             <div class="db-player-tabs">${tabsHtml}</div>
@@ -2939,6 +2945,7 @@ function renderDatabasePage() {
                             <th onclick="dbSort('pos')" id="dbTh-pos">Pos</th>
                             <th onclick="dbSort('rating')" id="dbTh-rating">Rating</th>
                             ${dbCurrentPlayer === 'ALL PLAYER' ? '<th onclick="dbSort(\'_owner\')" id="dbTh-_owner">Pemilik</th>' : ''}
+                            ${dbCurrentPlayer === 'NON USER' ? '<th onclick="dbSort(\'_fromPlayer\')" id="dbTh-_fromPlayer">Dari</th>' : ''}
                             ${modeAdmin && dbCurrentPlayer !== 'ALL PLAYER' ? '<th class="no-sort">Aksi</th>' : ''}
                         </tr>
                     </thead>
@@ -3335,7 +3342,7 @@ function dbSort(col) {
 }
 
 function dbUpdateSortHeaders() {
-    ['num','name','club','pos','rating','_owner'].forEach(col => {
+    ['num','name','club','pos','rating','_owner','_fromPlayer'].forEach(col => {
         const th = document.getElementById('dbTh-' + col);
         if (!th) return;
         th.className = '';
@@ -3402,7 +3409,7 @@ function dbRenderTable() {
 
     let pkData;
     if (dbCurrentPlayer === 'ALL PLAYER') {
-        const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
+        const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER');
         pkData = [];
         realPlayers.forEach(pk => {
             if (dbData[pk] && typeof dbData[pk] === 'object') {
@@ -3460,11 +3467,15 @@ function dbRenderTable() {
     }
 
     const isAll = dbCurrentPlayer === 'ALL PLAYER';
-    const totalCols = (modeAdmin && !isAll) ? 6 : (isAll ? 6 : 5);
+    const isNonUserTab = dbCurrentPlayer === 'NON USER';
+    const totalCols = (modeAdmin && !isAll) ? (isNonUserTab ? 7 : 6) : (isAll ? 6 : 5);
     if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="' + totalCols + '" class="db-empty">Tidak ada pemain ditemukan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="' + totalCols + '" class="db-empty">' + (isNonUserTab ? '📦 Belum ada pemain di Non User.' : 'Tidak ada pemain ditemukan.') + '</td></tr>';
         return;
     }
+
+    // Real player list for "pindah ke" dropdown
+    const realPlayerList = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER' && pk !== 'COMPARE');
 
     tbody.innerHTML = filtered.map(p => {
         const posCls = 'db-pos-' + (p.pos || 'CF').replace(/[^A-Z]/g,'');
@@ -3473,14 +3484,38 @@ function dbRenderTable() {
             ? '<img src="' + logoUrl + '" class="db-club-logo" onerror="this.style.display=\'none\'">'
             : '';
         const noteBadge = p.note ? '<span class="db-trade-badge">⚡ ' + escHtml(p.note) + '</span>' : '';
-        const adminCols = (modeAdmin && !isAll)
-            ? '<td><button class="db-action-btn db-edit-btn" onclick="bukaDbModalEdit(\'' + p.uid + '\')">✏️</button>'
-              + '<button class="db-action-btn db-del-btn" onclick="hapusDbPemain(\'' + p.uid + '\')">🗑️</button></td>'
-            : '';
+
+        let adminCols = '';
+        if (modeAdmin && !isAll) {
+            if (isNonUserTab) {
+                // Di NON USER: tombol pindah ke player, dan tombol hapus
+                const pindahOpts = realPlayerList.map(pk =>
+                    '<option value="' + escHtml(pk) + '">' + escHtml(pk) + '</option>'
+                ).join('');
+                adminCols = '<td style="white-space:nowrap;">'
+                    + '<select id="pindahTo_' + p.uid + '" class="db-filter-pos" style="font-size:0.7rem;padding:3px 6px;height:28px;margin-right:4px;">'
+                    + '<option value="">Pindah ke...</option>' + pindahOpts
+                    + '</select>'
+                    + '<button class="db-action-btn db-edit-btn" onclick="pindahDariNonUser(\'' + p.uid + '\')" title="Pindah ke player">↩️</button>'
+                    + '<button class="db-action-btn db-del-btn" onclick="hapusDbPemain(\'' + p.uid + '\')" title="Hapus permanent">🗑️</button>'
+                    + '</td>';
+            } else {
+                // Di player biasa: tombol edit dan pindah ke Non User (gantikan hapus)
+                adminCols = '<td>'
+                    + '<button class="db-action-btn db-edit-btn" onclick="bukaDbModalEdit(\'' + p.uid + '\')">✏️</button>'
+                    + '<button class="db-action-btn" onclick="pindahKeNonUser(\'' + p.uid + '\')" title="Pindah ke Non User" style="background:#fff3e0;border:1px solid #ffb74d;color:#e65100;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:0.8rem;">📦</button>'
+                    + '</td>';
+            }
+        }
+
         const ownerCol = isAll
             ? '<td><span style="font-size:0.75rem;font-weight:800;color:#1565c0;background:#e3f2fd;padding:2px 8px;border-radius:6px;border:1px solid #90caf9;">' + escHtml(p._owner||'') + '</span></td>'
             : '';
+        const fromPlayerCol = isNonUserTab
+            ? '<td><span style="font-size:0.7rem;font-weight:700;color:#e65100;background:#fff3e0;padding:2px 8px;border-radius:6px;border:1px solid #ffb74d;">' + escHtml(p._fromPlayer || '?') + '</span></td>'
+            : '';
         const ratingCol = '<td>' + ratingBadgeHtml(p.rating || 0) + '</td>';
+
         return '<tr>'
             + '<td><span class="db-num">' + (p.num||'') + '</span></td>'
             + '<td><strong>' + escHtml(p.name||'') + '</strong>' + noteBadge + '</td>'
@@ -3488,6 +3523,7 @@ function dbRenderTable() {
             + '<td><span class="db-pos-badge ' + posCls + '">' + escHtml(p.pos||'') + '</span></td>'
             + ratingCol
             + ownerCol
+            + fromPlayerCol
             + adminCols
             + '</tr>';
     }).join('');
@@ -3549,10 +3585,42 @@ function simpanDbPemain() {
 }
 
 function hapusDbPemain(uid) {
-    if (!confirm('Hapus pemain ini dari database?')) return;
+    if (!confirm('⚠️ Hapus PERMANEN pemain ini dari database?\nTindakan ini tidak bisa dibatalkan!')) return;
     db.ref(dbPath + '/database/' + dbCurrentPlayer + '/' + uid)
         .remove()
         .catch(e => alert('❌ Gagal hapus: ' + e.message));
+}
+
+/* Pindahkan pemain dari tab aktif ke NON USER */
+function pindahKeNonUser(uid) {
+    const pkData = dbData[dbCurrentPlayer] || {};
+    const p = pkData[uid];
+    if (!p) return alert('Data pemain tidak ditemukan!');
+    if (!confirm('📦 Pindahkan ' + (p.name||'pemain ini') + ' ke Non User?\nPemain akan dihapus dari skuad ' + dbCurrentPlayer + ' dan disimpan di Non User.')) return;
+
+    const payload = { ...p, _fromPlayer: dbCurrentPlayer };
+    const newRef = db.ref(dbPath + '/database/NON USER').push();
+    newRef.set(payload)
+        .then(() => db.ref(dbPath + '/database/' + dbCurrentPlayer + '/' + uid).remove())
+        .then(() => { /* Firebase listener will re-render */ })
+        .catch(e => alert('❌ Gagal pindah: ' + e.message));
+}
+
+/* Pindahkan pemain dari NON USER kembali ke player tertentu */
+function pindahDariNonUser(uid) {
+    const targetPk = document.getElementById('pindahTo_' + uid)?.value;
+    if (!targetPk) return alert('Pilih player tujuan terlebih dahulu!');
+    const pkData = dbData['NON USER'] || {};
+    const p = pkData[uid];
+    if (!p) return alert('Data pemain tidak ditemukan!');
+    if (!confirm('↩️ Pindahkan ' + (p.name||'pemain ini') + ' ke skuad ' + targetPk + '?')) return;
+
+    const { _fromPlayer, ...cleanPayload } = p;
+    const newRef = db.ref(dbPath + '/database/' + targetPk).push();
+    newRef.set(cleanPayload)
+        .then(() => db.ref(dbPath + '/database/NON USER/' + uid).remove())
+        .then(() => { /* Firebase listener will re-render */ })
+        .catch(e => alert('❌ Gagal pindah: ' + e.message));
 }
 
 /* ===================== TRADE PEMAIN ===================== */
