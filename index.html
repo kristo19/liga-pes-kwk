@@ -314,6 +314,57 @@
         .db-stat-chip span { color: var(--purple); font-size: 0.9rem; }
         .db-trade-badge { display: inline-block; padding: 1px 6px; border-radius: 5px; font-size: 0.62rem; font-weight: 700; background: #fff9c4; color: #f57f17; border: 1px solid #ffe082; margin-left: 4px; }
 
+        /* ===== RATING BADGE ===== */
+        .db-rating-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 32px; height: 22px; border-radius: 6px;
+            font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+        .db-rating-99  { background: #ffd700; color: #5a3800; border: 1px solid #d4a000; }
+        .db-rating-high { background: #00c853; color: white; border: 1px solid #009624; }
+        .db-rating-mid  { background: #1976d2; color: white; border: 1px solid #0d47a1; }
+        .db-rating-low  { background: #e53935; color: white; border: 1px solid #b71c1c; }
+        .db-rating-none { background: #eeeeee; color: #9e9e9e; border: 1px solid #e0e0e0; font-size: 0.68rem; }
+
+        /* ===== OVERALL RATING BAR ===== */
+        .db-overall-bar {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            padding: 14px 20px; background: linear-gradient(135deg, #003c8f 0%, #1565c0 100%);
+            color: white; border-bottom: 1px solid #0d47a1;
+        }
+        .db-overall-main {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .db-overall-num {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3rem; font-weight: 900; line-height: 1;
+            color: #ffd700; text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .db-overall-label-wrap { display: flex; flex-direction: column; }
+        .db-overall-label { font-size: 0.65rem; font-weight: 700; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .db-overall-sub { font-size: 0.78rem; font-weight: 600; opacity: 0.85; }
+        .db-overall-breakdown {
+            display: flex; gap: 8px; flex-wrap: wrap; flex: 1;
+        }
+        .db-ovr-pos-chip {
+            display: flex; align-items: center; gap: 4px;
+            background: rgba(255,255,255,0.15); border-radius: 8px;
+            padding: 4px 10px; font-size: 0.72rem; font-weight: 700;
+        }
+        .db-ovr-pos-chip .pos-lbl { opacity: 0.75; font-size: 0.65rem; }
+        .db-ovr-pos-chip .pos-val { color: #ffd700; font-size: 0.88rem; font-family: 'Barlow Condensed', sans-serif; }
+
+        /* toggle rating in compare */
+        .cmp-rating-toggle-wrap { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: #f8f5ff; border-bottom: 1px solid var(--border); }
+        .cmp-rating-toggle-label { font-size: 0.75rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; }
+        .toggle-switch { position: relative; width: 40px; height: 22px; cursor: pointer; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 22px; transition: 0.2s; }
+        .toggle-slider:before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+        .toggle-switch input:checked + .toggle-slider { background: #1565c0; }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); }
+
         /* ===== COMPARE PAGE ===== */
         .cmp-page { padding: 0; }
         .cmp-controls { padding: 16px 20px; background: #f8f5ff; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -890,6 +941,10 @@
                     <option value="SS">SS - Second Striker</option>
                     <option value="CF">CF - Centre Forward</option>
                 </select>
+            </div>
+            <div class="db-form-row">
+                <label class="db-form-label">Rating (1–99, opsional)</label>
+                <input type="number" id="dbFormRating" class="db-form-input" placeholder="cth: 85" min="1" max="99">
             </div>
             <div class="db-form-row">
                 <label class="db-form-label">Catatan (opsional)</label>
@@ -2860,6 +2915,7 @@ function renderDatabasePage() {
             </div>
             <div class="db-accent"></div>
             <div class="db-player-tabs">${tabsHtml}</div>
+            <div id="dbOverallBar"></div>
             <div id="dbStatRow" class="db-stat-row"></div>
             <div class="db-toolbar">
                 <div class="db-toolbar-left">
@@ -2877,6 +2933,7 @@ function renderDatabasePage() {
                             <th onclick="dbSort('name')" id="dbTh-name">Nama Pemain</th>
                             <th onclick="dbSort('club')" id="dbTh-club">Klub</th>
                             <th onclick="dbSort('pos')" id="dbTh-pos">Pos</th>
+                            ${dbCurrentPlayer !== 'ALL PLAYER' ? '<th onclick="dbSort(\'rating\')" id="dbTh-rating">Rating</th>' : ''}
                             ${dbCurrentPlayer === 'ALL PLAYER' ? '<th onclick="dbSort(\'_owner\')" id="dbTh-_owner">Pemilik</th>' : ''}
                             ${modeAdmin && dbCurrentPlayer !== 'ALL PLAYER' ? '<th class="no-sort">Aksi</th>' : ''}
                         </tr>
@@ -2892,6 +2949,7 @@ function renderDatabasePage() {
 
 /* ===================== HEAD-TO-HEAD COMPARE STATE ===================== */
 let h2hSelected = []; // array of player keys currently selected for compare
+let h2hShowRating = false; // toggle: show rating in compare
 
 function renderComparePage() {
     const el = document.getElementById('mainContent');
@@ -2912,6 +2970,14 @@ function renderComparePage() {
             </div>
             <div class="db-accent"></div>
             <div class="db-player-tabs" id="cmpTabsWrap"></div>
+            <div class="cmp-rating-toggle-wrap">
+                <span class="cmp-rating-toggle-label">⭐ Tampilkan Rating</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="h2hRatingToggle" ${h2hShowRating ? 'checked' : ''} onchange="h2hToggleRating(this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span style="font-size:0.75rem;color:var(--sub);font-weight:600;">${h2hShowRating ? 'Aktif' : 'Nonaktif'}</span>
+            </div>
             <div class="h2h-selector">
                 <div class="h2h-selector-label">🎯 Pilih Player yang ingin dibandingkan:</div>
                 <div class="h2h-player-pills" id="h2hPills"></div>
@@ -2970,6 +3036,14 @@ function h2hTogglePlayer(pk) {
         h2hSelected.push(pk);
     }
     renderH2HPills();
+    renderH2HTable();
+}
+
+function h2hToggleRating(val) {
+    h2hShowRating = !!val;
+    // Update label text
+    const wrap = document.querySelector('.cmp-rating-toggle-wrap span:last-child');
+    if (wrap) wrap.textContent = h2hShowRating ? 'Aktif' : 'Nonaktif';
     renderH2HTable();
 }
 
@@ -3074,10 +3148,13 @@ function renderH2HTable() {
                             ? '<img src="' + logoUrl + '" style="width:14px;height:14px;object-fit:contain;flex-shrink:0;vertical-align:middle;margin-right:3px;" onerror="this.style.display=\'none\'">'
                             : '';
                         const noteBadge = p.note ? ' <span style="font-size:0.6rem;color:#e91e63;font-weight:700;">⚡' + escHtml(p.note) + '</span>' : '';
+                        const ratingHtml = h2hShowRating && p.rating
+                            ? ' ' + ratingBadgeHtml(p.rating)
+                            : '';
                         tr += '<div class="h2h-player-item">'
                             + '<span class="h2h-player-num">' + (p.num||'—') + '</span>'
                             + '<div style="flex:1;min-width:0;">'
-                            + '<div class="h2h-player-name">' + escHtml(p.name||'') + noteBadge + '</div>'
+                            + '<div class="h2h-player-name">' + escHtml(p.name||'') + ratingHtml + noteBadge + '</div>'
                             + '<div class="h2h-player-club">' + logoHtml + escHtml(p.club||'') + '</div>'
                             + '</div>'
                             + '</div>';
@@ -3165,12 +3242,63 @@ function dbSort(col) {
 }
 
 function dbUpdateSortHeaders() {
-    ['num','name','club','pos','_owner'].forEach(col => {
+    ['num','name','club','pos','rating','_owner'].forEach(col => {
         const th = document.getElementById('dbTh-' + col);
         if (!th) return;
         th.className = '';
         if (col === dbSortCol) th.className = 'sort-' + dbSortDir;
     });
+}
+
+function ratingBadgeHtml(rating) {
+    if (!rating || rating <= 0) return '<span class="db-rating-badge db-rating-none">—</span>';
+    let cls;
+    if (rating >= 99) cls = 'db-rating-99';
+    else if (rating >= 85) cls = 'db-rating-high';
+    else if (rating >= 70) cls = 'db-rating-mid';
+    else cls = 'db-rating-low';
+    return '<span class="db-rating-badge ' + cls + '">' + rating + '</span>';
+}
+
+function renderOverallBar(pkData) {
+    const el = document.getElementById('dbOverallBar');
+    if (!el) return;
+    if (dbCurrentPlayer === 'ALL PLAYER') { el.innerHTML = ''; return; }
+
+    const rated = pkData.filter(p => p.rating && p.rating > 0);
+    if (!rated.length) { el.innerHTML = ''; return; }
+
+    const avg = Math.round(rated.reduce((s, p) => s + (parseInt(p.rating)||0), 0) / rated.length);
+
+    // Breakdown per position group
+    const POS_GROUPS = {
+        'GK': ['GK'],
+        'DEF': ['CB','LB','RB'],
+        'MID': ['DMF','CMF','AMF','RMF','LMF'],
+        'ATT': ['LWF','RWF','SS','CF'],
+    };
+    const breakdownHtml = Object.entries(POS_GROUPS).map(([label, positions]) => {
+        const group = rated.filter(p => positions.includes(p.pos || ''));
+        if (!group.length) return '';
+        const gAvg = Math.round(group.reduce((s, p) => s + (parseInt(p.rating)||0), 0) / group.length);
+        return '<div class="db-ovr-pos-chip">'
+            + '<span class="pos-lbl">' + label + '</span>'
+            + '<span class="pos-val">' + gAvg + '</span>'
+            + '</div>';
+    }).join('');
+
+    let avgCls = avg >= 90 ? '#ffd700' : avg >= 80 ? '#00c853' : avg >= 70 ? '#90caf9' : '#ef9a9a';
+
+    el.innerHTML = `<div class="db-overall-bar">
+        <div class="db-overall-main">
+            <div class="db-overall-num" style="color:${avgCls}">${avg}</div>
+            <div class="db-overall-label-wrap">
+                <span class="db-overall-label">Overall Rating</span>
+                <span class="db-overall-sub">${escHtml(dbCurrentPlayer)} &mdash; ${rated.length} pemain dinilai</span>
+            </div>
+        </div>
+        <div class="db-overall-breakdown">${breakdownHtml}</div>
+    </div>`;
 }
 
 function dbRenderTable() {
@@ -3196,6 +3324,9 @@ function dbRenderTable() {
             : [];
     }
 
+    // Render overall bar
+    renderOverallBar(pkData);
+
     // Filter
     const q = dbSearchQ.toLowerCase();
     let filtered = pkData.filter(p => {
@@ -3210,6 +3341,7 @@ function dbRenderTable() {
         let va = a[dbSortCol] || '';
         let vb = b[dbSortCol] || '';
         if (dbSortCol === 'num') { va = parseInt(va)||0; vb = parseInt(vb)||0; }
+        else if (dbSortCol === 'rating') { va = parseInt(va)||0; vb = parseInt(vb)||0; }
         else if (dbSortCol === 'pos') {
             const ia = POS_ORDER.indexOf(va) === -1 ? 99 : POS_ORDER.indexOf(va);
             const ib = POS_ORDER.indexOf(vb) === -1 ? 99 : POS_ORDER.indexOf(vb);
@@ -3235,7 +3367,7 @@ function dbRenderTable() {
     }
 
     const isAll = dbCurrentPlayer === 'ALL PLAYER';
-    const totalCols = (modeAdmin && !isAll) ? 5 : (isAll ? 5 : 4);
+    const totalCols = (modeAdmin && !isAll) ? 6 : (isAll ? 5 : 5);
     if (!filtered.length) {
         tbody.innerHTML = '<tr><td colspan="' + totalCols + '" class="db-empty">Tidak ada pemain ditemukan.</td></tr>';
         return;
@@ -3255,11 +3387,15 @@ function dbRenderTable() {
         const ownerCol = isAll
             ? '<td><span style="font-size:0.75rem;font-weight:800;color:#1565c0;background:#e3f2fd;padding:2px 8px;border-radius:6px;border:1px solid #90caf9;">' + escHtml(p._owner||'') + '</span></td>'
             : '';
+        const ratingCol = !isAll
+            ? '<td>' + ratingBadgeHtml(p.rating || 0) + '</td>'
+            : '';
         return '<tr>'
             + '<td><span class="db-num">' + (p.num||'') + '</span></td>'
             + '<td><strong>' + escHtml(p.name||'') + '</strong>' + noteBadge + '</td>'
             + '<td><div class="db-club-cell">' + logoHtml + '<span class="db-club-name">' + escHtml(p.club||'') + '</span></div></td>'
             + '<td><span class="db-pos-badge ' + posCls + '">' + escHtml(p.pos||'') + '</span></td>'
+            + ratingCol
             + ownerCol
             + adminCols
             + '</tr>';
@@ -3273,6 +3409,7 @@ function bukaDbModalTambah() {
     document.getElementById('dbFormName').value = '';
     document.getElementById('dbFormClub').value = '';
     document.getElementById('dbFormPos').value = '';
+    document.getElementById('dbFormRating').value = '';
     document.getElementById('dbFormNote').value = '';
     document.getElementById('dbModal').classList.add('on');
 }
@@ -3287,6 +3424,7 @@ function bukaDbModalEdit(uid) {
     document.getElementById('dbFormName').value = p.name || '';
     document.getElementById('dbFormClub').value = p.club || '';
     document.getElementById('dbFormPos').value = p.pos || '';
+    document.getElementById('dbFormRating').value = p.rating || '';
     document.getElementById('dbFormNote').value = p.note || '';
     document.getElementById('dbModal').classList.add('on');
 }
@@ -3295,16 +3433,19 @@ function tutupDbModal() { document.getElementById('dbModal').classList.remove('o
 function tutupDbModalOutside(e) { if (e.target === document.getElementById('dbModal')) tutupDbModal(); }
 
 function simpanDbPemain() {
-    const num  = parseInt(document.getElementById('dbFormNum').value) || 0;
-    const name = document.getElementById('dbFormName').value.trim();
-    const club = document.getElementById('dbFormClub').value.trim();
-    const pos  = document.getElementById('dbFormPos').value;
-    const note = document.getElementById('dbFormNote').value.trim();
+    const num    = parseInt(document.getElementById('dbFormNum').value) || 0;
+    const name   = document.getElementById('dbFormName').value.trim();
+    const club   = document.getElementById('dbFormClub').value.trim();
+    const pos    = document.getElementById('dbFormPos').value;
+    const note   = document.getElementById('dbFormNote').value.trim();
+    const ratingRaw = parseInt(document.getElementById('dbFormRating').value) || 0;
+    const rating = ratingRaw > 0 ? Math.min(99, Math.max(1, ratingRaw)) : 0;
 
     if (!name) return alert('Nama pemain wajib diisi!');
     if (!pos)  return alert('Posisi wajib dipilih!');
 
     const payload = { num, name, club, pos, note };
+    if (rating) payload.rating = rating;
     let ref;
     if (dbEditUid) {
         ref = db.ref(dbPath + '/database/' + dbCurrentPlayer + '/' + dbEditUid);
