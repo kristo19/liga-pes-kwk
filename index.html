@@ -3556,6 +3556,9 @@ function dbRenderTable() {
 
     if (countEl) countEl.textContent = filtered.length + ' pemain';
 
+    const isAll = dbCurrentPlayer === 'ALL PLAYER';
+    const isNonUserTab = dbCurrentPlayer === 'NON USER';
+
     // Stats row
     if (statRow) {
         const posCounts = {};
@@ -3570,9 +3573,6 @@ function dbRenderTable() {
             ).join('')
             + lineupBtn;
     }
-
-    const isAll = dbCurrentPlayer === 'ALL PLAYER';
-    const isNonUserTab = dbCurrentPlayer === 'NON USER';
     const totalCols = (modeAdmin && !isAll) ? (isNonUserTab ? 7 : 6) : (isAll ? 6 : 5);
     if (!filtered.length) {
         tbody.innerHTML = '<tr><td colspan="' + totalCols + '" class="db-empty">' + (isNonUserTab ? '📦 Belum ada pemain di Non User.' : 'Tidak ada pemain ditemukan.') + '</td></tr>';
