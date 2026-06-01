@@ -193,8 +193,9 @@
         .app { display: none; max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; }
         .app.on { display: block; }
         .app-header { background: var(--purple); border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
-        .app-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 900; color: white; letter-spacing: 1px; cursor: default; user-select: none; }
+        .app-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 900; color: white; letter-spacing: 1px; cursor: default; user-select: none; position: relative; display: inline-flex; align-items: center; }
         .app-title span { color: var(--cyan); }
+        .app-title-img-overlay { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: context-menu; z-index: 2; display: block; object-fit: cover; }
         .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .mode-badge { background: var(--pink); color: white; padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
         .btn-switch { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 20px; padding: 6px 14px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; font-family: 'Barlow', sans-serif; }
@@ -789,6 +790,64 @@
             .liga-type-card .ltc-icon { font-size: 1.6rem; }
             .liga-type-card .ltc-label { font-size: 0.85rem; }
         }
+        /* ===== LINE UP MODAL ===== */
+        .lineup-modal { display: none; position: fixed; inset: 0; background: rgba(5,0,20,0.92); z-index: 99999; justify-content: center; align-items: flex-start; padding: 16px; backdrop-filter: blur(8px); overflow-y: auto; }
+        .lineup-modal.on { display: flex; }
+        .lineup-modal-box { background: #1a1a2e; width: 100%; max-width: 900px; border-radius: 20px; overflow: hidden; box-shadow: 0 30px 100px rgba(0,0,0,0.8); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); margin: auto; }
+        .lineup-modal-header { background: linear-gradient(135deg, #37003c 0%, #6a0dad 60%, #1a0535 100%); padding: 18px 24px; color: white; display: flex; align-items: center; justify-content: space-between; }
+        .lineup-modal-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .lineup-modal-close { background: rgba(255,255,255,0.15); border: none; width: 34px; height: 34px; border-radius: 50%; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .lineup-modal-close:hover { background: var(--pink); }
+        .lineup-body { display: grid; grid-template-columns: 1fr 280px; gap: 0; min-height: 500px; }
+        
+        /* Formation selector */
+        .lineup-formation-bar { background: #0f0f23; padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .lineup-formation-bar label { color: rgba(255,255,255,0.6); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .lineup-formation-select { padding: 6px 12px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; font-family: 'Barlow', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; outline: none; }
+        .lineup-formation-select:focus { border-color: var(--cyan); }
+        .lineup-save-btn { padding: 6px 14px; border-radius: 8px; border: none; background: var(--cyan); color: #37003c; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .lineup-save-btn:hover { background: #00e07a; }
+        .lineup-autoset-btn { padding: 6px 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); transition: 0.2s; }
+        .lineup-autoset-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Pitch */
+        .lineup-pitch-wrap { position: relative; background: linear-gradient(180deg,#1a4a1a 0%,#1e5c1e 50%,#1a4a1a 100%); overflow: hidden; }
+        .lineup-pitch-inner { position: relative; width: 100%; padding-bottom: 135%; }
+        .lineup-pitch-lines { position: absolute; inset: 0; pointer-events: none; }
+        .lineup-pitch-lines svg { width: 100%; height: 100%; }
+        .lineup-slots-layer { position: absolute; inset: 0; }
+
+        /* Slot on pitch */
+        .lineup-slot { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 5; transition: 0.2s; }
+        .lineup-slot:hover { z-index: 10; }
+        .lineup-slot .slot-circle { width: 46px; height: 46px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.6); background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; flex-direction: column; transition: 0.2s; position: relative; overflow: visible; }
+        .lineup-slot.filled .slot-circle { border-color: var(--cyan); background: rgba(0,100,60,0.7); }
+        .lineup-slot.dragging-over .slot-circle { border-color: #ffd700; background: rgba(255,215,0,0.2); transform: scale(1.15); }
+        .lineup-slot.drag-source .slot-circle { opacity: 0.5; }
+        .lineup-slot .slot-pos { font-size: 0.6rem; font-weight: 900; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.5px; }
+        .lineup-slot.filled .slot-pos { color: var(--cyan); }
+        .lineup-slot .slot-name { font-size: 0.58rem; font-weight: 800; color: white; text-align: center; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; text-shadow: 0 1px 4px rgba(0,0,0,0.9); }
+        .lineup-slot .slot-rating { font-size: 0.6rem; font-weight: 900; color: #ffd700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .lineup-slot .slot-remove { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; border-radius: 50%; background: var(--pink); border: none; color: white; font-size: 0.6rem; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 20; }
+        .lineup-slot:hover .slot-remove { display: flex; }
+        .lineup-slot .slot-circle .slot-main-name { font-size: 0.62rem; font-weight: 900; color: white; text-align: center; line-height: 1.1; max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        /* Bench / Squad panel */
+        .lineup-panel { background: #12122a; border-left: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; }
+        .lineup-panel-head { background: rgba(255,255,255,0.05); padding: 10px 14px; font-size: 0.72rem; font-weight: 800; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
+        .lineup-panel-section { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .lineup-panel-section-title { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .lineup-bench-item { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 8px; cursor: grab; transition: 0.15s; border: 1px solid transparent; }
+        .lineup-bench-item:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
+        .lineup-bench-item.in-lineup { opacity: 0.35; cursor: default; }
+        .lineup-bench-item.in-lineup:hover { background: none; }
+        .lineup-bench-pos { width: 32px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 900; flex-shrink: 0; }
+        .lineup-bench-name { flex: 1; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.85); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .lineup-bench-rating { font-size: 0.7rem; font-weight: 900; color: #ffd700; flex-shrink: 0; }
+        .lineup-bench-num { font-size: 0.62rem; color: rgba(255,255,255,0.35); min-width: 18px; }
+
+        /* drag highlight */
+        .lineup-slot.drop-target-active .slot-circle { border-color: #ffd700 !important; background: rgba(255,215,0,0.25) !important; box-shadow: 0 0 16px rgba(255,215,0,0.5); }
     </style>
 </head>
 <body>
@@ -836,7 +895,7 @@
 <!-- APP -->
 <div id="appRoot" class="app">
     <div class="app-header">
-        <div class="app-title" onclick="cekAdmin()">LIGA <span>PES</span></div>
+        <div class="app-title" onclick="cekAdmin()">LIGA <span>PES</span><img class="app-title-img-overlay" id="ligaPesLogoImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='36' viewBox='0 0 120 36'%3E%3Crect width='120' height='36' rx='6' fill='%2337003c'/%3E%3Ctext x='10' y='26' font-family='Arial Black,sans-serif' font-size='22' font-weight='900' fill='white' letter-spacing='1'%3ELIGA %3C/text%3E%3Ctext x='72' y='26' font-family='Arial Black,sans-serif' font-size='22' font-weight='900' fill='%2300ff85' letter-spacing='1'%3EPЕС%3C/text%3E%3C/svg%3E" alt="LIGA PES Logo" title="Klik kanan → Open image in new tab"></div>
         <div class="header-right">
             <span id="modeBadge" class="mode-badge">Mode Aktif</span>
             <button class="btn-switch" onclick="kembaliKeMenuAwal()">&#128260; Ganti Mode</button>
@@ -1004,6 +1063,47 @@
         </div>
     </div>
 </div>
+<!-- MODAL LINE UP -->
+<div id="lineupModal" class="lineup-modal" onclick="tutupLineupModalOutside(event)">
+    <div class="lineup-modal-box">
+        <div class="lineup-modal-header">
+            <h3>🏟️ LINE UP — <span id="lineupModalPlayerName">Toxx</span></h3>
+            <button class="lineup-modal-close" onclick="tutupLineupModal()">×</button>
+        </div>
+        <div class="lineup-formation-bar">
+            <label>⚽ Formasi:</label>
+            <select id="lineupFormationSelect" class="lineup-formation-select" onchange="onFormationChange(this.value)">
+                <option value="4-3-3">4-3-3</option>
+                <option value="4-2-1-3">4-2-1-3</option>
+                <option value="4-2-3-1">4-2-3-1</option>
+                <option value="4-4-2">4-4-2</option>
+                <option value="4-1-2-1-2">4-1-2-1-2 (Diamond)</option>
+                <option value="3-5-2">3-5-2</option>
+                <option value="3-4-3">3-4-3</option>
+                <option value="5-3-2">5-3-2</option>
+                <option value="4-5-1">4-5-1</option>
+            </select>
+            <button class="lineup-autoset-btn" onclick="autoSetLineup()">⚡ Auto Set</button>
+            <button class="lineup-save-btn" onclick="simpanLineup()">💾 Simpan</button>
+        </div>
+        <div class="lineup-body">
+            <div class="lineup-pitch-wrap" id="lineupPitchWrap">
+                <div class="lineup-pitch-inner" id="lineupPitchInner">
+                    <div class="lineup-pitch-lines" id="lineupPitchLines"></div>
+                    <div class="lineup-slots-layer" id="lineupSlotsLayer"></div>
+                </div>
+            </div>
+            <div class="lineup-panel">
+                <div class="lineup-panel-head">
+                    <span>📋 Skuad &amp; Bench</span>
+                    <span id="lineupPanelCount" style="font-size:0.68rem;color:rgba(255,255,255,0.4);">0 dipilih</span>
+                </div>
+                <div style="overflow-y:auto;flex:1;max-height:580px;" id="lineupBenchList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL LOGIN -->
 <div id="loginModal" class="login-modal">
     <div class="login-box">
@@ -1416,6 +1516,7 @@ function applyMode() {
     listenMatchInfo();
     listenDatabase();
     loadTrophyOrder();
+    loadLineupData();
 }
 
 function buildMonthSelect() {
@@ -3460,10 +3561,14 @@ function dbRenderTable() {
         const posCounts = {};
         pkData.forEach(p => { const pos = p.pos || '?'; posCounts[pos] = (posCounts[pos]||0)+1; });
         const posOrder = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
+        const lineupBtn = (!isAll && !isNonUserTab)
+            ? '<button onclick="bukaLineupModal(\'' + dbCurrentPlayer + '\')" style="padding:4px 12px;border-radius:20px;border:none;background:linear-gradient(135deg,#37003c,#6a0dad);color:white;font-family:\'Barlow\',sans-serif;font-size:0.72rem;font-weight:700;cursor:pointer;margin-left:4px;transition:0.2s;" onmouseover="this.style.background=\'linear-gradient(135deg,#6a0dad,#e90052)\'" onmouseout="this.style.background=\'linear-gradient(135deg,#37003c,#6a0dad)\'">🏟️ Line Up</button>'
+            : '';
         statRow.innerHTML = '<span class="db-stat-chip">Total <span>' + pkData.length + '</span></span>'
             + posOrder.filter(p => posCounts[p]).map(p =>
                 '<span class="db-stat-chip">' + p + ' <span>' + posCounts[p] + '</span></span>'
-            ).join('');
+            ).join('')
+            + lineupBtn;
     }
 
     const isAll = dbCurrentPlayer === 'ALL PLAYER';
@@ -3717,7 +3822,390 @@ function konfirmasiTrade() {
 }
 
 
-/* ===================== TROPHY MANUAL ORDER ===================== */
+/* ===================== LINE UP FEATURE ===================== */
+let lineupCurrentPlayer = null;
+let lineupFormation = '4-3-3';
+let lineupAssignments = {}; // slotId -> {uid, name, pos, rating, num, club}
+let lineupSavedData = {}; // playerKey -> {formation, assignments}
+
+// Formation definitions: positions per slot with [x%, y%] on pitch (0=top GK, 1=bottom attack)
+const FORMATION_DEFS = {
+    '4-3-3': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'lb', pos:'LB', x:15, y:72}, {id:'cb1', pos:'CB', x:35, y:72}, {id:'cb2', pos:'CB', x:65, y:72}, {id:'rb', pos:'RB', x:85, y:72},
+            {id:'cm1', pos:'CMF', x:25, y:52}, {id:'cm2', pos:'CMF', x:50, y:52}, {id:'cm3', pos:'CMF', x:75, y:52},
+            {id:'lw', pos:'LWF', x:20, y:25}, {id:'st', pos:'CF', x:50, y:20}, {id:'rw', pos:'RWF', x:80, y:25},
+        ]
+    },
+    '4-2-1-3': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'lb', pos:'LB', x:15, y:72}, {id:'cb1', pos:'CB', x:35, y:72}, {id:'cb2', pos:'CB', x:65, y:72}, {id:'rb', pos:'RB', x:85, y:72},
+            {id:'dm1', pos:'DMF', x:33, y:57}, {id:'dm2', pos:'DMF', x:67, y:57},
+            {id:'am', pos:'AMF', x:50, y:42},
+            {id:'lw', pos:'LWF', x:20, y:22}, {id:'st', pos:'CF', x:50, y:15}, {id:'rw', pos:'RWF', x:80, y:22},
+        ]
+    },
+    '4-2-3-1': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'lb', pos:'LB', x:15, y:72}, {id:'cb1', pos:'CB', x:35, y:72}, {id:'cb2', pos:'CB', x:65, y:72}, {id:'rb', pos:'RB', x:85, y:72},
+            {id:'dm1', pos:'DMF', x:35, y:57}, {id:'dm2', pos:'DMF', x:65, y:57},
+            {id:'lam', pos:'AMF', x:18, y:38}, {id:'cam', pos:'AMF', x:50, y:38}, {id:'ram', pos:'AMF', x:82, y:38},
+            {id:'st', pos:'CF', x:50, y:18},
+        ]
+    },
+    '4-4-2': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'lb', pos:'LB', x:15, y:72}, {id:'cb1', pos:'CB', x:35, y:72}, {id:'cb2', pos:'CB', x:65, y:72}, {id:'rb', pos:'RB', x:85, y:72},
+            {id:'lm', pos:'LWF', x:15, y:52}, {id:'cm1', pos:'CMF', x:37, y:52}, {id:'cm2', pos:'CMF', x:63, y:52}, {id:'rm', pos:'RWF', x:85, y:52},
+            {id:'st1', pos:'CF', x:36, y:22}, {id:'st2', pos:'CF', x:64, y:22},
+        ]
+    },
+    '4-1-2-1-2': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'lb', pos:'LB', x:15, y:73}, {id:'cb1', pos:'CB', x:36, y:73}, {id:'cb2', pos:'CB', x:64, y:73}, {id:'rb', pos:'RB', x:85, y:73},
+            {id:'dm', pos:'DMF', x:50, y:60},
+            {id:'cm1', pos:'CMF', x:28, y:48}, {id:'cm2', pos:'CMF', x:72, y:48},
+            {id:'am', pos:'AMF', x:50, y:36},
+            {id:'st1', pos:'CF', x:33, y:18}, {id:'st2', pos:'CF', x:67, y:18},
+        ]
+    },
+    '3-5-2': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'cb1', pos:'CB', x:25, y:74}, {id:'cb2', pos:'CB', x:50, y:74}, {id:'cb3', pos:'CB', x:75, y:74},
+            {id:'lm', pos:'LWF', x:10, y:54}, {id:'cm1', pos:'CMF', x:30, y:52}, {id:'dm', pos:'DMF', x:50, y:52}, {id:'cm2', pos:'CMF', x:70, y:52}, {id:'rm', pos:'RWF', x:90, y:54},
+            {id:'st1', pos:'CF', x:35, y:22}, {id:'st2', pos:'CF', x:65, y:22},
+        ]
+    },
+    '3-4-3': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'cb1', pos:'CB', x:25, y:74}, {id:'cb2', pos:'CB', x:50, y:74}, {id:'cb3', pos:'CB', x:75, y:74},
+            {id:'lm', pos:'LWF', x:15, y:54}, {id:'cm1', pos:'CMF', x:38, y:54}, {id:'cm2', pos:'CMF', x:62, y:54}, {id:'rm', pos:'RWF', x:85, y:54},
+            {id:'lw', pos:'LWF', x:20, y:22}, {id:'st', pos:'CF', x:50, y:18}, {id:'rw', pos:'RWF', x:80, y:22},
+        ]
+    },
+    '5-3-2': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'lb', pos:'LB', x:8, y:74}, {id:'cb1', pos:'CB', x:27, y:74}, {id:'cb2', pos:'CB', x:50, y:74}, {id:'cb3', pos:'CB', x:73, y:74}, {id:'rb', pos:'RB', x:92, y:74},
+            {id:'cm1', pos:'CMF', x:25, y:52}, {id:'cm2', pos:'CMF', x:50, y:52}, {id:'cm3', pos:'CMF', x:75, y:52},
+            {id:'st1', pos:'CF', x:35, y:22}, {id:'st2', pos:'CF', x:65, y:22},
+        ]
+    },
+    '4-5-1': {
+        slots: [
+            {id:'gk', pos:'GK', x:50, y:90},
+            {id:'lb', pos:'LB', x:15, y:74}, {id:'cb1', pos:'CB', x:35, y:74}, {id:'cb2', pos:'CB', x:65, y:74}, {id:'rb', pos:'RB', x:85, y:74},
+            {id:'lm', pos:'LWF', x:10, y:52}, {id:'cm1', pos:'CMF', x:28, y:52}, {id:'cm2', pos:'CMF', x:50, y:52}, {id:'cm3', pos:'CMF', x:72, y:52}, {id:'rm', pos:'RWF', x:90, y:52},
+            {id:'st', pos:'CF', x:50, y:22},
+        ]
+    },
+};
+
+function bukaLineupModal(pk) {
+    lineupCurrentPlayer = pk;
+    document.getElementById('lineupModalPlayerName').textContent = pk;
+    // Load saved
+    const saved = lineupSavedData[pk] || {};
+    lineupFormation = saved.formation || '4-3-3';
+    lineupAssignments = JSON.parse(JSON.stringify(saved.assignments || {}));
+    document.getElementById('lineupFormationSelect').value = lineupFormation;
+    document.getElementById('lineupModal').classList.add('on');
+    renderLineupPitch();
+    renderLineupBench();
+}
+
+function tutupLineupModal() { document.getElementById('lineupModal').classList.remove('on'); }
+function tutupLineupModalOutside(e) { if (e.target === document.getElementById('lineupModal')) tutupLineupModal(); }
+
+function onFormationChange(val) {
+    lineupFormation = val;
+    // Keep assignments that still have valid slots
+    const def = FORMATION_DEFS[lineupFormation];
+    if (def) {
+        const validIds = def.slots.map(s => s.id);
+        Object.keys(lineupAssignments).forEach(id => {
+            if (!validIds.includes(id)) delete lineupAssignments[id];
+        });
+    }
+    renderLineupPitch();
+    renderLineupBench();
+}
+
+function renderLineupPitch() {
+    const def = FORMATION_DEFS[lineupFormation];
+    if (!def) return;
+    const inner = document.getElementById('lineupPitchInner');
+    const linesEl = document.getElementById('lineupPitchLines');
+    const slotsEl = document.getElementById('lineupSlotsLayer');
+
+    // Draw pitch lines SVG
+    linesEl.innerHTML = `<svg viewBox="0 0 100 135" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="3" width="90" height="129" rx="2" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.8"/>
+        <line x1="5" y1="67.5" x2="95" y2="67.5" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
+        <circle cx="50" cy="67.5" r="12" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
+        <rect x="27" y="3" width="46" height="18" rx="1" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
+        <rect x="35" y="3" width="30" height="9" rx="1" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+        <rect x="27" y="114" width="46" height="18" rx="1" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.6"/>
+        <rect x="35" y="123" width="30" height="9" rx="1" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+        <circle cx="50" cy="67.5" r="0.8" fill="rgba(255,255,255,0.3)"/>
+        <circle cx="50" cy="10" r="0.8" fill="rgba(255,255,255,0.2)"/>
+        <circle cx="50" cy="125" r="0.8" fill="rgba(255,255,255,0.2)"/>
+    </svg>`;
+
+    // Render slots
+    slotsEl.innerHTML = '';
+    def.slots.forEach(slot => {
+        const assigned = lineupAssignments[slot.id];
+        const el = document.createElement('div');
+        el.className = 'lineup-slot' + (assigned ? ' filled' : '');
+        el.dataset.slotId = slot.id;
+        el.dataset.slotPos = slot.pos;
+        el.style.left = slot.x + '%';
+        el.style.top = slot.y + '%';
+
+        const posColorMap = {GK:'#e65100',CB:'#1b5e20',LB:'#1b5e20',RB:'#1b5e20',DMF:'#0d47a1',CMF:'#0d47a1',AMF:'#880e4f',LWF:'#4a148c',RWF:'#4a148c',CF:'#b71c1c',SS:'#880e4f',RMF:'#0d47a1',LMF:'#0d47a1'};
+        const posColor = posColorMap[slot.pos] || '#333';
+
+        let circleContent = '';
+        if (assigned) {
+            const ratingStr = assigned.rating ? '<div class="slot-rating">' + assigned.rating + '</div>' : '';
+            const shortName = assigned.name.split(' ').pop();
+            circleContent = '<div class="slot-main-name">' + escHtml(shortName) + '</div>' + ratingStr;
+        } else {
+            circleContent = '<div class="slot-pos">' + slot.pos + '</div>';
+        }
+
+        el.innerHTML = '<div class="slot-circle" style="background:' + (assigned ? 'rgba(0,120,60,0.75)' : 'rgba(0,0,0,0.55)') + ';border-color:' + (assigned ? 'var(--cyan)' : 'rgba(255,255,255,0.4)') + ';">'
+            + circleContent
+            + (assigned ? '<button class="slot-remove" onclick="removeFromSlot(\'' + slot.id + '\');event.stopPropagation();">✕</button>' : '')
+            + '</div>'
+            + '<div class="slot-name">' + (assigned ? escHtml(assigned.name.split(' ').slice(0,2).join(' ')) : '') + '</div>';
+
+        // Drag over
+        el.addEventListener('dragover', e => {
+            e.preventDefault();
+            el.classList.add('drop-target-active');
+        });
+        el.addEventListener('dragleave', () => el.classList.remove('drop-target-active'));
+        el.addEventListener('drop', e => {
+            e.preventDefault();
+            el.classList.remove('drop-target-active');
+            const uid = e.dataTransfer.getData('text/uid');
+            const fromSlot = e.dataTransfer.getData('text/fromSlot');
+            if (uid) assignToSlot(slot.id, uid, fromSlot);
+        });
+        // Click to pick if empty
+        el.addEventListener('click', () => {
+            if (!lineupAssignments[slot.id]) highlightBenchForSlot(slot.id, slot.pos);
+        });
+        slotsEl.appendChild(el);
+    });
+    // update bench count
+    const filled = Object.keys(lineupAssignments).length;
+    const el2 = document.getElementById('lineupPanelCount');
+    if (el2) el2.textContent = filled + '/' + def.slots.length + ' diisi';
+}
+
+function highlightBenchForSlot(slotId, pos) {
+    // Flash bench items matching position
+    document.querySelectorAll('.lineup-bench-item').forEach(el => {
+        if (el.dataset.pos === pos && !el.classList.contains('in-lineup')) {
+            el.style.background = 'rgba(0,255,133,0.15)';
+            el.style.border = '1px solid var(--cyan)';
+            setTimeout(() => { el.style.background = ''; el.style.border = '1px solid transparent'; }, 1500);
+        }
+    });
+}
+
+function removeFromSlot(slotId) {
+    delete lineupAssignments[slotId];
+    renderLineupPitch();
+    renderLineupBench();
+}
+
+function assignToSlot(slotId, uid, fromSlot) {
+    const playerData = dbData[lineupCurrentPlayer] || {};
+    const p = playerData[uid];
+    if (!p) return;
+    // If dragged from another slot, swap or clear
+    if (fromSlot && fromSlot !== slotId) {
+        const prevInTarget = lineupAssignments[slotId];
+        if (prevInTarget && lineupAssignments[fromSlot]) {
+            // swap
+            lineupAssignments[slotId] = lineupAssignments[fromSlot];
+            lineupAssignments[fromSlot] = prevInTarget;
+        } else {
+            if (lineupAssignments[fromSlot]) delete lineupAssignments[fromSlot];
+            lineupAssignments[slotId] = {uid, name: p.name, pos: p.pos, rating: parseInt(p.rating)||0, num: p.num, club: p.club};
+        }
+    } else {
+        // Remove from any existing slot first
+        Object.keys(lineupAssignments).forEach(sid => {
+            if (lineupAssignments[sid] && lineupAssignments[sid].uid === uid) delete lineupAssignments[sid];
+        });
+        lineupAssignments[slotId] = {uid, name: p.name, pos: p.pos, rating: parseInt(p.rating)||0, num: p.num, club: p.club};
+    }
+    renderLineupPitch();
+    renderLineupBench();
+}
+
+function renderLineupBench() {
+    const benchEl = document.getElementById('lineupBenchList');
+    if (!benchEl || !lineupCurrentPlayer) return;
+
+    const playerData = dbData[lineupCurrentPlayer] || {};
+    const POS_ORDER = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
+    const posColorMap = {GK:'#fff3e0,#e65100',CB:'#e8f5e9,#1b5e20',LB:'#e8f5e9,#1b5e20',RB:'#e8f5e9,#1b5e20',DMF:'#e3f2fd,#0d47a1',CMF:'#e3f2fd,#0d47a1',AMF:'#fce4ec,#880e4f',LWF:'#f3e5f5,#4a148c',RWF:'#f3e5f5,#4a148c',CF:'#ffebee,#b71c1c',SS:'#fce4ec,#880e4f',RMF:'#e3f2fd,#0d47a1',LMF:'#e3f2fd,#0d47a1'};
+
+    // Group by pos
+    const groups = {};
+    POS_ORDER.forEach(p => groups[p] = []);
+    Object.entries(playerData).forEach(([uid, p]) => {
+        const pos = p.pos || '?';
+        if (!groups[pos]) groups[pos] = [];
+        groups[pos].push({uid, ...p});
+    });
+    POS_ORDER.forEach(pos => groups[pos].sort((a,b) => (parseInt(a.num)||0)-(parseInt(b.num)||0)));
+
+    // Assigned uids
+    const assignedUids = new Set(Object.values(lineupAssignments).map(a => a && a.uid).filter(Boolean));
+
+    let html = '';
+    const def = FORMATION_DEFS[lineupFormation];
+    // Bench = not in lineup
+    const inLineupUids = assignedUids;
+
+    // Show starting 11 section
+    const starting = Object.entries(lineupAssignments).filter(([sid, a]) => a);
+    if (starting.length > 0) {
+        html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">⚽ STARTING XI (' + starting.length + ')</div>';
+        starting.forEach(([slotId, a]) => {
+            const colors = (posColorMap[a.pos] || '#eee,#333').split(',');
+            html += '<div class="lineup-bench-item in-lineup" data-uid="' + a.uid + '" data-pos="' + a.pos + '">'
+                + '<span class="lineup-bench-num">' + (a.num||'') + '</span>'
+                + '<span class="lineup-bench-pos" style="background:' + colors[0] + ';color:' + colors[1] + ';">' + escHtml(a.pos) + '</span>'
+                + '<span class="lineup-bench-name" style="color:var(--cyan);">' + escHtml(a.name) + '</span>'
+                + (a.rating ? '<span class="lineup-bench-rating">' + a.rating + '</span>' : '')
+                + '</div>';
+        });
+        html += '</div>';
+    }
+
+    // Bench section (not assigned)
+    html += '<div class="lineup-panel-section"><div class="lineup-panel-section-title">📋 BENCH / SQUAD</div>';
+    let hasBench = false;
+    POS_ORDER.forEach(pos => {
+        (groups[pos] || []).forEach(p => {
+            if (inLineupUids.has(p.uid)) return;
+            hasBench = true;
+            const colors = (posColorMap[pos] || '#eee,#333').split(',');
+            html += '<div class="lineup-bench-item" data-uid="' + p.uid + '" data-pos="' + pos + '" draggable="true">'
+                + '<span class="lineup-bench-num">' + (p.num||'') + '</span>'
+                + '<span class="lineup-bench-pos" style="background:' + colors[0] + ';color:' + colors[1] + ';">' + escHtml(pos) + '</span>'
+                + '<span class="lineup-bench-name">' + escHtml(p.name||'') + '</span>'
+                + (p.rating ? '<span class="lineup-bench-rating">' + p.rating + '</span>' : '')
+                + '</div>';
+        });
+    });
+    if (!hasBench) html += '<div style="color:rgba(255,255,255,0.25);font-size:0.78rem;padding:8px;">Semua pemain sudah di lineup.</div>';
+    html += '</div>';
+
+    benchEl.innerHTML = html;
+
+    // Attach drag events to bench items
+    benchEl.querySelectorAll('.lineup-bench-item:not(.in-lineup)').forEach(el => {
+        el.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/uid', el.dataset.uid);
+            e.dataTransfer.setData('text/fromSlot', '');
+        });
+        // Click to assign to best matching empty slot
+        el.addEventListener('click', () => {
+            const uid = el.dataset.uid;
+            const pos = el.dataset.pos;
+            const def2 = FORMATION_DEFS[lineupFormation];
+            if (!def2) return;
+            const emptySlot = def2.slots.find(s => s.pos === pos && !lineupAssignments[s.id])
+                || def2.slots.find(s => !lineupAssignments[s.id]);
+            if (emptySlot) assignToSlot(emptySlot.id, uid, null);
+        });
+    });
+
+    // Slot drag from pitch (allow re-dragging slot items)
+    document.querySelectorAll('.lineup-slot.filled').forEach(slotEl => {
+        slotEl.setAttribute('draggable', 'true');
+        slotEl.addEventListener('dragstart', e => {
+            const slotId = slotEl.dataset.slotId;
+            const assigned = lineupAssignments[slotId];
+            if (assigned) {
+                e.dataTransfer.setData('text/uid', assigned.uid);
+                e.dataTransfer.setData('text/fromSlot', slotId);
+            }
+        });
+    });
+}
+
+function autoSetLineup() {
+    const def = FORMATION_DEFS[lineupFormation];
+    if (!def) return;
+    const playerData = dbData[lineupCurrentPlayer] || {};
+    const allPemain = Object.entries(playerData).map(([uid, p]) => ({uid, ...p}));
+    
+    lineupAssignments = {};
+    const used = new Set();
+
+    def.slots.forEach(slot => {
+        // Find best match: same pos, highest rating, not used
+        const candidates = allPemain
+            .filter(p => p.pos === slot.pos && !used.has(p.uid))
+            .sort((a,b) => (parseInt(b.rating)||0) - (parseInt(a.rating)||0));
+        // Fallback: any not used
+        const pick = candidates[0] || allPemain.filter(p => !used.has(p.uid)).sort((a,b) => (parseInt(b.rating)||0)-(parseInt(a.rating)||0))[0];
+        if (pick) {
+            lineupAssignments[slot.id] = {uid: pick.uid, name: pick.name, pos: pick.pos, rating: parseInt(pick.rating)||0, num: pick.num, club: pick.club};
+            used.add(pick.uid);
+        }
+    });
+    renderLineupPitch();
+    renderLineupBench();
+}
+
+function simpanLineup() {
+    if (!lineupCurrentPlayer) return;
+    lineupSavedData[lineupCurrentPlayer] = {
+        formation: lineupFormation,
+        assignments: JSON.parse(JSON.stringify(lineupAssignments))
+    };
+    // Save to Firebase
+    db.ref(dbPath + '/lineup/' + lineupCurrentPlayer).set({
+        formation: lineupFormation,
+        assignments: lineupAssignments
+    }).then(() => {
+        const btn = document.querySelector('.lineup-save-btn');
+        if (btn) { btn.textContent = '✅ Tersimpan!'; setTimeout(() => btn.textContent = '💾 Simpan', 1500); }
+    }).catch(() => {
+        alert('❌ Gagal simpan lineup ke Firebase. Data disimpan lokal saja.');
+    });
+}
+
+// Load lineup data from Firebase when database loads
+function loadLineupData() {
+    if (!dbPath) return;
+    db.ref(dbPath + '/lineup').once('value', snap => {
+        const data = snap.val() || {};
+        Object.entries(data).forEach(([pk, ld]) => {
+            lineupSavedData[pk] = ld;
+        });
+    });
+}
+
+
 function loadTrophyOrder() {
     db.ref(dbPath + '/trophyOrder').on('value', snap => {
         trophyManualOrder = snap.val() || {};
