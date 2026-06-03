@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LIGA PES</title>
     <!-- v3-fixed -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -190,7 +190,7 @@
         .mode-card span { font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; opacity: 0.8; text-transform: uppercase; }
 
         /* ===================== APP ===================== */
-        .app { display: none; max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; }
+        .app { display: none; max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; width: 100%; box-sizing: border-box; }
         .app.on { display: block; }
         .app-header { background: var(--purple); border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
         .app-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 900; color: white; letter-spacing: 1px; cursor: default; user-select: none; position: relative; display: inline-flex; align-items: center; }
@@ -201,7 +201,7 @@
         .btn-switch { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 20px; padding: 6px 14px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; font-family: 'Barlow', sans-serif; }
         .btn-switch:hover { background: var(--pink); border-color: var(--pink); }
 
-        .nav-bar { background: white; border-radius: 12px; padding: 12px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav-bar { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; box-sizing: border-box; }
         .nav-label { font-size: 0.7rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
         .nav-select { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--purple); font-family: 'Barlow', sans-serif; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2337003c' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; outline: none; transition: 0.2s; }
         .nav-select:focus { border-color: var(--purple); }
@@ -1220,6 +1220,46 @@
         <input type="password" id="adminPass" class="auth-input" placeholder="Password">
         <button class="auth-btn btn-login" onclick="prosesLogin()">Masuk</button>
         <button class="auth-btn btn-cancel" onclick="tutupLogin()">Batal</button>
+    </div>
+</div>
+
+<!-- MODAL IMPORT EXCEL -->
+<div id="importModal" style="display:none;position:fixed;inset:0;background:rgba(15,5,30,0.88);z-index:99999;justify-content:center;align-items:center;padding:16px;backdrop-filter:blur(8px);" onclick="tutupImportModalOutside(event)">
+    <div style="background:white;width:100%;max-width:520px;border-radius:18px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.55);animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);max-height:90vh;overflow-y:auto;">
+        <div style="background:linear-gradient(135deg,#1b5e20,#388e3c);padding:18px 22px;color:white;display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:900;margin:0;">📥 Import Pemain dari Excel</h3>
+            <button onclick="tutupImportModal()" style="background:rgba(255,255,255,0.15);border:none;width:32px;height:32px;border-radius:50%;color:white;font-size:1.1rem;cursor:pointer;">×</button>
+        </div>
+        <div style="padding:20px 22px 24px;">
+            <p style="font-size:0.82rem;color:#666;margin-bottom:14px;">
+                Import pemain untuk <strong id="importTargetPlayer"></strong>.<br>
+                Format kolom Excel/CSV: <code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;">num, name, club, pos, rating, note</code>
+            </p>
+            <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:14px;font-size:0.78rem;color:#555;">
+                <strong>Contoh isi Excel:</strong><br><br>
+                <table style="width:100%;border-collapse:collapse;font-size:0.75rem;">
+                    <tr style="background:#e8f5e9;"><th style="border:1px solid #ccc;padding:4px 8px;">num</th><th style="border:1px solid #ccc;padding:4px 8px;">name</th><th style="border:1px solid #ccc;padding:4px 8px;">club</th><th style="border:1px solid #ccc;padding:4px 8px;">pos</th><th style="border:1px solid #ccc;padding:4px 8px;">rating</th><th style="border:1px solid #ccc;padding:4px 8px;">note</th></tr>
+                    <tr><td style="border:1px solid #ccc;padding:4px 8px;">1</td><td style="border:1px solid #ccc;padding:4px 8px;">Erling Haaland</td><td style="border:1px solid #ccc;padding:4px 8px;">Man City</td><td style="border:1px solid #ccc;padding:4px 8px;">CF</td><td style="border:1px solid #ccc;padding:4px 8px;">91</td><td style="border:1px solid #ccc;padding:4px 8px;"></td></tr>
+                    <tr><td style="border:1px solid #ccc;padding:4px 8px;">2</td><td style="border:1px solid #ccc;padding:4px 8px;">Vinicius Jr</td><td style="border:1px solid #ccc;padding:4px 8px;">Real Madrid</td><td style="border:1px solid #ccc;padding:4px 8px;">LWF</td><td style="border:1px solid #ccc;padding:4px 8px;">90</td><td style="border:1px solid #ccc;padding:4px 8px;"></td></tr>
+                </table>
+            </div>
+            <div style="margin-bottom:14px;">
+                <label style="font-size:0.72rem;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Pilih File (.xlsx / .csv)</label>
+                <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" style="width:100%;padding:8px;border:1.5px solid #ddd;border-radius:8px;font-family:'Barlow',sans-serif;font-size:0.85rem;">
+            </div>
+            <div style="margin-bottom:14px;">
+                <label style="font-size:0.72rem;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Mode Import</label>
+                <select id="importMode" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-family:'Barlow',sans-serif;font-size:0.85rem;color:#37003c;">
+                    <option value="append">➕ Tambah ke data yang ada</option>
+                    <option value="replace">🔄 Ganti semua data (hapus lama)</option>
+                </select>
+            </div>
+            <div id="importPreview" style="display:none;margin-bottom:14px;max-height:200px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;"></div>
+            <div style="display:flex;gap:8px;">
+                <button onclick="tutupImportModal()" style="padding:11px 18px;border-radius:8px;border:none;background:#eee;color:#666;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer;">Batal</button>
+                <button onclick="prosesImport()" style="flex:1;padding:11px;border-radius:8px;border:none;background:#1b5e20;color:white;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer;">📥 Import Sekarang</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -3129,6 +3169,7 @@ function renderDatabasePage() {
             ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah ke Non User</button>'
             : '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
               + '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>'
+              + '<button onclick="bukaImportModal()" style="padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#1b5e20,#388e3c);color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">📥 Import Excel</button>'
               + '<button onclick="resetDatabaseKeDefault(true)" style="padding:7px 16px;border-radius:20px;border:none;background:#e53935;color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">🗑️ Reset ke Default</button>'
           )
         : '';
@@ -4681,6 +4722,117 @@ function resetSemuaManualJuara() {
             })
             .catch(e => alert('\u274c Gagal: ' + e.message));
     });
+}
+
+
+
+/* ===================== IMPORT EXCEL/CSV ===================== */
+let importParsedData = [];
+
+function bukaImportModal() {
+    document.getElementById('importTargetPlayer').textContent = dbCurrentPlayer;
+    document.getElementById('importFileInput').value = '';
+    document.getElementById('importPreview').style.display = 'none';
+    document.getElementById('importPreview').innerHTML = '';
+    importParsedData = [];
+    document.getElementById('importModal').style.display = 'flex';
+}
+
+function tutupImportModal() {
+    document.getElementById('importModal').style.display = 'none';
+    importParsedData = [];
+}
+
+function tutupImportModalOutside(e) {
+    if (e.target === document.getElementById('importModal')) tutupImportModal();
+}
+
+// Load SheetJS dari CDN jika belum ada
+function loadSheetJS(callback) {
+    if (window.XLSX) { callback(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    script.onload = callback;
+    document.head.appendChild(script);
+}
+
+document.getElementById('importFileInput') && document.getElementById('importFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    loadSheetJS(() => {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            try {
+                const data = new Uint8Array(ev.target.result);
+                const workbook = XLSX.read(data, {type:'array'});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, {defval:''});
+                importParsedData = rows.map((r, i) => ({
+                    num:    parseInt(r.num || r.No || r.NUMBER || i+1) || i+1,
+                    name:   String(r.name || r.Name || r.NAMA || r.nama || '').trim(),
+                    club:   String(r.club || r.Club || r.KLUB || r.klub || '').trim(),
+                    pos:    String(r.pos  || r.Pos  || r.POS  || r.posisi || '').trim().toUpperCase(),
+                    rating: parseInt(r.rating || r.Rating || r.RATING || 0) || 0,
+                    note:   String(r.note  || r.Note  || r.NOTE  || r.catatan || '').trim(),
+                })).filter(p => p.name);
+                tampilkanPreviewImport();
+            } catch(err) {
+                alert('❌ Gagal baca file: ' + err.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+});
+
+function tampilkanPreviewImport() {
+    const el = document.getElementById('importPreview');
+    if (!importParsedData.length) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.innerHTML = '<div style="padding:8px 12px;background:#e8f5e9;font-size:0.72rem;font-weight:700;color:#1b5e20;border-bottom:1px solid #ddd;">✅ Ditemukan ' + importParsedData.length + ' pemain — Preview:</div>'
+        + '<table style="width:100%;border-collapse:collapse;font-size:0.72rem;">'
+        + '<tr style="background:#f5f5f5;"><th style="padding:4px 8px;text-align:left;">#</th><th style="padding:4px 8px;text-align:left;">Nama</th><th style="padding:4px 8px;text-align:left;">Klub</th><th style="padding:4px 8px;">Pos</th><th style="padding:4px 8px;">Rtg</th></tr>'
+        + importParsedData.map(p =>
+            '<tr style="border-bottom:1px solid #eee;">'
+            + '<td style="padding:4px 8px;">' + p.num + '</td>'
+            + '<td style="padding:4px 8px;font-weight:600;">' + escHtml(p.name) + '</td>'
+            + '<td style="padding:4px 8px;color:#666;">' + escHtml(p.club) + '</td>'
+            + '<td style="padding:4px 8px;text-align:center;"><span style="background:#e3f2fd;color:#0d47a1;padding:1px 6px;border-radius:4px;font-weight:700;">' + escHtml(p.pos) + '</span></td>'
+            + '<td style="padding:4px 8px;text-align:center;font-weight:700;color:#1b5e20;">' + (p.rating || '—') + '</td>'
+            + '</tr>'
+        ).join('')
+        + '</table>';
+}
+
+function prosesImport() {
+    if (!importParsedData.length) return alert('Pilih file Excel/CSV terlebih dahulu!');
+    const mode = document.getElementById('importMode').value;
+    const targetPk = dbCurrentPlayer;
+
+    if (mode === 'replace') {
+        if (!confirm('⚠️ Semua data pemain ' + targetPk + ' akan dihapus dan diganti dengan data import. Lanjutkan?')) return;
+    }
+
+    const doImport = () => {
+        const updates = {};
+        importParsedData.forEach((p, i) => {
+            const uid = 'imp' + Date.now() + '_' + i;
+            const payload = { num: p.num, name: p.name, club: p.club, pos: p.pos, note: p.note };
+            if (p.rating) payload.rating = p.rating;
+            updates[dbPath + '/database/' + targetPk + '/' + uid] = payload;
+        });
+        db.ref().update(updates)
+            .then(() => {
+                tutupImportModal();
+                alert('✅ Berhasil import ' + importParsedData.length + ' pemain ke ' + targetPk + '!');
+            })
+            .catch(e => alert('❌ Gagal import: ' + e.message));
+    };
+
+    if (mode === 'replace') {
+        db.ref(dbPath + '/database/' + targetPk).remove().then(doImport).catch(e => alert('❌ Gagal hapus data lama: ' + e.message));
+    } else {
+        doImport();
+    }
 }
 
 </script>
