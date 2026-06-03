@@ -939,6 +939,34 @@
         .lineup-bench-name { flex: 1; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.85); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .lineup-bench-rating { font-size: 0.7rem; font-weight: 900; color: #ffd700; flex-shrink: 0; }
         .lineup-bench-num { font-size: 0.62rem; color: rgba(255,255,255,0.35); min-width: 18px; }
+
+        /* ===== MATCH STATS BAR ===== */
+        .match-stats-bar {
+        display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        padding: 8px 18px; background: rgba(255,255,255,0.08);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        }   
+        .match-stats-bar.admin {
+         background: #f0f4ff; border-bottom: 1px solid var(--border);
+        }
+        .msb-label {
+        font-size: 0.72rem; font-weight: 700; color: var(--sub);
+        text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .match-stats-bar.admin .msb-label { color: #37003c; }
+        .msb-select {
+        padding: 4px 10px; border-radius: 20px; border: 1.5px solid var(--border);
+        font-family: 'Barlow', sans-serif; font-size: 0.82rem; font-weight: 700;
+        color: var(--purple); background: white; outline: none; cursor: pointer;
+        }
+        .msb-select:focus { border-color: var(--purple); }
+        .msb-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+        }
+        .msb-chip.scorer { background: rgba(0,200,83,0.15); color: #00c853; border: 1px solid rgba(0,200,83,0.3); }
+        .msb-chip.assist { background: rgba(233,0,82,0.12); color: #e90052; border: 1px solid rgba(233,0,82,0.25); }
+        .msb-chip strong { font-weight: 900; }
     </style>
 </head>
 <body>
@@ -1298,6 +1326,8 @@ let editFormArr  = {};
 let allMatchesCache = {};
 let matchInfoData   = {};
 let trophyManualOrder = {}; // { 'Mei': ['Alfa','Toxx','Stive','Kobe'] }
+let matchStatsData = {}; // { matchId: { topScorer: 'Toxx', topAssist: 'Stive' } }
+let matchStatsRef = null;
 
 /* DATABASE PEMAIN state */
 let dbData = {}; // { playerKey: { [uid]: {num, name, club, pos, note} } }
@@ -1674,6 +1704,7 @@ function applyMode() {
     loadData();
     listenStats();
     listenMatchInfo();
+    listenMatchStats();
     listenDatabase();
     loadTrophyOrder();
     loadLineupData();
@@ -1780,6 +1811,17 @@ function listenMatchInfo() {
     });
 }
 
+function listenMatchStats() {
+    if (!dbPath) return;
+    db.ref(dbPath + '/matchStats').on('value', snap => {
+        matchStatsData = snap.val() || {};
+        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && currentMonth !== 'DATABASE' && localData && Object.keys(localData).length) {
+            renderMonthly(localData);
+        }
+        if (currentMonth === 'STATS') renderStatsPage();
+    });
+}
+
 function listenStats() {
     if (statsRef) { statsRef.off(); statsRef = null; }
     statsRef = db.ref(dbPath + '/allTimeStats');
@@ -1815,6 +1857,35 @@ function renderStatsPage() {
 
     function rankClass(i) { return i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : ''; }
     function rankLabel(i) { return i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1); }
+
+    const tsCount = {}, taCount = {};
+ALL_PLAYERS.forEach(n => { tsCount[n] = 0; taCount[n] = 0; });
+Object.values(matchStatsData).forEach(ms => {
+    if (ms.topScorer && tsCount[ms.topScorer] !== undefined) tsCount[ms.topScorer]++;
+    if (ms.topAssist && taCount[ms.topAssist] !== undefined) taCount[ms.topAssist]++;
+});
+const tsSorted = [...list].sort((a,b) => tsCount[b] - tsCount[a]);
+const taSorted = [...list].sort((a,b) => taCount[b] - taCount[a]);
+
+const tsHtml = tsSorted.map((n,i) => {
+    const val = tsCount[n] || 0;
+    return '<div class="stats-player-card">'
+        + '<div class="stats-player-rank ' + rankClass(i) + '">' + rankLabel(i) + '</div>'
+        + '<div class="stats-player-info"><div class="stats-player-name">' + escHtml(n) + '</div>'
+        + '<div class="stats-player-sub">' + val + 'x top scorer</div></div>'
+        + '<div class="stats-player-val goals">' + val + '</div>'
+        + '</div>';
+}).join('');
+
+const taHtml = taSorted.map((n,i) => {
+    const val = taCount[n] || 0;
+    return '<div class="stats-player-card">'
+        + '<div class="stats-player-rank ' + rankClass(i) + '">' + rankLabel(i) + '</div>'
+        + '<div class="stats-player-info"><div class="stats-player-name">' + escHtml(n) + '</div>'
+        + '<div class="stats-player-sub">' + val + 'x top assist</div></div>'
+        + '<div class="stats-player-val assists">' + val + '</div>'
+        + '</div>';
+}).join('');
 
     const scoresHtml = scoresSorted.map((n, i) => {
         const val = gs(n).score;
@@ -1856,14 +1927,24 @@ function renderStatsPage() {
             </div>
             <div class="stats-accent"></div>
             <div class="stats-grid">
-                <div class="stats-section">
-                    <div class="stats-section-title">⚽ Top Scores</div>
+                 <div class="stats-section">
+                     <div class="stats-section-title">⚽ Top Scorer (per liga)</div>
+                    ${tsHtml}
+                </div>
+                 <div class="stats-section">
+                      <div class="stats-section-title">🎯 Top Assist (per liga)</div>
+                     ${taHtml}
+                </div>
+            </div>
+            <div class="stats-grid" style="border-top:2px solid var(--border);margin-top:4px;">
+                 <div class="stats-section">
+                     <div class="stats-section-title" style="font-size:0.9rem;color:var(--sub);">📊 Total Gol (manual)</div>
                     ${scoresHtml}
-                </div>
+                 </div>
                 <div class="stats-section">
-                    <div class="stats-section-title">🎯 Top Assists</div>
+                    <div class="stats-section-title" style="font-size:0.9rem;color:var(--sub);">📊 Total Assist (manual)</div>
                     ${assistsHtml}
-                </div>
+                 </div>
             </div>
             <div class="stats-form-section">
                 <div class="stats-form-title">📈 Form 5 Laga Terakhir</div>
@@ -1972,6 +2053,34 @@ function renderMonthly(matches) {
         const accentBar = isFT ? '<div class="ft-accent-bar"></div>' : (isKlub ? '<div class="klub-accent-bar"></div>' : '');
         const juaraName = s[0] && (s[0].pts || 0) > 0 ? s[0].name : '-';
 
+        const ms = matchStatsData[id] || {};
+        const tsVal = ms.topScorer || '';
+        const taVal = ms.topAssist || '';
+        const playerOpts = playerNames.map(n =>
+            '<option value="' + escHtml(n) + '"' + (tsVal === n ? ' selected' : '') + '>' + escHtml(n) + '</option>'
+        ).join('');
+        const playerOptsA = playerNames.map(n =>
+    '<option value="' + escHtml(n) + '"' + (taVal === n ? ' selected' : '') + '>' + escHtml(n) + '</option>'
+    ).join('');
+
+        const statsBarHtml = modeAdmin
+            ? '<div class="match-stats-bar admin">'
+                + '<span class="msb-label">⚽ Top Scorer:</span>'
+                + '<select class="msb-select" onchange="simpanMatchStat(\'' + id + '\',\'topScorer\',this.value)">'
+                + '<option value="">— pilih —</option>' + playerOpts
+                + '</select>'
+                + '<span class="msb-label">🎯 Top Assist:</span>'
+                + '<select class="msb-select" onchange="simpanMatchStat(\'' + id + '\',\'topAssist\',this.value)">'
+                + '<option value="">— pilih —</option>' + playerOptsA
+                + '</select>'
+                + '</div>'
+            : (tsVal || taVal
+                ? '<div class="match-stats-bar">'
+                    + (tsVal ? '<span class="msb-chip scorer">⚽ Top Scorer: <strong>' + escHtml(tsVal) + '</strong></span>' : '')
+                    + (taVal ? '<span class="msb-chip assist">🎯 Top Assist: <strong>' + escHtml(taVal) + '</strong></span>' : '')
+                    + '</div>'
+        : '');
+
         let html = '<div class="match-block" id="mb-' + id + '">'
             + '<div class="' + headCls + '">'
             + '<span>' + heading + '</span>'
@@ -1981,7 +2090,7 @@ function renderMonthly(matches) {
             + '<span style="background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">🏆 ' + escHtml(juaraName) + '</span>'
             + (modeAdmin && !isEdit ? '<button class="btn-del" onclick="hapus(\'' + id + '\')">🗑️</button>' : '')
             + (modeAdmin ? '<button class="' + (isEdit ? 'btn-save' : 'btn-edit') + '" onclick="' + (isEdit ? 'simpan(\'' + id + '\')' : 'edit(\'' + id + '\')') + '">' + (isEdit ? '💾 Simpan' : '✏️ Edit') + '</button>' : '')
-            + '</span></div>' + accentBar;
+            + '</span></div>' + accentBar + statsBarHtml;
 
         const rowData = s.map((p, i) => ({
             name: p.name,
@@ -2427,6 +2536,11 @@ function simpanKlub(matchId, nama, safeId) {
     if (!clubInput || !ftCheck) return alert('❌ Elemen tidak ditemukan!');
     const clubVal = clubInput.value.trim();
     const ftVal   = ftCheck.checked;
+
+function simpanMatchStat(matchId, field, value) {
+    db.ref(dbPath + '/matchStats/' + matchId + '/' + field).set(value || null)
+        .catch(e => alert('❌ Gagal simpan: ' + e.message));
+}
 
     db.ref(dbPath + '/matchInfo/' + matchId + '/' + nama)
         .set({ club: clubVal, isFullTransfer: ftVal })
