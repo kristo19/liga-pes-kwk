@@ -1887,29 +1887,6 @@ const taHtml = taSorted.map((n,i) => {
         + '</div>';
 }).join('');
 
-    const scoresHtml = scoresSorted.map((n, i) => {
-        const val = gs(n).score;
-        return `<div class="stats-player-card">
-            <div class="stats-player-rank ${rankClass(i)}">${rankLabel(i)}</div>
-            <div class="stats-player-info">
-                <div class="stats-player-name">${escHtml(n)}</div>
-                <div class="stats-player-sub">${val} gol total</div>
-            </div>
-            <div class="stats-player-val goals">${val}</div>
-        </div>`;
-    }).join('');
-
-    const assistsHtml = assistsSorted.map((n, i) => {
-        const val = gs(n).assist;
-        return `<div class="stats-player-card">
-            <div class="stats-player-rank ${rankClass(i)}">${rankLabel(i)}</div>
-            <div class="stats-player-info">
-                <div class="stats-player-name">${escHtml(n)}</div>
-                <div class="stats-player-sub">${val} assist total</div>
-            </div>
-            <div class="stats-player-val assists">${val}</div>
-        </div>`;
-    }).join('');
 
     const formHtml = list.map(n => {
         const formArr = (gs(n).formText || '').toUpperCase().replace(/[^WDL]/g, '').split('').slice(-5);
@@ -1935,16 +1912,6 @@ const taHtml = taSorted.map((n,i) => {
                       <div class="stats-section-title">🎯 Top Assist (per liga)</div>
                      ${taHtml}
                 </div>
-            </div>
-            <div class="stats-grid" style="border-top:2px solid var(--border);margin-top:4px;">
-                 <div class="stats-section">
-                     <div class="stats-section-title" style="font-size:0.9rem;color:var(--sub);">📊 Total Gol (manual)</div>
-                    ${scoresHtml}
-                 </div>
-                <div class="stats-section">
-                    <div class="stats-section-title" style="font-size:0.9rem;color:var(--sub);">📊 Total Assist (manual)</div>
-                    ${assistsHtml}
-                 </div>
             </div>
             <div class="stats-form-section">
                 <div class="stats-form-title">📈 Form 5 Laga Terakhir</div>
