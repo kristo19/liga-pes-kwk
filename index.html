@@ -1869,9 +1869,9 @@ const taSorted = [...list].sort((a,b) => taCount[b] - taCount[a]);
 
 const tsHtml = tsSorted.map((n,i) => {
     const val = tsCount[n] || 0;
-    return '<div class="stats-player-card">'
+    return '<div class="stats-player-card" style="cursor:pointer; transition: background 0.2s; border-radius:8px; padding: 10px;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'" onclick="bukaDetailStats(\'' + escHtml(n) + '\', \'scorer\')">'
         + '<div class="stats-player-rank ' + rankClass(i) + '">' + rankLabel(i) + '</div>'
-        + '<div class="stats-player-info"><div class="stats-player-name">' + escHtml(n) + '</div>'
+        + '<div class="stats-player-info"><div class="stats-player-name" style="border-bottom: 1px dashed var(--purple); display: inline-block;">' + escHtml(n) + '</div>'
         + '<div class="stats-player-sub">' + val + 'x top scorer</div></div>'
         + '<div class="stats-player-val goals">' + val + '</div>'
         + '</div>';
@@ -1879,9 +1879,9 @@ const tsHtml = tsSorted.map((n,i) => {
 
 const taHtml = taSorted.map((n,i) => {
     const val = taCount[n] || 0;
-    return '<div class="stats-player-card">'
+    return '<div class="stats-player-card" style="cursor:pointer; transition: background 0.2s; border-radius:8px; padding: 10px;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'" onclick="bukaDetailStats(\'' + escHtml(n) + '\', \'assist\')">'
         + '<div class="stats-player-rank ' + rankClass(i) + '">' + rankLabel(i) + '</div>'
-        + '<div class="stats-player-info"><div class="stats-player-name">' + escHtml(n) + '</div>'
+        + '<div class="stats-player-info"><div class="stats-player-name" style="border-bottom: 1px dashed var(--purple); display: inline-block;">' + escHtml(n) + '</div>'
         + '<div class="stats-player-sub">' + val + 'x top assist</div></div>'
         + '<div class="stats-player-val assists">' + val + '</div>'
         + '</div>';
@@ -2353,6 +2353,7 @@ function bukaInfoPlayerAllTime(nama) {
         const root = snap.val() || {};
         const clubStats = {};
         let grandTotalW=0, grandTotalD=0, grandTotalL=0, grandTotalPl=0, grandLiga=0, grandJuara=0;
+        let grandTS=0, grandTA=0;
 
         MONTHS.forEach(bulan => {
             if (!root[bulan] || !root[bulan].matches) return;
@@ -2363,7 +2364,6 @@ function bukaInfoPlayerAllTime(nama) {
                 if (!st) return;
                 const mi   = (matchInfoData[id] || {})[nama] || {};
                 const isFT = mi.isFullTransfer || false;
-                // FIX: Semua liga Full Transfer digabung ke satu bucket, liga Klub per nama klub
                 const club = isFT ? '__FULL_TRANSFER__' : ((mi.club || '').trim() || '(Tidak Diisi)');
                 const w    = parseInt(st.w) || 0;
                 const d    = parseInt(st.d) || 0;
@@ -2371,7 +2371,7 @@ function bukaInfoPlayerAllTime(nama) {
                 const pl   = w + d + l;
                 const pts  = parseInt(st.pts) || (w*3 + d);
 
-                if (!clubStats[club]) clubStats[club] = { liga:0, w:0, d:0, l:0, pl:0, pts:0, juara:0, isFT };
+                if (!clubStats[club]) clubStats[club] = { liga:0, w:0, d:0, l:0, pl:0, pts:0, juara:0, isFT, ts:0, ta:0 };
                 const sorted  = sortStandings(match);
                 const isJuara = sorted.length > 0 && fix(sorted[0].name) === nama && (sorted[0].pts || 0) > 0;
 
@@ -2379,6 +2379,10 @@ function bukaInfoPlayerAllTime(nama) {
                 clubStats[club].w     += w; clubStats[club].d += d; clubStats[club].l += l;
                 clubStats[club].pl    += pl; clubStats[club].pts += pts;
                 clubStats[club].juara += isJuara ? 1 : 0;
+                
+                const ms = matchStatsData[id] || {};
+                if (ms.topScorer === nama) { clubStats[club].ts += 1; grandTS += 1; }
+                if (ms.topAssist === nama) { clubStats[club].ta += 1; grandTA += 1; }
 
                 grandTotalW  += w; grandTotalD += d; grandTotalL += l; grandTotalPl += pl;
                 grandLiga    += 1; if (isJuara) grandJuara += 1;
@@ -2391,7 +2395,6 @@ function bukaInfoPlayerAllTime(nama) {
                 '<div class="no-club" style="text-align:center;padding:20px;">Belum ada data klub untuk ' + escHtml(nama) + '.</div>';
         }
         clubs.sort((a, b) => {
-            // Full Transfer selalu di atas jika ada
             if (a === '__FULL_TRANSFER__') return -1;
             if (b === '__FULL_TRANSFER__') return 1;
             if (clubStats[b].liga !== clubStats[a].liga) return clubStats[b].liga - clubStats[a].liga;
@@ -2403,6 +2406,7 @@ function bukaInfoPlayerAllTime(nama) {
         const grandPct = winPct(grandTotalW, grandTotalPl);
         const grandPts = grandTotalW * 3 + grandTotalD;
 
+        // Grand Total UI — Menyusun urutan Scorer & Assist setelah Win%
         let html = '<div style="background:linear-gradient(135deg,#37003c,#6a0dad);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:white;">'
             + '<div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.7;margin-bottom:10px;">📊 Grand Total — ' + grandLiga + ' Liga</div>'
             + '<div style="display:flex;gap:10px;flex-wrap:wrap;">'
@@ -2413,6 +2417,8 @@ function bukaInfoPlayerAllTime(nama) {
             + '<div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#ff6b6b;">' + grandTotalL + '</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Loss</div></div>'
             + '<div style="text-align:center;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#fdbb2d;">' + grandPts + '</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Pts</div></div>'
             + '<div style="text-align:center;background:rgba(233,0,82,0.4);border-radius:8px;padding:8px 14px;min-width:50px;"><div style="font-size:1.4rem;font-weight:900;color:#fff;">' + grandPct + '%</div><div style="font-size:0.58rem;font-weight:700;opacity:0.7;text-transform:uppercase;margin-top:2px;">Win%</div></div>'
+            + '<div style="text-align:center;background:rgba(0,255,133,0.15);border-radius:8px;padding:8px 14px;min-width:50px;border:1px solid rgba(0,255,133,0.3);"><div style="font-size:1.4rem;font-weight:900;color:#00ff85;">' + grandTS + '</div><div style="font-size:0.58rem;font-weight:700;opacity:0.8;text-transform:uppercase;margin-top:2px;">⚽ Scorer</div></div>'
+            + '<div style="text-align:center;background:rgba(233,0,82,0.3);border-radius:8px;padding:8px 14px;min-width:50px;border:1px solid rgba(233,0,82,0.4);"><div style="font-size:1.4rem;font-weight:900;color:#ff80ab;">' + grandTA + '</div><div style="font-size:0.58rem;font-weight:700;opacity:0.8;text-transform:uppercase;margin-top:2px;">🎯 Assist</div></div>'
             + '</div></div>';
 
         clubs.forEach((club, idx) => {
@@ -2433,6 +2439,7 @@ function bukaInfoPlayerAllTime(nama) {
                     : 'linear-gradient(90deg,var(--loss),#ff8a80)';
             const badgeBg  = pct >= 60 ? 'var(--win)' : pct >= 40 ? '#888' : 'var(--loss)';
 
+            // Per Klub/FT UI — Menyusun urutan Pill Scorer & Assist setelah Win%
             html += '<div class="league-card" style="margin-bottom:10px;">'
                 + '<div class="league-card-head" style="' + (isBest ? 'background:linear-gradient(90deg,#fff9c4,#fff3e0);' : isFTBucket ? 'background:linear-gradient(90deg,#fff0f3,#ffe8ed);' : '') + '">'
                 + '<div style="display:flex;align-items:center;">' + logoHtml
@@ -2449,6 +2456,8 @@ function bukaInfoPlayerAllTime(nama) {
                 + '<div class="stat-pill"><span class="sp-val loss">' + cs.l + '</span><span class="sp-lbl">Loss</span></div>'
                 + '<div class="stat-pill"><span class="sp-val" style="color:#fdbb2d;">' + cs.pts + '</span><span class="sp-lbl">Pts</span></div>'
                 + '<div class="stat-pill"><span class="sp-val pct">' + pct + '%</span><span class="sp-lbl">Win%</span></div>'
+                + '<div class="stat-pill" style="background:' + (cs.ts > 0 ? '#e8f5e9' : '#f5f5f5') + ';' + (cs.ts > 0 ? 'border:1px solid #a5d6a7;' : '') + '"><span class="sp-val" style="color:' + (cs.ts > 0 ? 'var(--win)' : '#bbb') + ';">' + cs.ts + '⚽</span><span class="sp-lbl">Scorer</span></div>'
+                + '<div class="stat-pill" style="background:' + (cs.ta > 0 ? '#fce4ec' : '#f5f5f5') + ';' + (cs.ta > 0 ? 'border:1px solid #f48fb1;' : '') + '"><span class="sp-val" style="color:' + (cs.ta > 0 ? 'var(--pink)' : '#bbb') + ';">' + cs.ta + '🎯</span><span class="sp-lbl">Assist</span></div>'
                 + '</div><div class="win-bar-wrap">'
                 + '<div class="win-bar-label"><span>Win Rate</span><span>' + cs.w + 'W · ' + cs.d + 'D · ' + cs.l + 'L dari ' + cs.pl + ' pertandingan</span></div>'
                 + '<div class="win-bar-bg"><div class="win-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>'
@@ -4924,6 +4933,88 @@ function prosesImport() {
     } else {
         doImport();
     }
+}
+
+function bukaDetailStats(nama, tipe) {
+    // Siapkan Modal
+    document.getElementById('infoModalTitle').innerText = nama;
+    document.getElementById('infoModalSubtitle').innerText = (tipe === 'scorer' ? '⚽ Riwayat Top Scorer' : '🎯 Riwayat Top Assist') + ' - Memuat...';
+    document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Memuat data...</div>';
+    document.getElementById('infoModal').classList.add('on');
+
+    // Tarik data seluruh match
+    db.ref(dbPath).once('value', snap => {
+        const root = snap.val() || {};
+        let history = [];
+        
+        // Cek semua bulan
+        MONTHS.forEach(bulan => {
+            if (!root[bulan] || !root[bulan].matches) return;
+            
+            // Urutkan berdasarkan tanggal & timestamp agar nomor liga valid
+            const matchIds = Object.keys(root[bulan].matches).sort((a, b) => {
+                const tglA = root[bulan].matches[a].tanggal || 0;
+                const tglB = root[bulan].matches[b].tanggal || 0;
+                if (tglA !== tglB) return tglA - tglB;
+                return (root[bulan].matches[a].timestamp || 0) - (root[bulan].matches[b].timestamp || 0);
+            });
+            
+            let counters = {};
+            
+            matchIds.forEach(id => {
+                const match = root[bulan].matches[id];
+                counters[match.tanggal] = (counters[match.tanggal] || 0) + 1;
+                const ligaNum = counters[match.tanggal];
+                
+                // Ambil info dari matchStatsData
+                const ms = matchStatsData[id] || {};
+                const isScorer = (tipe === 'scorer' && ms.topScorer === nama);
+                const isAssist = (tipe === 'assist' && ms.topAssist === nama);
+                
+                if (isScorer || isAssist) {
+                    history.push({
+                        bulan: bulan,
+                        tanggal: match.tanggal,
+                        ligaNum: ligaNum,
+                        timestamp: match.timestamp || 0
+                    });
+                }
+            });
+        });
+        
+        // Urutkan riwayat dari yang terbaru ke yang terlama
+        history.sort((a, b) => b.timestamp - a.timestamp);
+        
+        // Update subtitle dengan total hitungan
+        document.getElementById('infoModalSubtitle').innerText = (tipe === 'scorer' ? '⚽ Riwayat Top Scorer' : '🎯 Riwayat Top Assist') + ' (' + history.length + 'x)';
+        
+        // Jika kosong (walau harusnya ada)
+        if (!history.length) {
+            document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Belum ada riwayat tercatat.</div>';
+            return;
+        }
+        
+        // Buat tabel output riwayat
+        let html = '<div class="league-card"><div class="league-card-body" style="padding:0;">';
+        html += '<table style="width:100%; border-collapse:collapse;">';
+        html += '<tr style="background:#f7f0ff; border-bottom:2px solid var(--border);">'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:var(--purple);">Bulan</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:var(--purple);">Tanggal</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:var(--purple);">Liga</th>'
+              + '</tr>';
+        
+        history.forEach(h => {
+            const hari = getNamaHari(h.tanggal, h.bulan);
+            html += '<tr style="border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'">';
+            html += '<td style="padding:10px; font-size:0.9rem; font-weight:700;">' + h.bulan + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; color:var(--sub);">' + hari + ', ' + h.tanggal + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; font-weight:700; color:var(--pink);">Liga ' + ligaOrdinal(h.ligaNum) + '</td>';
+            html += '</tr>';
+        });
+        
+        html += '</table></div></div>';
+        document.getElementById('infoModalBody').innerHTML = html;
+    });
 }
 
 </script>
