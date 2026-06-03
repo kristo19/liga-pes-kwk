@@ -3670,16 +3670,22 @@ function dbRenderTable() {
     if (!tbody) return;
 
     let pkData;
-    if (dbCurrentPlayer === 'ALL PLAYER') {
-        const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER');
-        pkData = [];
-        realPlayers.forEach(pk => {
-            if (dbData[pk] && typeof dbData[pk] === 'object') {
-                Object.entries(dbData[pk]).forEach(([uid, p]) => {
-                    pkData.push({uid: pk + '_' + uid, _owner: pk, ...p});
+if (dbCurrentPlayer === 'ALL PLAYER') {
+    const sourcePlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
+    pkData = [];
+    sourcePlayers.forEach(pk => {
+        if (dbData[pk] && typeof dbData[pk] === 'object') {
+            Object.entries(dbData[pk]).forEach(([uid, p]) => {
+                pkData.push({
+                    uid: pk + '_' + uid,
+                    _owner: pk,
+                    _isNonUser: pk === 'NON USER',
+                    ...p
                 });
-            }
-        });
+            });
+        }
+    });
+}
     } else {
         pkData = (dbData[dbCurrentPlayer] && typeof dbData[dbCurrentPlayer] === 'object')
             ? Object.entries(dbData[dbCurrentPlayer]).map(([uid, p]) => ({uid, ...p}))
@@ -3775,7 +3781,11 @@ function dbRenderTable() {
         }
 
         const ownerCol = isAll
-            ? '<td><span style="font-size:0.75rem;font-weight:800;color:#1565c0;background:#e3f2fd;padding:2px 8px;border-radius:6px;border:1px solid #90caf9;">' + escHtml(p._owner||'') + '</span></td>'
+         ? '<td>'
+            + (p._isNonUser
+                ? '<span style="font-size:0.75rem;font-weight:800;color:#e65100;background:#fff3e0;padding:2px 8px;border-radius:6px;border:1px solid #ffb74d;">📦 Non User</span>'
+                : '<span style="font-size:0.75rem;font-weight:800;color:#1565c0;background:#e3f2fd;padding:2px 8px;border-radius:6px;border:1px solid #90caf9;">' + escHtml(p._owner||'') + '</span>')
+            + '</td>'
             : '';
         const fromPlayerCol = isNonUserTab
             ? '<td><span style="font-size:0.7rem;font-weight:700;color:#e65100;background:#fff3e0;padding:2px 8px;border-radius:6px;border:1px solid #ffb74d;">' + escHtml(p._fromPlayer || '?') + '</span></td>'
