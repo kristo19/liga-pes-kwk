@@ -2530,17 +2530,17 @@ function buildAdminClubEdit(matchId, nama) {
         + '<button class="btn-save-club" onclick="simpanKlub(\'' + matchId + '\',\'' + escHtml(nama) + '\',\'' + safeId + '\')">💾 Simpan Klub</button></div>';
 }
 
+function simpanMatchStat(matchId, field, value) {
+    db.ref(dbPath + '/matchStats/' + matchId + '/' + field).set(value || null)
+        .catch(e => alert('❌ Gagal simpan: ' + e.message));
+}
+
 function simpanKlub(matchId, nama, safeId) {
     const clubInput = document.getElementById('clubInput_' + safeId + '_' + nama);
     const ftCheck   = document.getElementById('ftCheck_'   + safeId + '_' + nama);
     if (!clubInput || !ftCheck) return alert('❌ Elemen tidak ditemukan!');
     const clubVal = clubInput.value.trim();
     const ftVal   = ftCheck.checked;
-
-function simpanMatchStat(matchId, field, value) {
-    db.ref(dbPath + '/matchStats/' + matchId + '/' + field).set(value || null)
-        .catch(e => alert('❌ Gagal simpan: ' + e.message));
-}
 
     db.ref(dbPath + '/matchInfo/' + matchId + '/' + nama)
         .set({ club: clubVal, isFullTransfer: ftVal })
