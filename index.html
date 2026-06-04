@@ -4972,18 +4972,30 @@ function bukaDetailStats(nama, tipe) {
                 const isAssist = (tipe === 'assist' && ms.topAssist === nama);
                 
                 if (isScorer || isAssist) {
+                    // Tarik info Klub / Full Transfer untuk player ini di match bersangkutan
+                    const mi = (matchInfoData[id] || {})[nama] || {};
+                    const isFT = mi.isFullTransfer || false;
+                    const ket = isFT ? '🔀 Full Transfer' : (mi.club ? '⚽ ' + mi.club : '⚽ (Tidak Diisi)');
+
                     history.push({
                         bulan: bulan,
                         tanggal: match.tanggal,
                         ligaNum: ligaNum,
-                        timestamp: match.timestamp || 0
+                        timestamp: match.timestamp || 0,
+                        keterangan: ket
                     });
                 }
             });
         });
         
-        // Urutkan riwayat dari yang terbaru ke yang terlama
-        history.sort((a, b) => b.timestamp - a.timestamp);
+        // Urutkan riwayat secara KRONOLOGIS (Bulan paling awal -> Tanggal paling awal -> Liga paling awal)
+        history.sort((a, b) => {
+            const mA = MONTHS.indexOf(a.bulan);
+            const mB = MONTHS.indexOf(b.bulan);
+            if (mA !== mB) return mA - mB;
+            if (a.tanggal !== b.tanggal) return a.tanggal - b.tanggal;
+            return a.timestamp - b.timestamp;
+        });
         
         // Update subtitle dengan total hitungan
         document.getElementById('infoModalSubtitle').innerText = (tipe === 'scorer' ? '⚽ Riwayat Top Scorer' : '🎯 Riwayat Top Assist') + ' (' + history.length + 'x)';
@@ -5001,6 +5013,7 @@ function bukaDetailStats(nama, tipe) {
               + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:var(--purple);">Bulan</th>'
               + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:var(--purple);">Tanggal</th>'
               + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:var(--purple);">Liga</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:var(--purple);">Keterangan</th>'
               + '</tr>';
         
         history.forEach(h => {
@@ -5009,6 +5022,7 @@ function bukaDetailStats(nama, tipe) {
             html += '<td style="padding:10px; font-size:0.9rem; font-weight:700;">' + h.bulan + '</td>';
             html += '<td style="padding:10px; font-size:0.85rem; color:var(--sub);">' + hari + ', ' + h.tanggal + '</td>';
             html += '<td style="padding:10px; font-size:0.85rem; font-weight:700; color:var(--pink);">Liga ' + ligaOrdinal(h.ligaNum) + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; font-weight:600; color:var(--purple);">' + escHtml(h.keterangan) + '</td>';
             html += '</tr>';
         });
         
