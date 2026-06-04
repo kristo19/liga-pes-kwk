@@ -3850,22 +3850,23 @@ if (dbCurrentPlayer === 'ALL PLAYER') {
         let adminCols = '';
         if (modeAdmin && !isAll) {
             if (isNonUserTab) {
-                // Di NON USER: tombol pindah ke player, dan tombol hapus
+                // Di NON USER: tombol edit, tombol pindah ke player, dan tombol hapus
                 const pindahOpts = realPlayerList.map(pk =>
                     '<option value="' + escHtml(pk) + '">' + escHtml(pk) + '</option>'
                 ).join('');
                 adminCols = '<td style="white-space:nowrap;">'
-                    + '<select id="pindahTo_' + p.uid + '" class="db-filter-pos" style="font-size:0.7rem;padding:3px 6px;height:28px;margin-right:4px;">'
+                    + '<button class="db-action-btn db-edit-btn" onclick="bukaDbModalEdit(\'' + p.uid + '\')" title="Edit Pemain">✏️</button>'
+                    + '<select id="pindahTo_' + p.uid + '" class="db-filter-pos" style="font-size:0.7rem;padding:3px 6px;height:28px;margin-right:4px;margin-left:4px;">'
                     + '<option value="">Pindah ke...</option>' + pindahOpts
                     + '</select>'
-                    + '<button class="db-action-btn db-edit-btn" onclick="pindahDariNonUser(\'' + p.uid + '\')" title="Pindah ke player">↩️</button>'
+                    + '<button class="db-action-btn db-edit-btn" onclick="pindahDariNonUser(\'' + p.uid + '\')" title="Pindah ke player" style="background:#e3f2fd;color:#1565c0;">↩️</button>'
                     + '<button class="db-action-btn db-del-btn" onclick="hapusDbPemain(\'' + p.uid + '\')" title="Hapus permanent">🗑️</button>'
                     + '</td>';
             } else {
-                // Di player biasa: tombol edit dan pindah ke Non User (gantikan hapus)
+                // Di player biasa: tombol edit dan pindah ke Non User
                 adminCols = '<td>'
                     + '<button class="db-action-btn db-edit-btn" onclick="bukaDbModalEdit(\'' + p.uid + '\')">✏️</button>'
-                    + '<button class="db-action-btn" onclick="pindahKeNonUser(\'' + p.uid + '\')" title="Pindah ke Non User" style="background:#fff3e0;border:1px solid #ffb74d;color:#e65100;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:0.8rem;">📦</button>'
+                    + '<button class="db-action-btn" onclick="pindahKeNonUser(\'' + p.uid + '\')" title="Pindah ke Non User" style="background:#fff3e0;border:1px solid #ffb74d;color:#e65100;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:0.8rem;margin-left:4px;">📦</button>'
                     + '</td>';
             }
         }
