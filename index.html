@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LIGA PES</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#37003c">
+    <link rel="apple-touch-icon" href="192.jpg">
     <!-- v3-fixed -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -968,6 +971,15 @@
         .msb-chip.assist { background: rgba(233,0,82,0.12); color: #e90052; border: 1px solid rgba(233,0,82,0.25); }
         .msb-chip strong { font-weight: 900; }
     </style>
+<script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker berhasil didaftarkan!', reg.scope))
+            .catch(err => console.error('Service Worker gagal didaftarkan:', err));
+        });
+      }
+    </script>
 </head>
 <body>
 
