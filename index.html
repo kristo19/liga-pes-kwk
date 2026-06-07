@@ -2258,7 +2258,17 @@ function swTab(btn, tid, tab) {
     if (target) target.classList.add('on');
 }
 
-function edit(id) { editingId = id; renderMonthly(localData); }
+function edit(id) { 
+    editingId = id; 
+    renderMonthly(localData);
+    // Auto-switch ke tab edit di mobile setelah render
+    setTimeout(() => {
+        const editBtn = document.querySelector('#mb-' + id + ' .mob-tab-btn');
+        if (editBtn && editBtn.textContent.includes('Edit')) {
+            editBtn.click();
+        }
+    }, 50);
+}
 
 /* FIX: recalc now takes uniqueKey to scope selectors to the right block */
 function recalc(el, key) {
@@ -2274,36 +2284,45 @@ function simpan(id) {
     const tglEl = document.getElementById('editTgl_' + id);
     if (!tglEl) return alert('Tanggal tidak ditemukan!');
     const tgl = tglEl.value;
-
     const uniqueKey = id.replace(/[^a-zA-Z0-9]/g, '_');
-
     const matchBlock = document.getElementById('mb-' + id);
     if (!matchBlock) return alert('Block liga tidak ditemukan, coba refresh halaman.');
 
-    /* Collect unique player names from w-in inputs in this block */
+    // Kumpulkan semua input W dengan data-key ini (bisa ada di desktop & mobile)
     const allWEls = matchBlock.querySelectorAll('.w-in[data-key="' + uniqueKey + '"]');
     if (!allWEls.length) return alert('Data tidak ditemukan, coba refresh halaman.');
 
+    // Deduplikasi nama pemain
     const playerNames = [];
     const seen = new Set();
     allWEls.forEach(function(el) {
         var n = el.getAttribute('data-n');
         if (n && !seen.has(n)) { seen.add(n); playerNames.push(n); }
     });
-
     if (!playerNames.length) return alert('Tidak ada data pemain. Coba refresh halaman.');
 
-    /* For each player, read value by data-n selector — avoids index mismatch
-       between desktop and mobile duplicate inputs */
+    // Helper: ambil nilai numerik dari semua input yang cocok, gunakan yang pertama visible atau yang pertama saja
+    function getVal(cls, name) {
+        const els = Array.from(matchBlock.querySelectorAll('.' + cls + '[data-key="' + uniqueKey + '"][data-n="' + name + '"]'));
+        if (!els.length) return 0;
+        // Prioritaskan elemen yang visible (offsetParent !== null)
+        const visible = els.find(e => e.offsetParent !== null);
+        return parseInt((visible || els[0]).value) || 0;
+    }
+    function getRank(name) {
+        const els = Array.from(matchBlock.querySelectorAll('.rank-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]'));
+        if (!els.length) return 1;
+        const visible = els.find(e => e.offsetParent !== null);
+        return parseInt((visible || els[0]).value) || 1;
+    }
+
     var standings = playerNames.map(function(name) {
-        var sel = '.w-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]';
-        var w = parseInt(matchBlock.querySelector('.w-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
-        var d = parseInt(matchBlock.querySelector('.d-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
-        var l = parseInt(matchBlock.querySelector('.l-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
-        var f = parseInt(matchBlock.querySelector('.f-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
-        var a = parseInt(matchBlock.querySelector('.a-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]').value) || 0;
-        var rankEl = matchBlock.querySelector('.rank-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]');
-        var r = rankEl ? (parseInt(rankEl.value) || 1) : 1;
+        var w = getVal('w-in', name);
+        var d = getVal('d-in', name);
+        var l = getVal('l-in', name);
+        var f = getVal('f-in', name);
+        var a = getVal('a-in', name);
+        var r = getRank(name);
         return { name: name, w: w, d: d, l: l, f: f, a: a, gd: f - a, pts: w * 3 + d, manualRank: r };
     });
 
@@ -2311,8 +2330,6 @@ function simpan(id) {
         .update({ tanggal: parseInt(tgl), standings: standings, manualJuara: null })
         .then(function() {
             editingId = null;
-            /* Update localData directly so re-render works immediately
-               without waiting for Firebase listener to re-fire */
             if (localData[id]) {
                 localData[id].tanggal = parseInt(tgl);
                 localData[id].standings = standings;
