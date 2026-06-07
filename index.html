@@ -1825,7 +1825,6 @@ function listenMatchInfo() {
 
 function listenMatchStats() {
     if (!dbPath) return;
-    // Matikan listener lama dulu
     if (matchStatsRef) { matchStatsRef.off(); matchStatsRef = null; }
     
     matchStatsRef = db.ref(dbPath + '/matchStats');
@@ -1836,6 +1835,7 @@ function listenMatchStats() {
             renderMonthly(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
+        if (currentMonth === 'ALL TIME STANDING') renderAllTime();
     });
 }
 
@@ -1877,7 +1877,10 @@ function renderStatsPage() {
 
 const tsCount = {}, taCount = {};
 ALL_PLAYERS.forEach(n => { tsCount[n] = 0; taCount[n] = 0; });
-Object.values(matchStatsData).forEach((ms, idx) => {
+Object.values(matchStatsData).forEach(ms => {
+    if (ms.topScorer && tsCount.hasOwnProperty(ms.topScorer)) tsCount[ms.topScorer]++;
+    if (ms.topAssist && taCount.hasOwnProperty(ms.topAssist)) taCount[ms.topAssist]++;
+});
 const tsSorted = [...list].sort((a,b) => tsCount[b] - tsCount[a]);
 const taSorted = [...list].sort((a,b) => taCount[b] - taCount[a]);
 
@@ -1934,11 +1937,13 @@ const taHtml = taSorted.map((n,i) => {
         </div>
     `;
 
-    /* FIX: set adminStatsTool only once, not duplicated */
-    const adminTool = document.getElementById('adminStatsTool');
+const adminTool = document.getElementById('adminStatsTool');
     if (adminTool) {
         adminTool.innerHTML = modeAdmin
-            ? '<div style="padding:10px;"><button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family:\'Barlow\',sans-serif;">✏️ Edit Stats Manual</button></div>'
+            ? '<div style="padding:10px;">'
+              + '<button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family:\'Barlow\',sans-serif;margin-bottom:6px;">✏️ Edit Stats Manual</button>'
+              + '<button onclick="cleanupOrphanMatchStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#6a0dad;color:white;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;">🧹 Cleanup Orphan Stats</button>'
+              + '</div>'
             : '';
     }
 }
@@ -2344,12 +2349,36 @@ function simpan(id) {
 }
 
 function hapus(id) {
-    if (confirm('Hapus liga ini?')) {
+    if (!modeAdmin) return alert('❌ Harus login admin!');
+    
+    if (confirm('Yakin ingin menghapus liga ini beserta semua statistik Top Scorer & Assist-nya?')) {
+        
+        // Buat objek untuk menampung semua lokasi data yang ingin dihapus
         const updates = {};
-        updates[dbPath + '/' + currentMonth + '/matches/' + id] = null;
-        updates[dbPath + '/matchStats/' + id] = null;
+        
+        // 1. Hapus data pertandingan utamanya
+        updates[dbPath + '/' + currentMonth + '/matches/' + id] = null; 
+        
+        // 2. Hapus data Top Scorer dan Top Assist yang terkait dengan ID liga ini
+        updates[dbPath + '/matchStats/' + id] = null; 
+        
+        // 3. Hapus data tambahan lainnya (jika ada)
+        updates[dbPath + '/matchInfo/' + id] = null;
+
+        // Eksekusi penghapusan secara serentak
         db.ref().update(updates)
-          .catch(e => alert('❌ Gagal hapus: ' + e.message));
+        .then(() => {
+            // Bersihkan tampilan di website
+            delete localData[id];
+            delete matchStatsData[id];
+            
+            renderMonthly(localData);
+            updateSidebar(localData);
+            alert('Liga dan statistik berhasil dihapus bersih!');
+        })
+        .catch(e => {
+            alert('Gagal menghapus: ' + e.message);
+        });
     }
 }
 
@@ -2870,12 +2899,13 @@ function renderAdminArea() {
         const resetBtn = (currentMonth === 'DATABASE')
             ? '<button class="btn-adm" onclick="resetDatabaseKeDefault(true)" style="margin-bottom:8px;background:#e53935;color:white;">🔄 Reset Pemain ke Default</button><br>'
             : '';
-        adminArea.innerHTML = '<div class="admin-panel"><h3>⚙️ Admin Mode</h3>'
-            + '<p style="font-size:0.85rem;color:#999;margin-bottom:12px;">Pilih bulan terlebih dahulu untuk membuat liga baru.</p>'
-            + resetBtn
-            + '<button class="btn-adm btn-off" onclick="matikanAdmin()">🔒 Log Out Admin</button></div>';
-        return;
-    }
+adminArea.innerHTML = '<div class="admin-panel"><h3>⚙️ Admin Mode</h3>'
+    + '<p style="font-size:0.85rem;color:#999;margin-bottom:12px;">Pilih bulan terlebih dahulu untuk membuat liga baru.</p>'
+    + resetBtn
+    + '<button class="btn-adm" onclick="cleanupOrphanMatchStats()" style="margin-bottom:8px;background:#6a0dad;color:white;">🧹 Cleanup Orphan Stats</button>'
+    + '<button class="btn-adm btn-off" onclick="matikanAdmin()">🔒 Log Out Admin</button></div>';        
+            return;
+         }
 
     adminArea.innerHTML = '<div class="admin-panel">'
         + '<h3>⚙️ Buat Liga — ' + currentMonth + '</h3>'
@@ -2900,7 +2930,6 @@ function renderAdminArea() {
         + '</div>'
         + '<button class="btn-adm btn-create" onclick="buatLiga()">➕ Buat Liga</button>'
         + '<button class="btn-adm" onclick="cekManualJuara()" style="margin-top:6px;background:#ff6b35;color:white;">🔍 Cek ManualJuara</button>'
-        + '<button class="btn-adm" onclick="resetSemuaManualJuara()" style="margin-top:6px;background:#c62828;color:white;">⚠️ Reset ManualJuara Bulan Ini</button>'
         + '<button class="btn-adm" onclick="cleanupOrphanMatchStats()" style="margin-top:6px;background:#6a0dad;color:white;">🧹 Cleanup Orphan Stats</button>'
         + '<button class="btn-adm btn-off" onclick="matikanAdmin()" style="margin-top:6px;">🔒 Log Out Admin</button>'
         + '<p style="font-size:0.75rem;color:#999;margin-top:10px;">💡 Klik nama player di tabel untuk edit info klub per liga.</p>'
