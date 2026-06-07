@@ -1825,9 +1825,14 @@ function listenMatchInfo() {
 
 function listenMatchStats() {
     if (!dbPath) return;
-    db.ref(dbPath + '/matchStats').on('value', snap => {
+    // Matikan listener lama dulu
+    if (matchStatsRef) { matchStatsRef.off(); matchStatsRef = null; }
+    
+    matchStatsRef = db.ref(dbPath + '/matchStats');
+    matchStatsRef.on('value', snap => {
         matchStatsData = snap.val() || {};
-        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && currentMonth !== 'DATABASE' && localData && Object.keys(localData).length) {
+        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' 
+            && currentMonth !== 'DATABASE' && localData && Object.keys(localData).length) {
             renderMonthly(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
@@ -1870,12 +1875,9 @@ function renderStatsPage() {
     function rankClass(i) { return i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : ''; }
     function rankLabel(i) { return i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1); }
 
-    const tsCount = {}, taCount = {};
+const tsCount = {}, taCount = {};
 ALL_PLAYERS.forEach(n => { tsCount[n] = 0; taCount[n] = 0; });
-Object.values(matchStatsData).forEach(ms => {
-    if (ms.topScorer && tsCount[ms.topScorer] !== undefined) tsCount[ms.topScorer]++;
-    if (ms.topAssist && taCount[ms.topAssist] !== undefined) taCount[ms.topAssist]++;
-});
+Object.values(matchStatsData).forEach((ms, idx) => {
 const tsSorted = [...list].sort((a,b) => tsCount[b] - tsCount[a]);
 const taSorted = [...list].sort((a,b) => taCount[b] - taCount[a]);
 
@@ -2896,6 +2898,7 @@ function renderAdminArea() {
         + '<button class="btn-adm btn-create" onclick="buatLiga()">➕ Buat Liga</button>'
         + '<button class="btn-adm" onclick="cekManualJuara()" style="margin-top:6px;background:#ff6b35;color:white;">🔍 Cek ManualJuara</button>'
         + '<button class="btn-adm" onclick="resetSemuaManualJuara()" style="margin-top:6px;background:#c62828;color:white;">⚠️ Reset ManualJuara Bulan Ini</button>'
+        + '<button class="btn-adm" onclick="cleanupOrphanMatchStats()" style="margin-top:6px;background:#6a0dad;color:white;">🧹 Cleanup Orphan Stats</button>'
         + '<button class="btn-adm btn-off" onclick="matikanAdmin()" style="margin-top:6px;">🔒 Log Out Admin</button>'
         + '<p style="font-size:0.75rem;color:#999;margin-top:10px;">💡 Klik nama player di tabel untuk edit info klub per liga.</p>'
         + '</div>';
@@ -3341,7 +3344,7 @@ function renderDatabasePage() {
 
 /* ===================== HEAD-TO-HEAD COMPARE STATE ===================== */
 let h2hSelected = []; // array of player keys currently selected for compare
-let h2hShowRating = false; // toggle: show rating in compare
+let h2hShowRating = false;
 
 function renderComparePage() {
     const el = document.getElementById('mainContent');
@@ -4854,6 +4857,34 @@ function resetSemuaManualJuara() {
     });
 }
 
+
+// Tambahkan di sini ↓
+function cleanupOrphanMatchStats() {
+    if (!confirm('Hapus matchStats yang matchId-nya sudah tidak ada?\nIni akan memperbaiki hitungan Top Scorer/Assist.')) return;
+    
+    db.ref(dbPath).once('value', snap => {
+        const root = snap.val() || {};
+        const validMatchIds = new Set();
+        
+        Object.keys(root).forEach(bulan => {
+            if (root[bulan] && root[bulan].matches) {
+                Object.keys(root[bulan].matches).forEach(id => validMatchIds.add(id));
+            }
+        });
+        
+        const orphanStats = root.matchStats || {};
+        const toDelete = Object.keys(orphanStats).filter(id => !validMatchIds.has(id));
+        
+        if (!toDelete.length) return alert('✅ Tidak ada orphan data ditemukan!');
+        
+        const updates = {};
+        toDelete.forEach(id => { updates[dbPath + '/matchStats/' + id] = null; });
+        
+        db.ref().update(updates)
+            .then(() => alert('✅ Berhasil hapus ' + toDelete.length + ' orphan matchStats!'))
+            .catch(e => alert('❌ Gagal: ' + e.message));
+    });
+}
 
 
 /* ===================== IMPORT EXCEL/CSV ===================== */
