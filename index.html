@@ -2345,7 +2345,10 @@ function simpan(id) {
 
 function hapus(id) {
     if (confirm('Hapus liga ini?')) {
-        db.ref(dbPath + '/' + currentMonth + '/matches/' + id).remove()
+        const updates = {};
+        updates[dbPath + '/' + currentMonth + '/matches/' + id] = null;
+        updates[dbPath + '/matchStats/' + id] = null;
+        db.ref().update(updates)
           .catch(e => alert('❌ Gagal hapus: ' + e.message));
     }
 }
