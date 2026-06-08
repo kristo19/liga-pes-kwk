@@ -1615,17 +1615,28 @@ function sortStandings(match) {
     s = Object.values(nameMap);
 
     const j = fix(match.manualJuara);
-    s.sort((a, b) => {
+s.sort((a, b) => {
         if (j) { if (a.name === j) return -1; if (b.name === j) return 1; }
         if ((b.pts || 0) !== (a.pts || 0)) return (b.pts || 0) - (a.pts || 0);
-        // Tiebreaker 1: GD
+
+        // Tiebreaker 1: manualRank (Prioritas Utama jika poin sama)
+        const rankA = parseInt(a.manualRank) || 0;
+        const rankB = parseInt(b.manualRank) || 0;
+        if (rankA > 0 || rankB > 0) {
+            const rA = rankA === 0 ? 99 : rankA;
+            const rB = rankB === 0 ? 99 : rankB;
+            if (rA !== rB) return rA - rB;
+        }
+
+        // Tiebreaker 2: GD
         const gdA = (parseInt(a.f)||0) - (parseInt(a.a)||0);
         const gdB = (parseInt(b.f)||0) - (parseInt(b.a)||0);
         if (gdB !== gdA) return gdB - gdA;
-        // Tiebreaker 2: GF
+
+        // Tiebreaker 3: GF
         if ((parseInt(b.f)||0) !== (parseInt(a.f)||0)) return (parseInt(b.f)||0) - (parseInt(a.f)||0);
-        // Tiebreaker 3: manualRank
-        return (a.manualRank || 99) - (b.manualRank || 99);
+
+        return 0;
     });
     return s;
 }
@@ -1977,14 +1988,24 @@ function renderAllTime() {
         Object.keys(stats).forEach(n => {
             stats[n].form = (statsData[n]?.formText || '').toUpperCase().replace(/[^WDL]/g, '').split('').slice(-5);
         });
+        
         const sorted = Object.keys(stats)
             .map(name => ({name, ...stats[name]}))
             .filter(p => p.pl > 0)
             .sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+            
         if (!sorted.length) {
             return document.getElementById('mainContent').innerHTML = '<div class="empty-state">Belum ada data untuk Mode ' + currentMode + ' Player.</div>';
         }
-        document.getElementById('mainContent').innerHTML = buildEplBlock(sorted, true, false, [], true, null, 'unknown');
+
+        // TAMBAHAN: Beri penanda isWin = true khusus untuk peringkat 1 (index 0)
+        const finalData = sorted.map((p, i) => ({
+            ...p,
+            isWin: i === 0 && p.pts > 0
+        }));
+
+        // Render tabel menggunakan finalData yang sudah memiliki status juara (isWin)
+        document.getElementById('mainContent').innerHTML = buildEplBlock(finalData, true, false, [], true, null, 'unknown');
     });
 }
 
@@ -2163,6 +2184,7 @@ function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matc
             + (showForm ? '<td><div class="form-row">' + formCircles(p.form) + '</div></td>' : '')
             + (isEdit
                 ? '<td><select class="tbl-in rank-in" data-n="' + escHtml(p.name) + '" data-key="' + uniqueKey + '" style="width:48px;">'
+                  + '<option value="0" ' + ((rawStandings[i] || {}).manualRank == 0 ? 'selected' : '') + '>-</option>'
                   + [1,2,3,4].map(n => '<option value="' + n + '" ' + ((rawStandings[i] || {}).manualRank == n ? 'selected' : '') + '>' + n + '</option>').join('')
                   + '</select></td>'
                 : '')
@@ -2233,6 +2255,7 @@ function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matc
                     + '<td><input type="number" class="tbl-in a-in" data-n="' + n + '" data-key="' + uniqueKey + '" min="0" value="' + (p.ga||0) + '"></td>'
                     + '<td><input class="tbl-in tbl-in-pts pts-in" data-n="' + n + '" data-key="' + uniqueKey + '" value="' + p.pts + '" readonly style="width:36px;"></td>'
                     + '<td><select class="tbl-in rank-in" data-n="' + n + '" data-key="' + uniqueKey + '">'
+                      + '<option value="0" ' + ((rawStandings[i]||{}).manualRank == 0 ? 'selected' : '') + '>-</option>'
                       + [1,2,3,4].map(nv => '<option value="' + nv + '" ' + ((rawStandings[i]||{}).manualRank == nv ? 'selected' : '') + '>' + nv + '</option>').join('')
                       + '</select></td>'
                     + '</tr>';
@@ -2281,10 +2304,17 @@ function edit(id) {
 function recalc(el, key) {
     const n = el.getAttribute('data-n');
     if (!n || !key) return;
-    const w   = parseInt(document.querySelector('.w-in[data-n="' + n + '"][data-key="' + key + '"]')?.value) || 0;
-    const d   = parseInt(document.querySelector('.d-in[data-n="' + n + '"][data-key="' + key + '"]')?.value) || 0;
-    const pts = document.querySelector('.pts-in[data-n="' + n + '"][data-key="' + key + '"]');
-    if (pts) pts.value = w * 3 + d;
+    const isDesktop = window.innerWidth > 900;
+    
+    const wEls = document.querySelectorAll('.w-in[data-n="' + n + '"][data-key="' + key + '"]');
+    const dEls = document.querySelectorAll('.d-in[data-n="' + n + '"][data-key="' + key + '"]');
+    const ptsEls = document.querySelectorAll('.pts-in[data-n="' + n + '"][data-key="' + key + '"]');
+
+    const w = parseInt((wEls.length > 1 && !isDesktop) ? wEls[1].value : (wEls[0] ? wEls[0].value : 0)) || 0;
+    const d = parseInt((dEls.length > 1 && !isDesktop) ? dEls[1].value : (dEls[0] ? dEls[0].value : 0)) || 0;
+    
+    const ptsEl = (ptsEls.length > 1 && !isDesktop) ? ptsEls[1] : ptsEls[0];
+    if (ptsEl) ptsEl.value = w * 3 + d;
 }
 
 function simpan(id) {
@@ -2312,15 +2342,19 @@ function simpan(id) {
     function getVal(cls, name) {
         const els = Array.from(matchBlock.querySelectorAll('.' + cls + '[data-key="' + uniqueKey + '"][data-n="' + name + '"]'));
         if (!els.length) return 0;
-        // Prioritaskan elemen yang visible (offsetParent !== null)
-        const visible = els.find(e => e.offsetParent !== null);
-        return parseInt((visible || els[0]).value) || 0;
+        // Deteksi apakah sedang pakai Desktop atau Mobile berdasarkan CSS
+        const isDesktop = window.innerWidth > 900;
+        // Pilih elemen input yang sesuai dengan tampilan layar
+        const el = (els.length > 1 && !isDesktop) ? els[1] : els[0];
+        return parseInt(el.value) || 0;
     }
+
     function getRank(name) {
         const els = Array.from(matchBlock.querySelectorAll('.rank-in[data-key="' + uniqueKey + '"][data-n="' + name + '"]'));
-        if (!els.length) return 1;
-        const visible = els.find(e => e.offsetParent !== null);
-        return parseInt((visible || els[0]).value) || 1;
+        if (!els.length) return 0;
+        const isDesktop = window.innerWidth > 900;
+        const el = (els.length > 1 && !isDesktop) ? els[1] : els[0];
+        return parseInt(el.value) || 0;
     }
 
     var standings = playerNames.map(function(name) {
@@ -2663,7 +2697,7 @@ function updateSidebar(monthlyMatches) {
                       + '</div></td>'
                     : '';
                 return '<tr class="' + (i === 0 && t > 0 ? 'sb-r1' : '') + '">'
-                    + '<td class="tl">' + (i === 0 && t > 0 ? '👑 ' : '') + '<strong>' + escHtml(n) + '</strong></td>'
+                    + '<td class="tl">' + (i === 0 && t > 0 ? '👑 ' : '') + '<span class="clickable-name" onclick="bukaDetailJuaraBulan(\'' + escHtml(n) + '\',\'' + escHtml(currentMonth) + '\')" title="Klik untuk lihat riwayat juara bulan ini">' + escHtml(n) + '</span></td>'
                     + '<td class="trophy-count">' + (t > 0 ? t + 'x 🏆' : '—') + '</td>'
                     + moveBtns
                     + '</tr>';
@@ -2752,7 +2786,7 @@ function updateSidebarAllTime() {
                       + '</div></td>'
                     : '';
                 return '<tr class="' + (i === 0 && t > 0 ? 'sb-r1' : '') + '">'
-                    + '<td class="tl">' + (i === 0 && t > 0 ? '👑 ' : '') + '<strong>' + escHtml(n) + '</strong></td>'
+                    + '<td class="tl">' + (i === 0 && t > 0 ? '👑 ' : '') + '<span class="clickable-name" onclick="bukaDetailJuara(\'' + escHtml(n) + '\')" title="Klik untuk lihat riwayat juara">' + escHtml(n) + '</span></td>'
                     + '<td class="trophy-count">' + (t > 0 ? t + 'x 🏆' : '—') + '</td>'
                     + moveBtns + '</tr>';
             })
@@ -2977,7 +3011,7 @@ function buatLiga() {
 
     /* FIX: standings array must have EXACTLY sel.length entries, no more */
     const standingsPayload = sel.map((n, i) => ({
-        name: n, w:0, d:0, l:0, f:0, a:0, gd:0, pts:0, manualRank: i+1
+        name: n, w:0, d:0, l:0, f:0, a:0, gd:0, pts:0, manualRank: 0
     }));
 
     const matchRef = db.ref(dbPath + '/' + currentMonth + '/matches').push();
@@ -5114,6 +5148,185 @@ function bukaDetailStats(nama, tipe) {
             html += '<tr style="border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'">';
             html += '<td style="padding:10px; font-size:0.9rem; font-weight:700;">' + h.bulan + '</td>';
             html += '<td style="padding:10px; font-size:0.85rem; color:var(--sub);">' + hari + ', ' + h.tanggal + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; font-weight:700; color:var(--pink);">Liga ' + ligaOrdinal(h.ligaNum) + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; font-weight:600; color:var(--purple);">' + escHtml(h.keterangan) + '</td>';
+            html += '</tr>';
+        });
+        
+        html += '</table></div></div>';
+        document.getElementById('infoModalBody').innerHTML = html;
+    });
+}
+
+function bukaDetailJuara(nama) {
+    // Siapkan Modal
+    document.getElementById('infoModalTitle').innerText = nama;
+    document.getElementById('infoModalSubtitle').innerText = '🏆 Riwayat Juara Liga - Memuat...';
+    document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Memuat data...</div>';
+    document.getElementById('infoModal').classList.add('on');
+
+    // Tarik data seluruh match
+    db.ref(dbPath).once('value', snap => {
+        const root = snap.val() || {};
+        let history = [];
+        
+        // Cek semua bulan
+        MONTHS.forEach(bulan => {
+            if (!root[bulan] || !root[bulan].matches) return;
+            
+            // Urutkan berdasarkan tanggal & timestamp agar nomor liga valid
+            const matchIds = Object.keys(root[bulan].matches).sort((a, b) => {
+                const tglA = root[bulan].matches[a].tanggal || 0;
+                const tglB = root[bulan].matches[b].tanggal || 0;
+                if (tglA !== tglB) return tglA - tglB;
+                return (root[bulan].matches[a].timestamp || 0) - (root[bulan].matches[b].timestamp || 0);
+            });
+            
+            let counters = {};
+            
+            matchIds.forEach(id => {
+                const match = root[bulan].matches[id];
+                counters[match.tanggal] = (counters[match.tanggal] || 0) + 1;
+                const ligaNum = counters[match.tanggal];
+                
+                // Urutkan klasemen liga ini untuk mencari tahu siapa juaranya
+                const s = sortStandings(match);
+                const isJuara = s.length > 0 && fix(s[0].name) === nama && (s[0].pts || 0) > 0;
+                
+                if (isJuara) {
+                    // Tarik info Klub / Full Transfer untuk player ini saat dia juara
+                    const mi = (matchInfoData[id] || {})[nama] || {};
+                    const isFT = mi.isFullTransfer || false;
+                    const ket = isFT ? '🔀 Full Transfer' : (mi.club ? '⚽ ' + mi.club : '⚽ (Tidak Diisi)');
+
+                    history.push({
+                        bulan: bulan,
+                        tanggal: match.tanggal,
+                        ligaNum: ligaNum,
+                        timestamp: match.timestamp || 0,
+                        keterangan: ket
+                    });
+                }
+            });
+        });
+        
+        // Urutkan riwayat secara KRONOLOGIS (Bulan paling awal -> Tanggal paling awal -> Liga paling awal)
+        history.sort((a, b) => {
+            const mA = MONTHS.indexOf(a.bulan);
+            const mB = MONTHS.indexOf(b.bulan);
+            if (mA !== mB) return mA - mB;
+            if (a.tanggal !== b.tanggal) return a.tanggal - b.tanggal;
+            return a.timestamp - b.timestamp;
+        });
+        
+        // Update subtitle dengan total hitungan juara
+        document.getElementById('infoModalSubtitle').innerText = '🏆 Riwayat Juara Liga (' + history.length + 'x)';
+        
+        // Jika belum pernah juara
+        if (!history.length) {
+            document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Belum ada riwayat juara yang tercatat.</div>';
+            return;
+        }
+        
+        // Buat tabel output riwayat
+        let html = '<div class="league-card"><div class="league-card-body" style="padding:0;">';
+        html += '<table style="width:100%; border-collapse:collapse;">';
+        html += '<tr style="background:#fff9c4; border-bottom:2px solid #fbc02d;">'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:#f57f17;">Bulan</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:#f57f17;">Tanggal</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:#f57f17;">Liga</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:#f57f17;">Klub Saat Juara</th>'
+              + '</tr>';
+        
+        history.forEach(h => {
+            const hari = getNamaHari(h.tanggal, h.bulan);
+            html += '<tr style="border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background=\'#fffde7\'" onmouseout="this.style.background=\'transparent\'">';
+            html += '<td style="padding:10px; font-size:0.9rem; font-weight:700;">' + h.bulan + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; color:var(--sub);">' + hari + ', ' + h.tanggal + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; font-weight:700; color:var(--pink);">Liga ' + ligaOrdinal(h.ligaNum) + '</td>';
+            html += '<td style="padding:10px; font-size:0.85rem; font-weight:600; color:var(--purple);">' + escHtml(h.keterangan) + '</td>';
+            html += '</tr>';
+        });
+        
+        html += '</table></div></div>';
+        document.getElementById('infoModalBody').innerHTML = html;
+    });
+}
+
+function bukaDetailJuaraBulan(nama, bulan) {
+    if (!bulan || bulan === 'ALL TIME STANDING' || bulan === 'STATS' || bulan === 'DATABASE') return;
+    
+    // Siapkan Modal
+    document.getElementById('infoModalTitle').innerText = nama;
+    document.getElementById('infoModalSubtitle').innerText = '🏆 Juara Liga ' + bulan + ' - Memuat...';
+    document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Memuat data...</div>';
+    document.getElementById('infoModal').classList.add('on');
+
+    // Tarik data match di bulan ini saja
+    db.ref(dbPath + '/' + bulan + '/matches').once('value', snap => {
+        const matches = snap.val() || {};
+        let history = [];
+        
+        // Urutkan berdasarkan tanggal & timestamp agar nomor liga valid
+        const matchIds = Object.keys(matches).sort((a, b) => {
+            const tglA = matches[a].tanggal || 0;
+            const tglB = matches[b].tanggal || 0;
+            if (tglA !== tglB) return tglA - tglB;
+            return (matches[a].timestamp || 0) - (matches[b].timestamp || 0);
+        });
+        
+        let counters = {};
+        
+        matchIds.forEach(id => {
+            const match = matches[id];
+            counters[match.tanggal] = (counters[match.tanggal] || 0) + 1;
+            const ligaNum = counters[match.tanggal];
+            
+            // Urutkan klasemen liga ini untuk mencari tahu siapa juaranya
+            const s = sortStandings(match);
+            const isJuara = s.length > 0 && fix(s[0].name) === nama && (s[0].pts || 0) > 0;
+            
+            if (isJuara) {
+                // Tarik info Klub / Full Transfer untuk player ini saat dia juara
+                const mi = (matchInfoData[id] || {})[nama] || {};
+                const isFT = mi.isFullTransfer || false;
+                const ket = isFT ? '🔀 Full Transfer' : (mi.club ? '⚽ ' + mi.club : '⚽ (Tidak Diisi)');
+
+                history.push({
+                    bulan: bulan,
+                    tanggal: match.tanggal,
+                    ligaNum: ligaNum,
+                    timestamp: match.timestamp || 0,
+                    keterangan: ket
+                });
+            }
+        });
+        
+        // Urutkan riwayat secara kronologis berdasarkan tanggal
+        history.sort((a, b) => a.tanggal - b.tanggal || a.timestamp - b.timestamp);
+        
+        // Update subtitle dengan total hitungan juara
+        document.getElementById('infoModalSubtitle').innerText = '🏆 Juara Liga di Bulan ' + bulan + ' (' + history.length + 'x)';
+        
+        // Jika belum pernah juara di bulan ini
+        if (!history.length) {
+            document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Belum ada riwayat juara di bulan ini.</div>';
+            return;
+        }
+        
+        // Buat tabel output riwayat
+        let html = '<div class="league-card"><div class="league-card-body" style="padding:0;">';
+        html += '<table style="width:100%; border-collapse:collapse;">';
+        html += '<tr style="background:#fff9c4; border-bottom:2px solid #fbc02d;">'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:#f57f17;">Tanggal</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:#f57f17;">Liga</th>'
+              + '<th style="padding:10px; text-align:left; font-size:0.8rem; color:#f57f17;">Klub Saat Juara</th>'
+              + '</tr>';
+        
+        history.forEach(h => {
+            const hari = getNamaHari(h.tanggal, h.bulan);
+            html += '<tr style="border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background=\'#fffde7\'" onmouseout="this.style.background=\'transparent\'">';
+            html += '<td style="padding:10px; font-size:0.85rem; color:var(--sub);">' + hari + ', ' + h.tanggal + ' ' + h.bulan + '</td>';
             html += '<td style="padding:10px; font-size:0.85rem; font-weight:700; color:var(--pink);">Liga ' + ligaOrdinal(h.ligaNum) + '</td>';
             html += '<td style="padding:10px; font-size:0.85rem; font-weight:600; color:var(--purple);">' + escHtml(h.keterangan) + '</td>';
             html += '</tr>';
