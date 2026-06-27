@@ -186,11 +186,11 @@
         .landing h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; text-align: center; margin-bottom: 6px; text-shadow: 0 4px 20px rgba(0,0,0,0.4); }
         .landing h1 span { color: var(--cyan); }
         .landing p { font-size: 1rem; color: rgba(255,255,255,0.55); margin-bottom: 50px; letter-spacing: 3px; text-transform: uppercase; }
-        .mode-cards { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; padding: 20px; }
-        .mode-card { background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 48px 36px; border-radius: 20px; cursor: pointer; transition: all 0.3s; text-align: center; width: 200px; }
+        .mode-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; padding: 20px; }
+        .mode-card { background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 36px 24px; border-radius: 20px; cursor: pointer; transition: all 0.3s; text-align: center; width: 160px; }
         .mode-card:hover { background: var(--pink); border-color: var(--pink); transform: translateY(-8px); box-shadow: 0 20px 40px rgba(233,0,82,0.35); }
         .mode-card h2 { font-size: 2.8rem; font-weight: 900; margin-bottom: 8px; }
-        .mode-card span { font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; opacity: 0.8; text-transform: uppercase; }
+        .mode-card span { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px; opacity: 0.8; text-transform: uppercase; }
 
         /* ===================== APP ===================== */
         .app { display: none; max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; width: 100%; box-sizing: border-box; }
@@ -217,6 +217,14 @@
         .btn-db-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #1565c0, #90caf9); color: #003c8f; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
         .btn-db-menu:hover { background: linear-gradient(135deg, #003c8f, #1565c0); color: white; }
         .btn-db-menu.active { background: linear-gradient(135deg, #003c8f, #1565c0); color: white; box-shadow: 0 4px 14px rgba(21,101,192,0.4); }
+
+        /* ===== LIGA TYPE FILTER ===== */
+        .liga-filter-group { display: flex; align-items: center; gap: 6px; margin-left: 4px; flex-wrap: wrap; }
+        .btn-filter-liga { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; color: var(--sub); cursor: pointer; font-size: 0.8rem; font-weight: 700; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.2px; }
+        .btn-filter-liga:hover { border-color: var(--purple); color: var(--purple); }
+        .btn-filter-liga.active { background: var(--purple); border-color: var(--purple); color: white; box-shadow: 0 3px 10px rgba(55,0,60,0.25); }
+        #filterKlub.active { background: #2e7d32; border-color: #2e7d32; color: white; box-shadow: 0 3px 10px rgba(46,125,50,0.3); }
+        #filterFT.active   { background: #c62828; border-color: #c62828; color: white; box-shadow: 0 3px 10px rgba(198,40,40,0.3); }
 
         /* ===== DATABASE PEMAIN PAGE ===== */
         .db-page { padding: 0; }
@@ -785,7 +793,7 @@
         @media (max-width: 600px) {
             .app-title { font-size: 1.2rem; }
             .landing h1 { font-size: 2.4rem; }
-            .mode-card { width: 150px; padding: 36px 20px; }
+            .mode-card { width: 130px; padding: 28px 14px; }
             .info-modal-body { padding: 16px 18px 20px; }
             .form-laga-label { min-width: 72px; }
             .liga-type-group { gap: 8px; }
@@ -1018,8 +1026,11 @@
     <h1>LIGA <span>PES</span></h1>
     <p>&#9917; League Manager</p>
     <div class="mode-cards">
-        <div class="mode-card" onclick="setMode('3')"><h2>3</h2><span>Player Mode</span></div>
-        <div class="mode-card" onclick="setMode('4')"><h2>4</h2><span>Player Mode</span></div>
+        <div class="mode-card" data-mode="3A" onclick="setMode('3A')"><h2>3</h2><span>Toxx · Stive · Alfa</span></div>
+        <div class="mode-card" data-mode="3B" onclick="setMode('3B')"><h2>3</h2><span>Toxx · Stive · Kobe</span></div>
+        <div class="mode-card" data-mode="3C" onclick="setMode('3C')"><h2>3</h2><span>Stive · Kobe · Alfa</span></div>
+        <div class="mode-card" data-mode="3D" onclick="setMode('3D')"><h2>3</h2><span>Alfa · Kobe · Toxx</span></div>
+        <div class="mode-card" data-mode="4" onclick="setMode('4')"><h2>4</h2><span>FULL SQUAD</span></div>
     </div>
 </div>
 
@@ -1039,6 +1050,12 @@
         <button id="btnAllTime" class="btn-alltime" onclick="gantiBulan('ALL TIME STANDING')">&#127942; All Time Standing</button>
         <button id="btnStats" class="btn-stats-menu" onclick="gantiBulan('STATS')">&#128202; Stats</button>
         <button id="btnDB" class="btn-db-menu" onclick="gantiBulan('DATABASE')">&#128101; Database Pemain</button>
+        <div class="liga-filter-group" id="ligaFilterGroup">
+            <span class="nav-label">&#128269; Filter:</span>
+            <button id="filterAll"  class="btn-filter-liga active" onclick="setLigaFilter('all')">🔘 Semua</button>
+            <button id="filterKlub" class="btn-filter-liga"        onclick="setLigaFilter('klub')">⚽ Klub</button>
+            <button id="filterFT"   class="btn-filter-liga"        onclick="setLigaFilter('ft')">🔀 Full Transfer</button>
+        </div>
     </div>
 
     <div class="main-layout">
@@ -1318,7 +1335,22 @@ const db   = firebase.database();
 const auth = firebase.auth();
 
 const MONTHS      = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-const ALL_PLAYERS = ["Toxx","Stive","Alfa","Kobe"];
+const ALL_PLAYERS_4 = ["Toxx","Stive","Alfa","Kobe"];
+const MODE_PLAYERS = {
+    '3A': ['Toxx','Stive','Alfa'],
+    '3B': ['Toxx','Stive','Kobe'],
+    '3C': ['Stive','Kobe','Alfa'],
+    '3D': ['Alfa','Kobe','Toxx'],
+    '4':  ['Toxx','Stive','Alfa','Kobe']
+};
+const MODE_LABELS = {
+    '3A': '3 Player — Toxx · Stive · Alfa',
+    '3B': '3 Player — Toxx · Stive · Kobe',
+    '3C': '3 Player — Stive · Kobe · Alfa',
+    '3D': '3 Player — Alfa · Kobe · Toxx',
+    '4':  '4 Player — FULL SQUAD'
+};
+let ALL_PLAYERS = [...ALL_PLAYERS_4];
 const LIGA_ORDINAL = ["Pertama","Kedua","Ketiga","Keempat","Kelima","Keenam","Ketujuh","Kedelapan","Kesembilan","Kesepuluh","Kesebelas","Kedua Belas","Ketiga Belas","Keempat Belas","Kelima Belas","Keenam Belas","Ketujuh Belas","Kedelapan Belas","Kesembilan Belas","Kedua Puluh"];
 function ligaOrdinal(n) { return LIGA_ORDINAL[(n-1)] || 'ke-'+n; }
 
@@ -1340,6 +1372,7 @@ let matchInfoData   = {};
 let trophyManualOrder = {}; // { 'Mei': ['Alfa','Toxx','Stive','Kobe'] }
 let matchStatsData = {}; // { matchId: { topScorer: 'Toxx', topAssist: 'Stive' } }
 let matchStatsRef = null;
+let ligaFilter = 'all'; // 'all' | 'klub' | 'ft'
 
 /* DATABASE PEMAIN state */
 let dbData = {}; // { playerKey: { [uid]: {num, name, club, pos, note} } }
@@ -1532,8 +1565,10 @@ const LOADING_MESSAGES = [
 function showModeSwitch(fromMode, toMode, callback) {
     const fromNumEl = document.getElementById('msoFromNum');
     const toNumEl   = document.getElementById('msoToNum');
-    if (fromNumEl) fromNumEl.textContent = fromMode;
-    if (toNumEl)   toNumEl.textContent   = toMode;
+    const fromLabel = MODE_PLAYERS[fromMode] ? MODE_PLAYERS[fromMode].length.toString() : fromMode;
+    const toLabel   = MODE_PLAYERS[toMode]   ? MODE_PLAYERS[toMode].length.toString()   : toMode;
+    if (fromNumEl) fromNumEl.textContent = fromLabel;
+    if (toNumEl)   toNumEl.textContent   = toLabel;
     const overlay = document.getElementById('modeSwitchOverlay');
     if (!overlay) { if (callback) callback(); return; }
     overlay.classList.add('on');
@@ -1691,7 +1726,7 @@ function kembaliKeMenuAwal() {
     });
     document.querySelectorAll('.mode-card').forEach(card => {
         card.addEventListener('click', function() {
-            const newMode = this.querySelector('h2').textContent.trim();
+            const newMode = this.getAttribute('data-mode') || this.querySelector('h2').textContent.trim();
             if (newMode !== prevMode) {
                 showModeSwitch(prevMode, newMode, () => {
                     currentMode = newMode;
@@ -1717,8 +1752,14 @@ function applyMode() {
     dbCurrentPlayer = null;
     h2hSelected = [];
 
-    dbPath = currentMode === '3' ? 'liga3' : 'liga';
-    document.getElementById('modeBadge').innerText = '🔥 ' + currentMode + ' Player Mode';
+    dbPath = currentMode === '4' ? 'liga' : currentMode === '3A' ? 'liga3' : ('liga3_' + currentMode.toLowerCase());
+    ALL_PLAYERS.length = 0;
+    (MODE_PLAYERS[currentMode] || MODE_PLAYERS['4']).forEach(p => ALL_PLAYERS.push(p));
+    const modeLabel = MODE_LABELS[currentMode] || MODE_LABELS[currentMode] || currentMode + ' Player Mode';
+    document.getElementById('modeBadge').innerText = '🔥 ' + modeLabel;
+    ligaFilter = 'all';
+    const fg = document.getElementById('ligaFilterGroup');
+    if (fg) { fg.style.display = 'none'; ['All','Klub','FT'].forEach(k => { const b = document.getElementById('filter'+k); if(b) b.classList.toggle('active', k==='All'); }); }
     editingId = null; editingStats = false; tipeLiga = null;
     currentMonth = 'ALL TIME STANDING';
     document.getElementById('btnStats').classList.remove('active');
@@ -1750,9 +1791,21 @@ function gantiBulan(m) {
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
     document.getElementById('btnStats').classList.toggle('active', m === 'STATS');
     document.getElementById('btnDB').classList.toggle('active', m === 'DATABASE');
+    // Hide filter when not in monthly view
+    const fg = document.getElementById('ligaFilterGroup');
+    if (fg) fg.style.display = (m !== 'ALL TIME STANDING' && m !== 'STATS' && m !== 'DATABASE') ? 'flex' : 'none';
     editingId = null; tipeLiga = null;
     loadData();
     renderAdminArea();
+}
+
+function setLigaFilter(f) {
+    ligaFilter = f;
+    ['all','klub','ft'].forEach(k => {
+        const btn = document.getElementById('filter' + (k === 'all' ? 'All' : k === 'klub' ? 'Klub' : 'FT'));
+        if (btn) btn.classList.toggle('active', k === f);
+    });
+    if (localData && Object.keys(localData).length) renderMonthly(localData);
 }
 
 function loadData() {
@@ -1790,6 +1843,8 @@ function loadData() {
     banner.classList.remove('hidden');
     banner.innerHTML = '⏳ Memuat...';
     toggleSidebarMode(false, false);
+    const fgEl = document.getElementById('ligaFilterGroup');
+    if (fgEl) fgEl.style.display = 'flex';
 
     if (matchesRef) { matchesRef.off(); matchesRef = null; }
     matchesRef = db.ref(dbPath + '/' + currentMonth + '/matches');
@@ -1928,7 +1983,7 @@ const taHtml = taSorted.map((n,i) => {
         <div class="stats-page">
             <div class="stats-page-header">
                 <h2>📊 STATISTIK PLAYER</h2>
-                <p>All Time &mdash; ${escHtml(currentMode)} Player Mode</p>
+                <p>All Time &mdash; ${escHtml(MODE_LABELS[currentMode] || currentMode)}</p>
             </div>
             <div class="stats-accent"></div>
             <div class="stats-grid">
@@ -2027,6 +2082,7 @@ function renderMonthly(matches) {
     });
     const counters = {};
     let htmlAll = '';
+    let visibleCount = 0;
 
     ids.forEach(id => {
         const m = matches[id];
@@ -2040,6 +2096,11 @@ function renderMonthly(matches) {
         const ligaType    = detectLigaType(id, playerNames);
         const isFT        = ligaType === 'ft';
         const isKlub      = ligaType === 'klub' || ligaType === 'mixed';
+
+        // ===== FILTER =====
+        if (ligaFilter === 'ft'   && !isFT)   return;
+        if (ligaFilter === 'klub' && !isKlub)  return;
+        visibleCount++;
 
         const headCls   = isFT ? 'section-head type-ft' : (isKlub ? 'section-head type-klub' : 'section-head type-unknown');
         const badgeCls  = isFT ? 'badge-liga badge-ft'  : (isKlub ? 'badge-liga badge-klub'  : 'badge-liga badge-unknown');
@@ -2117,6 +2178,12 @@ function renderMonthly(matches) {
         });
         htmlAll += html + buildEplBlock(rowData, false, isEdit, s, false, id, ligaType) + '</div>';
     });
+
+    if (!visibleCount && ligaFilter !== 'all') {
+        const filterLabel = ligaFilter === 'ft' ? '🔀 Full Transfer' : '⚽ Klub';
+        el.innerHTML = '<div class="empty-state">Tidak ada liga <strong>' + filterLabel + '</strong> di bulan <strong>' + currentMonth + '</strong>.<br><span style="font-size:0.85rem;color:#bbb;">Coba pilih filter lain.</span></div>';
+        return;
+    }
     el.innerHTML = htmlAll;
 }
 
@@ -2943,7 +3010,7 @@ adminArea.innerHTML = '<div class="admin-panel"><h3>⚙️ Admin Mode</h3>'
 
     adminArea.innerHTML = '<div class="admin-panel">'
         + '<h3>⚙️ Buat Liga — ' + currentMonth + '</h3>'
-        + '<p style="font-size:0.82rem;color:#666;margin-bottom:6px;">Centang tepat <strong>' + currentMode + ' pemain</strong>:</p>'
+        + '<p style="font-size:0.82rem;color:#666;margin-bottom:6px;">Centang tepat <strong>' + ALL_PLAYERS.length + ' pemain</strong>:</p>'
         + '<div class="p-checks">' + ALL_PLAYERS.map(p =>
             '<label><input type="checkbox" class="p-check" value="' + p + '" checked> ' + p + '</label>'
           ).join('') + '</div>'
@@ -2992,13 +3059,14 @@ function pilihTipeLiga(tipe) {
 }
 
 function buatLiga() {
-    /* FIX: only take checked players, limit to exactly currentMode count */
+    /* FIX: only take checked players, limit to exactly ALL_PLAYERS.length count */
     const allChecked = Array.from(document.querySelectorAll('.p-check:checked')).map(c => c.value);
-    const sel = allChecked.slice(0, parseInt(currentMode)); // safety: cap to mode
+    const modeCount = ALL_PLAYERS.length;
+    const sel = allChecked.slice(0, modeCount); // safety: cap to mode
     const tgl = document.getElementById('newDate')?.value;
     if (!tgl) return alert('Tanggal tidak ditemukan!');
-    if (allChecked.length !== parseInt(currentMode)) {
-        return alert('Mode ' + currentMode + ' Player: Centang TEPAT ' + currentMode + ' pemain!');
+    if (allChecked.length !== modeCount) {
+        return alert('Mode ' + modeCount + ' Player: Centang TEPAT ' + modeCount + ' pemain!');
     }
     if (!tipeLiga) {
         return alert('Pilih Tipe Liga terlebih dahulu:\n⚽ Klub  atau  🔀 Full Transfer');
@@ -3074,7 +3142,10 @@ function matikanAdmin() {
 }
 /* ===================== DATABASE PEMAIN ===================== */
 
-const DB_PLAYERS = ['Toxx', 'Stive', 'Alfa', 'Kobe', 'NON USER', 'ALL PLAYER'];
+const DB_PLAYERS_STATIC = ['Toxx', 'Stive', 'Alfa', 'Kobe', 'NON USER', 'ALL PLAYER'];
+function getDbPlayers() {
+    return [...ALL_PLAYERS, 'NON USER', 'ALL PLAYER'];
+}
 
 const DB_DEFAULT_3 = {
   'Toxx': [
@@ -3316,8 +3387,8 @@ function resetDatabaseKeDefault(konfirmasi) {
     if (konfirmasi) {
         if (!confirm('⚠️ Reset semua pemain ke data default?\nSemua data pemain yang ada akan diganti. Lanjutkan?')) return;
     }
-    const DB_DEFAULT = dbPath === 'liga3' ? DB_DEFAULT_3 : DB_DEFAULT_4;
-    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER');
+    const DB_DEFAULT = dbPath.startsWith('liga3') ? DB_DEFAULT_3 : DB_DEFAULT_4;
+    const realPlayers = ALL_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER');
     // Hapus dulu semua data lama, lalu isi ulang
     db.ref(dbPath + '/database').remove().then(() => {
         const updates = {};
@@ -3339,9 +3410,9 @@ function renderDatabasePage() {
     const banner = document.getElementById('champBanner');
     banner.classList.add('hidden');
 
-    if (!dbCurrentPlayer) dbCurrentPlayer = DB_PLAYERS[0];
+    if (!dbCurrentPlayer) dbCurrentPlayer = getDbPlayers()[0];
 
-    const tabsHtml = DB_PLAYERS.map(pk => {
+    const tabsHtml = getDbPlayers().map(pk => {
         let style = '';
         if (pk === 'NON USER') style = ' style="color:#ff8f00;border-bottom-color:' + (pk === dbCurrentPlayer ? '#ff8f00' : 'transparent') + ';"';
         return '<button class="db-player-tab' + (pk === dbCurrentPlayer ? ' on' : '') + '" onclick="dbSwitchPlayer(\'' + pk + '\')"' + style + '>' + (pk === 'NON USER' ? '📦 ' : '') + escHtml(pk) + '</button>';
@@ -3416,7 +3487,7 @@ function renderComparePage() {
     const el = document.getElementById('mainContent');
     if (!el) return;
 
-    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
+    const realPlayers = getDbPlayers().filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
 
     // Init default: select all real players (up to 4)
     if (!h2hSelected.length || !h2hSelected.every(p => realPlayers.includes(p))) {
@@ -3452,7 +3523,7 @@ function renderComparePage() {
     // Rebuild tabs
     const tw = document.getElementById('cmpTabsWrap');
     if (tw) {
-        tw.innerHTML = DB_PLAYERS.map(pk =>
+        tw.innerHTML = getDbPlayers().map(pk =>
             '<button class="db-player-tab" onclick="dbSwitchPlayer(\'' + pk + '\')">' + escHtml(pk) + '</button>'
         ).join('') + '<button class="db-player-tab on" style="color:#e90052;border-bottom-color:#e90052;">⚔️ Compare</button>';
     }
@@ -3462,7 +3533,7 @@ function renderComparePage() {
 }
 
 function renderH2HPills() {
-    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
+    const realPlayers = getDbPlayers().filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
     const COLORS = ['#e91e63','#1976d2','#388e3c','#f57c00'];
     const pillsEl = document.getElementById('h2hPills');
     const hintEl  = document.getElementById('h2hHint');
@@ -3487,7 +3558,7 @@ function renderH2HPills() {
 }
 
 function h2hTogglePlayer(pk) {
-    const realPlayers = DB_PLAYERS.filter(p => p !== 'ALL PLAYER' && p !== 'COMPARE');
+    const realPlayers = getDbPlayers().filter(p => p !== 'ALL PLAYER' && p !== 'COMPARE');
     const idx = h2hSelected.indexOf(pk);
     if (idx !== -1) {
         // Deselect — tapi minimal 2 harus tetap terpilih
@@ -3859,7 +3930,7 @@ function dbRenderTable() {
 
     let pkData;
 if (dbCurrentPlayer === 'ALL PLAYER') {
-    const sourcePlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
+    const sourcePlayers = getDbPlayers().filter(pk => pk !== 'ALL PLAYER' && pk !== 'COMPARE');
     pkData = [];
     sourcePlayers.forEach(pk => {
         if (dbData[pk] && typeof dbData[pk] === 'object') {
@@ -3935,7 +4006,7 @@ if (dbCurrentPlayer === 'ALL PLAYER') {
     }
 
     // Real player list for "pindah ke" dropdown
-    const realPlayerList = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER' && pk !== 'COMPARE');
+    const realPlayerList = getDbPlayers().filter(pk => pk !== 'ALL PLAYER' && pk !== 'NON USER' && pk !== 'COMPARE');
 
     tbody.innerHTML = filtered.map(p => {
         const posCls = 'db-pos-' + (p.pos || 'CF').replace(/[^A-Z]/g,'');
@@ -4047,7 +4118,7 @@ function simpanDbPemain() {
 ref.set(payload)
 .then(() => {
 
-    const otherPath = dbPath === 'liga3' ? 'liga' : 'liga3';
+    const otherPath = dbPath.startsWith('liga3') ? 'liga' : 'liga3_3a';
 
     return db.ref(otherPath + '/database').once('value')
     .then(snap => {
@@ -4157,8 +4228,8 @@ function pindahDariNonUser(uid) {
 
 /* ===================== TRADE PEMAIN ===================== */
 function bukaTradePemain() {
-    document.getElementById('tradeModeLabel').textContent = currentMode + ' Player Mode';
-    const realPlayers = DB_PLAYERS.filter(pk => pk !== 'ALL PLAYER');
+    document.getElementById('tradeModeLabel').textContent = MODE_LABELS[currentMode] || currentMode + ' Player Mode';
+    const realPlayers = getDbPlayers().filter(pk => pk !== 'ALL PLAYER');
     const opts = '<option value="">-- Pilih Player --</option>'
         + realPlayers.map(p => '<option value="' + escHtml(p) + '">' + escHtml(p) + '</option>').join('');
     document.getElementById('tradePlayerA').innerHTML = opts;
