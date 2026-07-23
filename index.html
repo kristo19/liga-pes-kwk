@@ -1383,6 +1383,7 @@ let dbSortDir = 'asc';
 let dbSearchQ = '';
 let dbFilterPos = '';
 let dbEditUid = null;
+let dbEditOwner = null; // pemilik asli data saat edit dilakukan dari tab ALL PLAYER
 
 /* ===================== CLUB LOGO MAPPING ===================== */
 const CLUB_LOGO_MAP = {
@@ -3467,7 +3468,7 @@ function renderDatabasePage() {
                             <th onclick="dbSort('rating')" id="dbTh-rating">Rating</th>
                             ${dbCurrentPlayer === 'ALL PLAYER' ? '<th onclick="dbSort(\'_owner\')" id="dbTh-_owner">Pemilik</th>' : ''}
                             ${dbCurrentPlayer === 'NON USER' ? '<th onclick="dbSort(\'_fromPlayer\')" id="dbTh-_fromPlayer">Dari</th>' : ''}
-                            ${modeAdmin && dbCurrentPlayer !== 'ALL PLAYER' ? '<th class="no-sort">Aksi</th>' : ''}
+                            ${modeAdmin ? '<th class="no-sort">Aksi</th>' : ''}
                         </tr>
                     </thead>
                     <tbody id="dbTbody"></tbody>
@@ -3937,6 +3938,7 @@ if (dbCurrentPlayer === 'ALL PLAYER') {
             Object.entries(dbData[pk]).forEach(([uid, p]) => {
                 pkData.push({
                     uid: pk + '_' + uid,
+                    _realUid: uid,
                     _owner: pk,
                     _isNonUser: pk === 'NON USER',
                     ...p
@@ -3999,7 +4001,10 @@ if (dbCurrentPlayer === 'ALL PLAYER') {
             ).join('')
             + lineupBtn;
     }
-    const totalCols = (modeAdmin && !isAll) ? (isNonUserTab ? 7 : 6) : (isAll ? 6 : 5);
+    let totalCols = 5; // #, Nama, Klub, Pos, Rating
+    if (isAll) totalCols++;        // kolom Pemilik
+    if (isNonUserTab) totalCols++; // kolom Dari
+    if (modeAdmin) totalCols++;    // kolom Aksi
     if (!filtered.length) {
         tbody.innerHTML = '<tr><td colspan="' + totalCols + '" class="db-empty">' + (isNonUserTab ? '📦 Belum ada pemain di Non User.' : 'Tidak ada pemain ditemukan.') + '</td></tr>';
         return;
@@ -4017,7 +4022,12 @@ if (dbCurrentPlayer === 'ALL PLAYER') {
         const noteBadge = p.note ? '<span class="db-trade-badge">⚡ ' + escHtml(p.note) + '</span>' : '';
 
         let adminCols = '';
-        if (modeAdmin && !isAll) {
+        if (modeAdmin && isAll) {
+            // Di ALL PLAYER: tombol edit yang menulis langsung ke data pemilik aslinya
+            adminCols = '<td>'
+                + '<button class="db-action-btn db-edit-btn" onclick="bukaDbModalEdit(\'' + p._realUid + '\', \'' + p._owner + '\')" title="Edit Pemain">✏️</button>'
+                + '</td>';
+        } else if (modeAdmin && !isAll) {
             if (isNonUserTab) {
                 // Di NON USER: tombol edit, tombol pindah ke player, dan tombol hapus
                 const pindahOpts = realPlayerList.map(pk =>
@@ -4067,6 +4077,7 @@ if (dbCurrentPlayer === 'ALL PLAYER') {
 
 function bukaDbModalTambah() {
     dbEditUid = null;
+    dbEditOwner = null;
     document.getElementById('dbModalTitle').textContent = '➕ Tambah Pemain — ' + dbCurrentPlayer;
     document.getElementById('dbFormNum').value = '';
     document.getElementById('dbFormName').value = '';
@@ -4077,12 +4088,14 @@ function bukaDbModalTambah() {
     document.getElementById('dbModal').classList.add('on');
 }
 
-function bukaDbModalEdit(uid) {
-    const pkData = dbData[dbCurrentPlayer] || {};
+function bukaDbModalEdit(uid, owner) {
+    owner = owner || dbCurrentPlayer;
+    const pkData = dbData[owner] || {};
     const p = pkData[uid];
     if (!p) return;
     dbEditUid = uid;
-    document.getElementById('dbModalTitle').textContent = '✏️ Edit Pemain — ' + dbCurrentPlayer;
+    dbEditOwner = owner;
+    document.getElementById('dbModalTitle').textContent = '✏️ Edit Pemain — ' + owner;
     document.getElementById('dbFormNum').value = p.num || '';
     document.getElementById('dbFormName').value = p.name || '';
     document.getElementById('dbFormClub').value = p.club || '';
@@ -4092,7 +4105,7 @@ function bukaDbModalEdit(uid) {
     document.getElementById('dbModal').classList.add('on');
 }
 
-function tutupDbModal() { document.getElementById('dbModal').classList.remove('on'); }
+function tutupDbModal() { document.getElementById('dbModal').classList.remove('on'); dbEditOwner = null; }
 function tutupDbModalOutside(e) { if (e.target === document.getElementById('dbModal')) tutupDbModal(); }
 
 function simpanDbPemain() {
@@ -4111,7 +4124,8 @@ function simpanDbPemain() {
     if (rating) payload.rating = rating;
     let ref;
     if (dbEditUid) {
-        ref = db.ref(dbPath + '/database/' + dbCurrentPlayer + '/' + dbEditUid);
+        const targetOwner = dbEditOwner || dbCurrentPlayer;
+        ref = db.ref(dbPath + '/database/' + targetOwner + '/' + dbEditUid);
     } else {
         ref = db.ref(dbPath + '/database/' + dbCurrentPlayer).push();
     }
