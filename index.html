@@ -1500,7 +1500,7 @@ const CLUB_LOGO_MAP = {
     'al-ahli': 'https://upload.wikimedia.org/wikipedia/en/4/45/Al_Ahli_Saudi_FC_logo.svg',
     'al-hilal': 'https://upload.wikimedia.org/wikipedia/commons/5/55/Al_Hilal_SFC_Logo.svg',
     'al-ittihad': 'https://upload.wikimedia.org/wikipedia/en/8/87/Al-Ittihad_Club_%28Jeddah%29_logo.svg',
-    'al-nassr': 'https://upload.wikimedia.org/wikipedia/en/3/3f/Nassr_FC_Logo.svg',
+    'al-nassr': 'https://upload.wikimedia.org/wikipedia/id/2/25/1000016855.png',
     'as monaco': 'https://upload.wikimedia.org/wikipedia/en/c/cf/LogoASMonacoFC2021.svg',
     'atlético madrid': 'https://upload.wikimedia.org/wikipedia/en/f/f9/Atletico_Madrid_Logo_2024.svg',
     'bayern munich': 'https://upload.wikimedia.org/wikipedia/commons/8/8d/FC_Bayern_M%C3%BCnchen_logo_%282024%29.svg',
@@ -1779,7 +1779,7 @@ function buildMonthSelect() {
     const sel = document.getElementById('monthSelect');
     sel.innerHTML = MONTHS.map(m =>
         '<option value="' + m + '" ' + (m === currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' ? 'selected' : '') + '>' + m + '</option>'
-    ).join('');
+    ).join('') + '<option value="ALL BULAN" ' + (currentMonth === 'ALL BULAN' ? 'selected' : '') + '>🗓️ All (Januari - Desember)</option>';
     document.getElementById('btnAllTime').classList.toggle('active', currentMonth === 'ALL TIME STANDING');
     document.getElementById('btnStats').classList.toggle('active', currentMonth === 'STATS');
 }
@@ -1838,6 +1838,15 @@ function loadData() {
         updateSidebarAllTime();
         return;
     }
+    if (currentMonth === 'ALL BULAN') {
+        document.getElementById('sbMonthTitle').innerText = 'Total Poin (Semua Bulan)';
+        banner.classList.add('hidden');
+        toggleSidebarMode(true, false);
+        if (matchesRef) { matchesRef.off(); matchesRef = null; }
+        renderAllBulan();
+        updateSidebarAllTime();
+        return;
+    }
 
     document.getElementById('sbMonthTitle').innerText = 'Total Poin ' + currentMonth;
     document.getElementById('sbTrophyMonthTitle').innerText = currentMonth;
@@ -1883,10 +1892,11 @@ function listenMatchInfo() {
     if (!dbPath) return;
     db.ref(dbPath + '/matchInfo').on('value', snap => {
         matchInfoData = snap.val() || {};
-        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && localData && Object.keys(localData).length) {
+        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && currentMonth !== 'ALL BULAN' && localData && Object.keys(localData).length) {
             renderMonthly(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
+        if (currentMonth === 'ALL BULAN') renderAllBulan();
     });
 }
 
@@ -1898,11 +1908,12 @@ function listenMatchStats() {
     matchStatsRef.on('value', snap => {
         matchStatsData = snap.val() || {};
         if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' 
-            && currentMonth !== 'DATABASE' && localData && Object.keys(localData).length) {
+            && currentMonth !== 'DATABASE' && currentMonth !== 'ALL BULAN' && localData && Object.keys(localData).length) {
             renderMonthly(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
         if (currentMonth === 'ALL TIME STANDING') renderAllTime();
+        if (currentMonth === 'ALL BULAN') renderAllBulan();
     });
 }
 
@@ -2186,6 +2197,141 @@ function renderMonthly(matches) {
         return;
     }
     el.innerHTML = htmlAll;
+}
+
+function renderAllBulan() {
+    const el = document.getElementById('mainContent');
+    if (!el) return;
+    el.innerHTML = '<div class="empty-state">Memuat data...</div>';
+
+    db.ref(dbPath).once('value', snap => {
+        const root = snap.val() || {};
+        let htmlAll = '';
+        let hasAnyMatch = false;
+        let totalVisible = 0;
+        allMatchesCache = {};
+
+        MONTHS.forEach(bulan => {
+            const matches = (root[bulan] && root[bulan].matches) || {};
+            const ids = Object.keys(matches);
+            if (!ids.length) return;
+            hasAnyMatch = true;
+
+            /* Urutkan berdasarkan tanggal lalu timestamp agar nomor liga konsisten */
+            const sortedIds = ids.sort((a, b) => {
+                const tglA = matches[a].tanggal || 0;
+                const tglB = matches[b].tanggal || 0;
+                if (tglA !== tglB) return tglA - tglB;
+                return (matches[a].timestamp || 0) - (matches[b].timestamp || 0);
+            });
+
+            const counters = {};
+            let monthHtml = '';
+            let monthVisible = 0;
+
+            sortedIds.forEach(id => {
+                const m = matches[id];
+                if (!m) return;
+                counters[m.tanggal] = (counters[m.tanggal] || 0) + 1;
+                const ligaNum = counters[m.tanggal];
+                const s = sortStandings(m);
+
+                allMatchesCache[id] = {
+                    bulan: bulan,
+                    tanggal: m.tanggal,
+                    ligaNum: ligaNum,
+                    standings: m.standings,
+                    manualJuara: m.manualJuara
+                };
+
+                const playerNames = (m.standings || []).map(p => fix(p.name));
+                const ligaType    = detectLigaType(id, playerNames);
+                const isFT        = ligaType === 'ft';
+                const isKlub      = ligaType === 'klub' || ligaType === 'mixed';
+
+                // ===== FILTER (pakai filter liga yang sama dengan tampilan bulanan) =====
+                if (ligaFilter === 'ft'   && !isFT)   return;
+                if (ligaFilter === 'klub' && !isKlub)  return;
+                monthVisible++;
+
+                const headCls   = isFT ? 'section-head type-ft' : (isKlub ? 'section-head type-klub' : 'section-head type-unknown');
+                const badgeCls  = isFT ? 'badge-liga badge-ft'  : (isKlub ? 'badge-liga badge-klub'  : 'badge-liga badge-unknown');
+                const badgeIcon = isFT ? '🔀' : (isKlub ? '⚽' : '?');
+                const ligaNama  = ligaOrdinal(ligaNum);
+
+                const modeLabel = isFT ? 'Full Transfer' : (isKlub ? 'Klub' : '');
+                const modeCls   = isFT ? 'badge-mode mode-ft' : 'badge-mode mode-klub';
+                const modeIcon  = isFT ? '🔀' : '⚽';
+                const modeBadgeHtml = modeLabel ? '<span class="' + modeCls + '">' + modeIcon + ' ' + modeLabel + '</span>' : '';
+
+                const heading = '📅 ' + getNamaHari(m.tanggal || 1, bulan) + ', ' + (m.tanggal || 1) + ' ' + bulan;
+                const accentBar = isFT ? '<div class="ft-accent-bar"></div>' : (isKlub ? '<div class="klub-accent-bar"></div>' : '');
+                const juaraName = s[0] && (s[0].pts || 0) > 0 ? s[0].name : '-';
+
+                const ms = matchStatsData[id] || {};
+                const tsVal = ms.topScorer || '';
+                const taVal = ms.topAssist || '';
+                const statsBarHtml = (tsVal || taVal)
+                    ? '<div class="match-stats-bar">'
+                        + (tsVal ? '<span class="msb-chip scorer">⚽ Top Scorer: <strong>' + escHtml(tsVal) + '</strong></span>' : '')
+                        + (taVal ? '<span class="msb-chip assist">🎯 Top Assist: <strong>' + escHtml(taVal) + '</strong></span>' : '')
+                        + '</div>'
+                    : '';
+
+                // Catatan: tampilan ini read-only (tanpa tombol Edit/Hapus) karena
+                // datanya gabungan dari 12 bulan sekaligus.
+                let blockHtml = '<div class="match-block" id="mb-all-' + id + '">'
+                    + '<div class="' + headCls + '">'
+                    + '<span>' + heading + '</span>'
+                    + '<span class="' + badgeCls + '">' + badgeIcon + ' Liga ' + ligaNama + '</span>'
+                    + modeBadgeHtml
+                    + '<span style="margin-left:auto;display:flex;align-items:center;gap:4px;">'
+                    + '<span style="background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:600;">🏆 ' + escHtml(juaraName) + '</span>'
+                    + '</span></div>' + accentBar + statsBarHtml;
+
+                const rowData = s.map((p, i) => ({
+                    name: p.name,
+                    pos: i + 1,
+                    pl: (p.w || 0) + (p.d || 0) + (p.l || 0),
+                    w: p.w || 0, d: p.d || 0, l: p.l || 0,
+                    gf: p.f || 0, ga: p.a || 0,
+                    gd: p.gd || 0, pts: p.pts || 0,
+                    form: [],
+                    manualRank: p.manualRank,
+                    isWin: i === 0 && (p.pts || 0) > 0
+                }));
+                rowData.forEach(p => {
+                    const mi = (matchInfoData[id] || {})[p.name] || {};
+                    p.club = mi.club || '';
+                    p.isFullTransfer = mi.isFullTransfer || false;
+                });
+
+                monthHtml += blockHtml + buildEplBlock(rowData, false, false, s, false, id, ligaType) + '</div>';
+            });
+
+            if (monthVisible > 0) {
+                totalVisible += monthVisible;
+                htmlAll += '<div class="all-bulan-month-header" style="margin:28px 0 12px;padding:10px 16px;'
+                    + 'background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:10px;color:#fff;'
+                    + 'font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:1px;'
+                    + 'display:flex;align-items:center;gap:10px;">'
+                    + '📆 ' + bulan
+                    + '<span style="font-size:0.75rem;font-weight:600;opacity:0.85;background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:10px;">' + monthVisible + ' Liga</span>'
+                    + '</div>' + monthHtml;
+            }
+        });
+
+        if (!hasAnyMatch) {
+            el.innerHTML = '<div class="empty-state">Belum ada klasemen liga sama sekali untuk Mode <strong>' + currentMode + ' Player</strong>.</div>';
+            return;
+        }
+        if (!totalVisible) {
+            const filterLabel = ligaFilter === 'ft' ? '🔀 Full Transfer' : '⚽ Klub';
+            el.innerHTML = '<div class="empty-state">Tidak ada liga <strong>' + filterLabel + '</strong> di bulan manapun.<br><span style="font-size:0.85rem;color:#bbb;">Coba pilih filter lain.</span></div>';
+            return;
+        }
+        el.innerHTML = htmlAll;
+    });
 }
 
 function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matchId, ligaType) {
@@ -2997,7 +3143,7 @@ function renderAdminArea() {
     if (!adminArea) return;
     if (!modeAdmin) { adminArea.innerHTML = ''; return; }
 
-    if (currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE') {
+    if (currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE' || currentMonth === 'ALL BULAN') {
         const resetBtn = (currentMonth === 'DATABASE')
             ? '<button class="btn-adm" onclick="resetDatabaseKeDefault(true)" style="margin-bottom:8px;background:#e53935;color:white;">🔄 Reset Pemain ke Default</button><br>'
             : '';
@@ -4914,7 +5060,7 @@ function loadTrophyOrder() {
     db.ref(dbPath + '/trophyOrder').on('value', snap => {
         trophyManualOrder = snap.val() || {};
         // Re-render sidebar jika sedang di bulan tertentu
-        if (currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && currentMonth !== 'DATABASE' && Object.keys(localData).length) {
+        if (currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && currentMonth !== 'DATABASE' && currentMonth !== 'ALL BULAN' && Object.keys(localData).length) {
             updateSidebar(localData);
         }
     });
@@ -4969,7 +5115,7 @@ function moveTrophyRow(bulan, idx, dir) {
 
 /* ===================== CEK & RESET MANUAL JUARA ===================== */
 function cekManualJuara() {
-    if (!currentMonth || currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE') {
+    if (!currentMonth || currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE' || currentMonth === 'ALL BULAN') {
         return alert('Pilih bulan dulu!');
     }
     db.ref(dbPath + '/' + currentMonth + '/matches').once('value', snap => {
@@ -4988,7 +5134,7 @@ function cekManualJuara() {
 }
 
 function resetSemuaManualJuara() {
-    if (!currentMonth || currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE') {
+    if (!currentMonth || currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE' || currentMonth === 'ALL BULAN') {
         return alert('Pilih bulan dulu!');
     }
     if (!confirm('Reset semua manualJuara di bulan ' + currentMonth + '? Juara akan ditentukan otomatis berdasarkan poin/GD/GF.')) return;
