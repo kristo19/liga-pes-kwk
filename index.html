@@ -1048,6 +1048,8 @@
         <span class="nav-label">&#128197; Bulan:</span>
         <select id="monthSelect" class="nav-select" onchange="gantiBulan(this.value)"></select>
         <button id="btnAllTime" class="btn-alltime" onclick="gantiBulan('ALL TIME STANDING')">&#127942; All Time Standing</button>
+        <button id="btnAllTimeKlub" class="btn-alltime" onclick="gantiBulan('ALL TIME KLUB')" style="background:#2e7d32;">&#9917; Klasemen Klub</button>
+        <button id="btnAllTimeFT" class="btn-alltime" onclick="gantiBulan('ALL TIME FT')" style="background:#c62828;">&#128256; Klasemen Full Transfer</button>
         <button id="btnStats" class="btn-stats-menu" onclick="gantiBulan('STATS')">&#128202; Stats</button>
         <button id="btnDB" class="btn-db-menu" onclick="gantiBulan('DATABASE')">&#128101; Database Pemain</button>
         <div class="liga-filter-group" id="ligaFilterGroup">
@@ -1778,23 +1780,30 @@ function applyMode() {
 function buildMonthSelect() {
     const sel = document.getElementById('monthSelect');
     sel.innerHTML = MONTHS.map(m =>
-        '<option value="' + m + '" ' + (m === currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' ? 'selected' : '') + '>' + m + '</option>'
+        '<option value="' + m + '" ' + (m === currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'ALL TIME KLUB' && currentMonth !== 'ALL TIME FT' && currentMonth !== 'STATS' ? 'selected' : '') + '>' + m + '</option>'
     ).join('') + '<option value="ALL BULAN" ' + (currentMonth === 'ALL BULAN' ? 'selected' : '') + '>🗓️ All (Januari - Desember)</option>';
     document.getElementById('btnAllTime').classList.toggle('active', currentMonth === 'ALL TIME STANDING');
+    document.getElementById('btnAllTimeKlub').classList.toggle('active', currentMonth === 'ALL TIME KLUB');
+    document.getElementById('btnAllTimeFT').classList.toggle('active', currentMonth === 'ALL TIME FT');
     document.getElementById('btnStats').classList.toggle('active', currentMonth === 'STATS');
 }
 
+const ALLTIME_VIEWS = ['ALL TIME STANDING', 'ALL TIME KLUB', 'ALL TIME FT'];
+
 function gantiBulan(m) {
     currentMonth = m;
-    if (m !== 'ALL TIME STANDING' && m !== 'STATS' && m !== 'DATABASE') {
+    if (!ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE') {
         document.getElementById('monthSelect').value = m;
     }
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
+    document.getElementById('btnAllTimeKlub').classList.toggle('active', m === 'ALL TIME KLUB');
+    document.getElementById('btnAllTimeFT').classList.toggle('active', m === 'ALL TIME FT');
     document.getElementById('btnStats').classList.toggle('active', m === 'STATS');
     document.getElementById('btnDB').classList.toggle('active', m === 'DATABASE');
     // Hide filter when not in monthly view
     const fg = document.getElementById('ligaFilterGroup');
-    if (fg) fg.style.display = (m !== 'ALL TIME STANDING' && m !== 'STATS' && m !== 'DATABASE') ? 'flex' : 'none';
+    const isMonthly = !ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE';
+    if (fg) fg.style.display = isMonthly ? 'flex' : 'none';
     editingId = null; tipeLiga = null;
     loadData();
     renderAdminArea();
@@ -1821,7 +1830,7 @@ function loadData() {
         renderAdminArea();
         return;
     }
-    if (currentMonth === 'STATS') {
+        if (currentMonth === 'STATS') {
         banner.classList.add('hidden');
         toggleSidebarMode(false, true);
         if (matchesRef) { matchesRef.off(); matchesRef = null; }
@@ -1835,6 +1844,17 @@ function loadData() {
         toggleSidebarMode(true, false);
         if (matchesRef) { matchesRef.off(); matchesRef = null; }
         renderAllTime();
+        updateSidebarAllTime();
+        return;
+    }
+    if (currentMonth === 'ALL TIME KLUB') {
+    }
+    if (currentMonth === 'ALL TIME FT') {
+        document.getElementById('sbMonthTitle').innerText = 'All Time — Full Transfer';
+        banner.classList.add('hidden');
+        toggleSidebarMode(true, false);
+        if (matchesRef) { matchesRef.off(); matchesRef = null; }
+        renderAllTimeFiltered('ft');
         updateSidebarAllTime();
         return;
     }
@@ -2030,18 +2050,116 @@ function renderAllTime() {
     document.getElementById('mainContent').innerHTML = '<div class="empty-state">Memuat data...</div>';
     db.ref(dbPath).once('value', snap => {
         const root = snap.val() || {};
-        const stats = {};
-        ALL_PLAYERS.forEach(p => { stats[p] = { pl:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0, form:[] }; });
+
+        function emptyStats() {
+            const s = {};
+            ALL_PLAYERS.forEach(p => { s[p] = { pl:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0, form:[] }; });
+            return s;
+        }
+        const statsAll  = emptyStats();
+        const statsKlub = emptyStats();
+        const statsFT   = emptyStats();
+
         let allMatches = [];
         MONTHS.forEach(m => {
             if (root[m] && root[m].matches) {
-                Object.values(root[m].matches).forEach(match => {
-                    if (match && match.standings) allMatches.push(match);
+                Object.entries(root[m].matches).forEach(([id, match]) => {
+                    if (match && match.standings) allMatches.push({ id, match });
                 });
             }
         });
-        allMatches.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-        allMatches.forEach(match => {
+        allMatches.sort((a, b) => (a.match.timestamp || 0) - (b.match.timestamp || 0));
+
+        function applyTo(statsObj, match) {
+            (match.standings || []).forEach(p => {
+                const n = fix(p.name);
+                if (!statsObj[n]) return;
+                const w=parseInt(p.w)||0, d=parseInt(p.d)||0, l=parseInt(p.l)||0, f=parseInt(p.f)||0, a=parseInt(p.a)||0;
+                statsObj[n].pl  += w+d+l;
+                statsObj[n].w   += w; statsObj[n].d += d; statsObj[n].l += l;
+                statsObj[n].gf  += f; statsObj[n].ga += a; statsObj[n].gd += f-a;
+                statsObj[n].pts += parseInt(p.pts) || 0;
+            });
+        }
+
+        allMatches.forEach(({ id, match }) => {
+            const playerNames = (match.standings || []).map(p => fix(p.name));
+            const ligaType = detectLigaType(id, playerNames);
+            const isFT   = ligaType === 'ft';
+            const isKlub = ligaType === 'klub' || ligaType === 'mixed';
+
+            applyTo(statsAll, match);
+            if (isFT)   applyTo(statsFT, match);
+            if (isKlub) applyTo(statsKlub, match);
+        });
+
+        [statsAll, statsKlub, statsFT].forEach(s => {
+            Object.keys(s).forEach(n => {
+                s[n].form = (statsData[n]?.formText || '').toUpperCase().replace(/[^WDL]/g, '').split('').slice(-5);
+            });
+        });
+
+        function buildSorted(statsObj) {
+            const sorted = Object.keys(statsObj)
+                .map(name => ({ name, ...statsObj[name] }))
+                .filter(p => p.pl > 0)
+                .sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+            return sorted.map((p, i) => ({ ...p, isWin: i === 0 && p.pts > 0 }));
+        }
+
+        const finalAll  = buildSorted(statsAll);
+        const finalKlub = buildSorted(statsKlub);
+        const finalFT   = buildSorted(statsFT);
+
+        let html = '';
+
+        html += '<div class="section-head type-unknown"><span>🏆 All Time Standing &mdash; Gabungan</span></div>';
+        html += finalAll.length
+            ? buildEplBlock(finalAll, true, false, [], true, null, 'unknown')
+            : '<div class="empty-state">Belum ada data untuk Mode ' + currentMode + ' Player.</div>';
+
+        html += '<div class="section-head type-klub" style="margin-top:14px;"><span>⚽ Klasemen All Time &mdash; Klub</span></div>';
+        html += '<div class="klub-accent-bar"></div>';
+        html += finalKlub.length
+            ? buildEplBlock(finalKlub, true, false, [], true, null, 'klub')
+            : '<div class="empty-state">Belum ada liga bertipe ⚽ Klub.</div>';
+
+        html += '<div class="section-head type-ft" style="margin-top:14px;"><span>🔀 Klasemen All Time &mdash; Full Transfer</span></div>';
+        html += '<div class="ft-accent-bar"></div>';
+                html += finalFT.length
+            ? buildEplBlock(finalFT, true, false, [], true, null, 'ft')
+            : '<div class="empty-state">Belum ada liga bertipe 🔀 Full Transfer.</div>';
+
+        document.getElementById('mainContent').innerHTML = html;
+    });
+}
+
+function renderAllTimeFiltered(tipe) {
+    // tipe: 'klub' atau 'ft'
+    document.getElementById('mainContent').innerHTML = '<div class="empty-state">Memuat data...</div>';
+    db.ref(dbPath).once('value', snap => {
+        const root = snap.val() || {};
+        const stats = {};
+        ALL_PLAYERS.forEach(p => { stats[p] = { pl:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0, form:[] }; });
+
+        let allMatches = [];
+        MONTHS.forEach(m => {
+            if (root[m] && root[m].matches) {
+                Object.entries(root[m].matches).forEach(([id, match]) => {
+                    if (match && match.standings) allMatches.push({ id, match });
+                });
+            }
+        });
+        allMatches.sort((a, b) => (a.match.timestamp || 0) - (b.match.timestamp || 0));
+
+        allMatches.forEach(({ id, match }) => {
+            const playerNames = (match.standings || []).map(p => fix(p.name));
+            const ligaType = detectLigaType(id, playerNames);
+            const isFT   = ligaType === 'ft';
+            const isKlub = ligaType === 'klub' || ligaType === 'mixed';
+            const cocok  = (tipe === 'ft' && isFT) || (tipe === 'klub' && isKlub);
+            if (!cocok) return;
+
             (match.standings || []).forEach(p => {
                 const n = fix(p.name);
                 if (!stats[n]) return;
@@ -2052,27 +2170,28 @@ function renderAllTime() {
                 stats[n].pts += parseInt(p.pts) || 0;
             });
         });
+
         Object.keys(stats).forEach(n => {
             stats[n].form = (statsData[n]?.formText || '').toUpperCase().replace(/[^WDL]/g, '').split('').slice(-5);
         });
-        
+
         const sorted = Object.keys(stats)
             .map(name => ({name, ...stats[name]}))
             .filter(p => p.pl > 0)
             .sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
-            
+
+        const labelFull = tipe === 'ft' ? '🔀 Full Transfer' : '⚽ Klub';
         if (!sorted.length) {
-            return document.getElementById('mainContent').innerHTML = '<div class="empty-state">Belum ada data untuk Mode ' + currentMode + ' Player.</div>';
+            return document.getElementById('mainContent').innerHTML =
+                '<div class="empty-state">Belum ada liga bertipe <strong>' + labelFull + '</strong> untuk Mode ' + currentMode + ' Player.</div>';
         }
 
-        // TAMBAHAN: Beri penanda isWin = true khusus untuk peringkat 1 (index 0)
         const finalData = sorted.map((p, i) => ({
             ...p,
             isWin: i === 0 && p.pts > 0
         }));
 
-        // Render tabel menggunakan finalData yang sudah memiliki status juara (isWin)
-        document.getElementById('mainContent').innerHTML = buildEplBlock(finalData, true, false, [], true, null, 'unknown');
+        document.getElementById('mainContent').innerHTML = buildEplBlock(finalData, true, false, [], true, null, tipe === 'ft' ? 'ft' : 'klub');
     });
 }
 
