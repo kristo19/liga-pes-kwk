@@ -489,7 +489,10 @@
         .h2h-section-divider td { padding: 6px 14px !important; font-size: 0.68rem; font-weight: 800; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--border) !important; }
 
         .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
+        .main-layout.full-width { grid-template-columns: 1fr; }
+        .main-layout.full-width .sidebar { display: none; }
         .content-panel { background: white; border-radius: 14px; overflow: hidden; }
+        .main-photo { width: 100%; height: auto; display: block; }
         .champ-banner { background: linear-gradient(135deg, var(--purple) 0%, #6a0dad 100%); color: white; text-align: center; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; }
         .champ-banner.hidden { display: none; }
 
@@ -1075,7 +1078,7 @@
         </div>
     </div>
 
-    <div class="main-layout">
+    <div class="main-layout" id="mainLayout">
         <div>
             <div class="content-panel" id="contentPanel">
                 <div id="champBanner" class="champ-banner hidden"></div>
@@ -1813,6 +1816,8 @@ function gantiBulan(m) {
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
     document.getElementById('btnStats').classList.toggle('active', m === 'STATS');
     document.getElementById('btnMain').classList.toggle('active', m === 'MAIN');
+    const layout = document.getElementById('mainLayout');
+    if (layout && m !== 'MAIN') layout.classList.remove('full-width');
     // Hide filter when not in monthly view
     const fg = document.getElementById('ligaFilterGroup');
     const isMonthly = !ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE' && m !== 'MAIN';
@@ -1981,10 +1986,10 @@ function listenStats() {
 /* ===================== MAIN PAGE (halaman teks saja) ===================== */
 function renderMainPage() {
     const el = document.getElementById('mainContent');
+    const layout = document.getElementById('mainLayout');
     if (!el) return;
-    el.innerHTML = '<div style="text-align:center;padding:10px;">'
-        + '<img src="goats.jpg" style="max-width:100%;border-radius:16px;display:block;margin:0 auto;">'
-        + '</div>';
+    if (layout) layout.classList.add('full-width');
+    el.innerHTML = '<img src="goats.jpg" class="main-photo">';
 }
 
 /* ===================== STATS PAGE ===================== */
