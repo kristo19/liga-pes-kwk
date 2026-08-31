@@ -177,12 +177,26 @@
         @keyframes scanlineMove { 0%{background-position:0 0} 100%{background-position:0 100vh} }
 
         /* ===================== LANDING ===================== */
-        .landing {
-            position: fixed; inset: 0;
-            background: linear-gradient(160deg, #270668 0%, #5d15a3 45%, #1a0535 100%);
-            z-index: 10000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; color: white; transition: opacity 0.5s;
+        .landing-bg {
+        position: absolute; inset: 0; z-index: 0;
+        background-image: url('goats.jpg');
+        background-size: cover;
+        background-position: center top;
+        filter: brightness(0.55);
         }
+        .landing-overlay {
+        position: absolute; inset: 0; z-index: 1;
+        background: linear-gradient(180deg, rgba(39,6,104,0.25) 0%, rgba(26,5,53,0.85) 100%);
+        }
+        .landing > * { position: relative; z-index: 2; }
+
+        .landing {
+        position: fixed; inset: 0;
+        background: linear-gradient(160deg, #270668 0%, #5d15a3 45%, #1a0535 100%);
+        z-index: 10000; display: flex; flex-direction: column;
+        justify-content: center; align-items: center; color: white; transition: opacity 0.5s;
+        overflow: hidden;
+}
         .landing h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; text-align: center; margin-bottom: 6px; text-shadow: 0 4px 20px rgba(0,0,0,0.4); }
         .landing h1 span { color: var(--cyan); }
         .landing p { font-size: 1rem; color: rgba(255,255,255,0.55); margin-bottom: 50px; letter-spacing: 3px; text-transform: uppercase; }
@@ -1023,6 +1037,8 @@
 
 <!-- LANDING -->
 <div id="landingPage" class="landing">
+    <div class="landing-bg"></div>
+    <div class="landing-overlay"></div>
     <h1>LIGA <span>PES</span></h1>
     <p>&#9917; League Manager</p>
     <div class="mode-cards">
@@ -1048,8 +1064,6 @@
         <span class="nav-label">&#128197; Bulan:</span>
         <select id="monthSelect" class="nav-select" onchange="gantiBulan(this.value)"></select>
         <button id="btnAllTime" class="btn-alltime" onclick="gantiBulan('ALL TIME STANDING')">&#127942; All Time Standing</button>
-        <button id="btnAllTimeKlub" class="btn-alltime" onclick="gantiBulan('ALL TIME KLUB')" style="background:#2e7d32;">&#9917; Klasemen Klub</button>
-        <button id="btnAllTimeFT" class="btn-alltime" onclick="gantiBulan('ALL TIME FT')" style="background:#c62828;">&#128256; Klasemen Full Transfer</button>
         <button id="btnStats" class="btn-stats-menu" onclick="gantiBulan('STATS')">&#128202; Stats</button>
         <button id="btnDB" class="btn-db-menu" onclick="gantiBulan('DATABASE')">&#128101; Database Pemain</button>
         <div class="liga-filter-group" id="ligaFilterGroup">
@@ -1783,9 +1797,7 @@ function buildMonthSelect() {
         '<option value="' + m + '" ' + (m === currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'ALL TIME KLUB' && currentMonth !== 'ALL TIME FT' && currentMonth !== 'STATS' ? 'selected' : '') + '>' + m + '</option>'
     ).join('') + '<option value="ALL BULAN" ' + (currentMonth === 'ALL BULAN' ? 'selected' : '') + '>🗓️ All (Januari - Desember)</option>';
     document.getElementById('btnAllTime').classList.toggle('active', currentMonth === 'ALL TIME STANDING');
-    document.getElementById('btnAllTimeKlub').classList.toggle('active', currentMonth === 'ALL TIME KLUB');
-    document.getElementById('btnAllTimeFT').classList.toggle('active', currentMonth === 'ALL TIME FT');
-    document.getElementById('btnStats').classList.toggle('active', currentMonth === 'STATS');
+    document.getElementById('btnStats').classList.toggle('active', currentMonth === 'STATS'); 
 }
 
 const ALLTIME_VIEWS = ['ALL TIME STANDING', 'ALL TIME KLUB', 'ALL TIME FT'];
@@ -1796,10 +1808,7 @@ function gantiBulan(m) {
         document.getElementById('monthSelect').value = m;
     }
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
-    document.getElementById('btnAllTimeKlub').classList.toggle('active', m === 'ALL TIME KLUB');
-    document.getElementById('btnAllTimeFT').classList.toggle('active', m === 'ALL TIME FT');
     document.getElementById('btnStats').classList.toggle('active', m === 'STATS');
-    document.getElementById('btnDB').classList.toggle('active', m === 'DATABASE');
     // Hide filter when not in monthly view
     const fg = document.getElementById('ligaFilterGroup');
     const isMonthly = !ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE';
