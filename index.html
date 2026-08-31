@@ -1061,6 +1061,7 @@
     </div>
 
     <div class="nav-bar">
+        <button id="btnMain" class="btn-stats-menu" onclick="gantiBulan('MAIN')">&#128196; Main</button>
         <span class="nav-label">&#128197; Bulan:</span>
         <select id="monthSelect" class="nav-select" onchange="gantiBulan(this.value)"></select>
         <button id="btnAllTime" class="btn-alltime" onclick="gantiBulan('ALL TIME STANDING')">&#127942; All Time Standing</button>
@@ -1778,9 +1779,10 @@ function applyMode() {
     const fg = document.getElementById('ligaFilterGroup');
     if (fg) { fg.style.display = 'none'; ['All','Klub','FT'].forEach(k => { const b = document.getElementById('filter'+k); if(b) b.classList.toggle('active', k==='All'); }); }
     editingId = null; editingStats = false; tipeLiga = null;
-    currentMonth = 'ALL TIME STANDING';
+    currentMonth = 'MAIN';
     document.getElementById('btnStats').classList.remove('active');
-    document.getElementById('btnAllTime').classList.add('active');
+    document.getElementById('btnAllTime').classList.remove('active');
+    document.getElementById('btnMain').classList.add('active');
     buildMonthSelect();
     loadData();
     listenStats();
@@ -1794,24 +1796,26 @@ function applyMode() {
 function buildMonthSelect() {
     const sel = document.getElementById('monthSelect');
     sel.innerHTML = MONTHS.map(m =>
-        '<option value="' + m + '" ' + (m === currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'ALL TIME KLUB' && currentMonth !== 'ALL TIME FT' && currentMonth !== 'STATS' ? 'selected' : '') + '>' + m + '</option>'
+        '<option value="' + m + '" ' + (m === currentMonth && currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'ALL TIME KLUB' && currentMonth !== 'ALL TIME FT' && currentMonth !== 'STATS' && currentMonth !== 'MAIN' ? 'selected' : '') + '>' + m + '</option>'
     ).join('') + '<option value="ALL BULAN" ' + (currentMonth === 'ALL BULAN' ? 'selected' : '') + '>🗓️ All (Januari - Desember)</option>';
     document.getElementById('btnAllTime').classList.toggle('active', currentMonth === 'ALL TIME STANDING');
     document.getElementById('btnStats').classList.toggle('active', currentMonth === 'STATS'); 
+    document.getElementById('btnMain').classList.toggle('active', currentMonth === 'MAIN');
 }
 
 const ALLTIME_VIEWS = ['ALL TIME STANDING', 'ALL TIME KLUB', 'ALL TIME FT'];
 
 function gantiBulan(m) {
     currentMonth = m;
-    if (!ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE') {
+    if (!ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE' && m !== 'MAIN') {
         document.getElementById('monthSelect').value = m;
     }
     document.getElementById('btnAllTime').classList.toggle('active', m === 'ALL TIME STANDING');
     document.getElementById('btnStats').classList.toggle('active', m === 'STATS');
+    document.getElementById('btnMain').classList.toggle('active', m === 'MAIN');
     // Hide filter when not in monthly view
     const fg = document.getElementById('ligaFilterGroup');
-    const isMonthly = !ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE';
+    const isMonthly = !ALLTIME_VIEWS.includes(m) && m !== 'STATS' && m !== 'DATABASE' && m !== 'MAIN';
     if (fg) fg.style.display = isMonthly ? 'flex' : 'none';
     editingId = null; tipeLiga = null;
     loadData();
@@ -1831,6 +1835,14 @@ function loadData() {
     if (!currentMode) return; // FIX: guard — don't run before mode selected
     const banner = document.getElementById('champBanner');
 
+    if (currentMonth === 'MAIN') {
+        banner.classList.add('hidden');
+        toggleSidebarMode(false, true);
+        if (matchesRef) { matchesRef.off(); matchesRef = null; }
+        renderMainPage();
+        renderAdminArea();
+        return;
+    }
     if (currentMonth === 'DATABASE') {
         banner.classList.add('hidden');
         toggleSidebarMode(false, true);
@@ -1921,7 +1933,7 @@ function listenMatchInfo() {
     if (!dbPath) return;
     db.ref(dbPath + '/matchInfo').on('value', snap => {
         matchInfoData = snap.val() || {};
-        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && currentMonth !== 'ALL BULAN' && localData && Object.keys(localData).length) {
+        if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' && currentMonth !== 'ALL BULAN' && currentMonth !== 'MAIN' && localData && Object.keys(localData).length) {
             renderMonthly(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
@@ -1937,7 +1949,7 @@ function listenMatchStats() {
     matchStatsRef.on('value', snap => {
         matchStatsData = snap.val() || {};
         if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' 
-            && currentMonth !== 'DATABASE' && currentMonth !== 'ALL BULAN' && localData && Object.keys(localData).length) {
+            && currentMonth !== 'DATABASE' && currentMonth !== 'ALL BULAN' && currentMonth !== 'MAIN' && localData && Object.keys(localData).length) {
             renderMonthly(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
@@ -1964,6 +1976,15 @@ function listenStats() {
         if (currentMonth === 'STATS') renderStatsPage();
         else renderStatsCards();
     });
+}
+
+/* ===================== MAIN PAGE (halaman teks saja) ===================== */
+function renderMainPage() {
+    const el = document.getElementById('mainContent');
+    if (!el) return;
+    el.innerHTML = '<div style="text-align:center;padding:10px;">'
+        + '<img src="goats.jpg" style="max-width:100%;border-radius:16px;display:block;margin:0 auto;">'
+        + '</div>';
 }
 
 /* ===================== STATS PAGE ===================== */
@@ -3271,7 +3292,7 @@ function renderAdminArea() {
     if (!adminArea) return;
     if (!modeAdmin) { adminArea.innerHTML = ''; return; }
 
-    if (currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE' || currentMonth === 'ALL BULAN') {
+    if (currentMonth === 'ALL TIME STANDING' || currentMonth === 'STATS' || currentMonth === 'DATABASE' || currentMonth === 'ALL BULAN' || currentMonth === 'MAIN') {
         const resetBtn = (currentMonth === 'DATABASE')
             ? '<button class="btn-adm" onclick="resetDatabaseKeDefault(true)" style="margin-bottom:8px;background:#e53935;color:white;">🔄 Reset Pemain ke Default</button><br>'
             : '';
