@@ -674,6 +674,16 @@
         .stats-player-rank.r2 { background: #c0c0c0; color: #3a3a3a; }
         .stats-player-rank.r3 { background: #cd7f32; color: white; }
         .stats-player-info { flex: 1; }
+        .stats-player-photo {
+            width: 100px; height: 100px; flex-shrink: 0;
+            border-radius: 12px; object-fit: cover; display: block;
+            border: 2px solid var(--border); background: #f0e6ff;
+        }
+        .stats-player-photo.noimg {
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif; font-size: 2.6rem;
+            font-weight: 900; color: var(--purple);
+        }
         .stats-player-name { font-weight: 800; font-size: 0.9rem; color: var(--purple); }
         .stats-player-sub { font-size: 0.7rem; color: var(--sub); font-weight: 600; }
         .stats-player-val {
@@ -1377,6 +1387,22 @@ const db   = firebase.database();
 const auth = firebase.auth();
 
 const MONTHS      = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+/* ===== FOTO PLAYER (menu Statistics) =====
+   Taruh file foto di folder yang sama dengan index.html (tanpa subfolder), lalu ganti nama file di bawah
+   jika perlu. Ukuran tampil otomatis 100x100 px. Jika foto belum ada, tampil inisial. */
+const PLAYER_PHOTOS = {
+    "Toxx":  "toxx.jpg",
+    "Stive": "stive.jpg",
+    "Alfa":  "alfa.jpg",
+    "Kobe":  "kobe.jpg"
+};
+function playerPhotoHtml(n) {
+    const src = PLAYER_PHOTOS[n];
+    const initial = escHtml((n || '?').charAt(0).toUpperCase());
+    if (!src) return '<div class="stats-player-photo noimg">' + initial + '</div>';
+    return '<img class="stats-player-photo" src="' + src + '" alt="' + escHtml(n) + '" loading="lazy"'
+        + ' onerror="this.outerHTML=\'<div class=&quot;stats-player-photo noimg&quot;>' + initial + '</div>\'">';
+}
 const ALL_PLAYERS_4 = ["Toxx","Stive","Alfa","Kobe"];
 const MODE_PLAYERS = {
     '3A': ['Toxx','Stive','Alfa'],
@@ -2074,6 +2100,7 @@ function renderStatisticsInner(el, validIds) {
                 const val = cnt[cat][k][n] || 0;
                 return '<div class="stats-player-card" style="cursor:pointer; transition: background 0.2s; border-radius:8px; padding: 10px;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'" onclick="bukaDetailStats(\'' + escHtml(n) + '\', \'' + tipe + '\', \'' + cat + '\')">'
                     + '<div class="stats-player-rank ' + rankClass(i, val) + '">' + rankLabel(i, val) + '</div>'
+                    + playerPhotoHtml(n)
                     + '<div class="stats-player-info"><div class="stats-player-name" style="border-bottom: 1px dashed var(--purple); display: inline-block;">' + escHtml(n) + '</div>'
                     + '<div class="stats-player-sub">' + val + sub + '</div></div>'
                     + '<div class="stats-player-val ' + vCls + '">' + val + '</div>'
