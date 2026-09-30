@@ -237,6 +237,8 @@
         .btn-filter-liga { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; color: var(--sub); cursor: pointer; font-size: 0.8rem; font-weight: 700; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.2px; }
         .btn-filter-liga:hover { border-color: var(--purple); color: var(--purple); }
         .btn-filter-liga.active { background: var(--purple); border-color: var(--purple); color: white; box-shadow: 0 3px 10px rgba(55,0,60,0.25); }
+        .lf-count { display:inline-block; min-width:20px; padding:1px 7px; margin-left:5px; border-radius:10px; background:rgba(0,0,0,0.12); font-size:0.72rem; font-weight:900; line-height:1.4; text-align:center; }
+        .btn-filter-liga.active .lf-count { background:rgba(255,255,255,0.28); }
         #filterKlub.active { background: #2e7d32; border-color: #2e7d32; color: white; box-shadow: 0 3px 10px rgba(46,125,50,0.3); }
         #filterFT.active   { background: #c62828; border-color: #c62828; color: white; box-shadow: 0 3px 10px rgba(198,40,40,0.3); }
 
@@ -1074,7 +1076,7 @@
         <span class="nav-label">&#128197; Bulan:</span>
         <select id="monthSelect" class="nav-select" onchange="gantiBulan(this.value)"></select>
         <button id="btnAllTime" class="btn-alltime" onclick="gantiBulan('ALL TIME STANDING')">&#127942; All Time Standing</button>
-        <button id="btnStats" class="btn-stats-menu" onclick="gantiBulan('STATS')">&#128202; Stats</button>
+        <button id="btnStats" class="btn-stats-menu" onclick="gantiBulan('STATS')">&#128202; Statistics</button>
         <button id="btnDB" class="btn-db-menu" onclick="gantiBulan('DATABASE')">&#128101; Database Pemain</button>
         <div class="liga-filter-group" id="ligaFilterGroup">
             <span class="nav-label">&#128269; Filter:</span>
@@ -2021,47 +2023,70 @@ function renderMainPage() {
 function renderStatsPage() {
     const el = document.getElementById('mainContent');
     if (!el) return;
-    const banner = document.getElementById('champBanner');
-    banner.classList.add('hidden');
+    document.getElementById('champBanner').classList.add('hidden');
+    if (!el.querySelector('.stats-page')) el.innerHTML = '<div class="empty-state">Memuat data...</div>';
 
+    // Ambil semua match yang benar-benar ada (supaya stats "yatim" dari liga yang sudah dihapus tidak ikut terhitung)
+    db.ref(dbPath).once('value', snap => {
+        if (currentMonth !== 'STATS') return;
+        const root = snap.val() || {};
+        const validIds = new Set();
+        MONTHS.forEach(b => Object.keys((root[b] && root[b].matches) || {}).forEach(id => validIds.add(id)));
+        renderStatisticsInner(el, validIds);
+    });
+}
+
+function renderStatisticsInner(el, validIds) {
     const list = modeAdmin ? ALL_PLAYERS : (activeSet.size > 0 ? Array.from(activeSet) : ALL_PLAYERS);
     const gs   = (n) => statsData[n] || { score: 0, assist: 0, formText: '' };
 
-    const scoresSorted  = [...list].sort((a, b) => gs(b).score  - gs(a).score);
-    const assistsSorted = [...list].sort((a, b) => gs(b).assist - gs(a).assist);
+    // cnt[kategori][s|a][nama]
+    const cnt = { all: { s: {}, a: {} }, klub: { s: {}, a: {} }, ft: { s: {}, a: {} } };
+    ALL_PLAYERS.forEach(n => Object.keys(cnt).forEach(c => { cnt[c].s[n] = 0; cnt[c].a[n] = 0; }));
 
-    function rankClass(i) { return i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : ''; }
-    function rankLabel(i) { return i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1); }
+    Object.keys(matchStatsData).forEach(id => {
+        if (!validIds.has(id)) return;
+        const ms = matchStatsData[id] || {};
+        const mi = matchInfoData[id] || {};
+        [['topScorer', 's'], ['topAssist', 'a']].forEach(([field, k]) => {
+            if (!ms[field]) return;
+            const n = fix(ms[field]);
+            if (!(n in cnt.all[k])) return;
+            cnt.all[k][n]++;
+            // Tentukan Klub / Full Transfer berdasarkan info player itu di liga tsb
+            let info = mi[n];
+            if (!info) { const key = Object.keys(mi).find(x => fix(x) === n); info = key ? mi[key] : null; }
+            if (!info) return;
+            cnt[info.isFullTransfer ? 'ft' : 'klub'][k][n]++;
+        });
+    });
 
-const tsCount = {}, taCount = {};
-ALL_PLAYERS.forEach(n => { tsCount[n] = 0; taCount[n] = 0; });
-Object.values(matchStatsData).forEach(ms => {
-    if (ms.topScorer && tsCount.hasOwnProperty(ms.topScorer)) tsCount[ms.topScorer]++;
-    if (ms.topAssist && taCount.hasOwnProperty(ms.topAssist)) taCount[ms.topAssist]++;
-});
-const tsSorted = [...list].sort((a,b) => tsCount[b] - tsCount[a]);
-const taSorted = [...list].sort((a,b) => taCount[b] - taCount[a]);
+    function rankClass(i, v) { return v <= 0 ? '' : (i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : ''); }
+    function rankLabel(i, v) { return v <= 0 ? (i + 1) : (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)); }
 
-const tsHtml = tsSorted.map((n,i) => {
-    const val = tsCount[n] || 0;
-    return '<div class="stats-player-card" style="cursor:pointer; transition: background 0.2s; border-radius:8px; padding: 10px;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'" onclick="bukaDetailStats(\'' + escHtml(n) + '\', \'scorer\')">'
-        + '<div class="stats-player-rank ' + rankClass(i) + '">' + rankLabel(i) + '</div>'
-        + '<div class="stats-player-info"><div class="stats-player-name" style="border-bottom: 1px dashed var(--purple); display: inline-block;">' + escHtml(n) + '</div>'
-        + '<div class="stats-player-sub">' + val + 'x top scorer</div></div>'
-        + '<div class="stats-player-val goals">' + val + '</div>'
-        + '</div>';
-}).join('');
+    function buildList(cat, k) {
+        const tipe = k === 's' ? 'scorer' : 'assist';
+        const sub  = k === 's' ? 'x top scorer' : 'x top assist';
+        const vCls = k === 's' ? 'goals' : 'assists';
+        return [...list]
+            .sort((a, b) => (cnt[cat][k][b] - cnt[cat][k][a]) || a.localeCompare(b))
+            .map((n, i) => {
+                const val = cnt[cat][k][n] || 0;
+                return '<div class="stats-player-card" style="cursor:pointer; transition: background 0.2s; border-radius:8px; padding: 10px;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'" onclick="bukaDetailStats(\'' + escHtml(n) + '\', \'' + tipe + '\', \'' + cat + '\')">'
+                    + '<div class="stats-player-rank ' + rankClass(i, val) + '">' + rankLabel(i, val) + '</div>'
+                    + '<div class="stats-player-info"><div class="stats-player-name" style="border-bottom: 1px dashed var(--purple); display: inline-block;">' + escHtml(n) + '</div>'
+                    + '<div class="stats-player-sub">' + val + sub + '</div></div>'
+                    + '<div class="stats-player-val ' + vCls + '">' + val + '</div>'
+                    + '</div>';
+            }).join('');
+    }
 
-const taHtml = taSorted.map((n,i) => {
-    const val = taCount[n] || 0;
-    return '<div class="stats-player-card" style="cursor:pointer; transition: background 0.2s; border-radius:8px; padding: 10px;" onmouseover="this.style.background=\'#f3eaff\'" onmouseout="this.style.background=\'transparent\'" onclick="bukaDetailStats(\'' + escHtml(n) + '\', \'assist\')">'
-        + '<div class="stats-player-rank ' + rankClass(i) + '">' + rankLabel(i) + '</div>'
-        + '<div class="stats-player-info"><div class="stats-player-name" style="border-bottom: 1px dashed var(--purple); display: inline-block;">' + escHtml(n) + '</div>'
-        + '<div class="stats-player-sub">' + val + 'x top assist</div></div>'
-        + '<div class="stats-player-val assists">' + val + '</div>'
-        + '</div>';
-}).join('');
-
+    function buildRow(cat, labelScorer, labelAssist, extraStyle) {
+        return '<div class="stats-grid" style="' + (extraStyle || '') + '">'
+            + '<div class="stats-section"><div class="stats-section-title">' + labelScorer + '</div>' + buildList(cat, 's') + '</div>'
+            + '<div class="stats-section"><div class="stats-section-title">' + labelAssist + '</div>' + buildList(cat, 'a') + '</div>'
+            + '</div>';
+    }
 
     const formHtml = list.map(n => {
         const formArr = (gs(n).formText || '').toUpperCase().replace(/[^WDL]/g, '').split('').slice(-5);
@@ -2074,20 +2099,13 @@ const taHtml = taSorted.map((n,i) => {
     el.innerHTML = `
         <div class="stats-page">
             <div class="stats-page-header">
-                <h2>📊 STATISTIK PLAYER</h2>
+                <h2>📊 STATISTICS</h2>
                 <p>All Time &mdash; ${escHtml(MODE_LABELS[currentMode] || currentMode)}</p>
             </div>
             <div class="stats-accent"></div>
-            <div class="stats-grid">
-                 <div class="stats-section">
-                     <div class="stats-section-title">⚽ Top Scorer (per liga)</div>
-                    ${tsHtml}
-                </div>
-                 <div class="stats-section">
-                      <div class="stats-section-title">🎯 Top Assist (per liga)</div>
-                     ${taHtml}
-                </div>
-            </div>
+            ${buildRow('all',  '⚽ Top Scorer All Time',          '🎯 Top Assists All Time')}
+            ${buildRow('klub', '⚽ Top Scorer Klub',              '🎯 Top Assists Klub',              'border-top:1px solid var(--border);')}
+            ${buildRow('ft',   '🔀 Top Scorer Full Transfers',    '🎯 Top Assists Full Transfers',    'border-top:1px solid var(--border);')}
             <div class="stats-form-section">
                 <div class="stats-form-title">📈 Form 5 Laga Terakhir</div>
                 ${formHtml}
@@ -2095,7 +2113,7 @@ const taHtml = taSorted.map((n,i) => {
         </div>
     `;
 
-const adminTool = document.getElementById('adminStatsTool');
+    const adminTool = document.getElementById('adminStatsTool');
     if (adminTool) {
         adminTool.innerHTML = modeAdmin
             ? '<div style="padding:10px;">'
@@ -2299,9 +2317,28 @@ function renderAllTimeFiltered(tipe) {
     });
 }
 
+/* ===================== HITUNG JUMLAH LIGA PER FILTER ===================== */
+function updateLigaCounts(matchesObj) {
+    let total = 0, klub = 0, ft = 0;
+    Object.keys(matchesObj || {}).forEach(id => {
+        const m = matchesObj[id];
+        if (!m) return;
+        total++;
+        const names = (m.standings || []).map(p => fix(p.name));
+        const t = detectLigaType(id, names);
+        if (t === 'ft') ft++;
+        else if (t === 'klub' || t === 'mixed') klub++;
+    });
+    const set = (id, label, n) => { const b = document.getElementById(id); if (b) b.innerHTML = label + '<span class="lf-count">' + n + '</span>'; };
+    set('filterAll',  '🔘 Semua',          total);
+    set('filterKlub', '⚽ Klub',           klub);
+    set('filterFT',   '🔀 Full Transfer',  ft);
+}
+
 function renderMonthly(matches) {
     const el = document.getElementById('mainContent');
     if (!el) return;
+    updateLigaCounts(matches);
     el.innerHTML = '';
     if (!matches || !Object.keys(matches).length) {
         return el.innerHTML = '<div class="empty-state">Belum ada klasemen di bulan <strong>' + currentMonth + '</strong> untuk Mode <strong>' + currentMode + ' Player</strong>.</div>';
@@ -2410,6 +2447,7 @@ function renderMonthly(matches) {
             const mi = (matchInfoData[id] || {})[p.name] || {};
             p.club = mi.club || '';
             p.isFullTransfer = mi.isFullTransfer || false;
+            p.clubs = (!mi.isFullTransfer && mi.club) ? [mi.club] : [];
         });
         htmlAll += html + buildEplBlock(rowData, false, isEdit, s, false, id, ligaType) + '</div>';
     });
@@ -2429,6 +2467,9 @@ function renderAllBulan() {
 
     db.ref(dbPath).once('value', snap => {
         const root = snap.val() || {};
+        const _allM = {};
+        MONTHS.forEach(b => Object.assign(_allM, (root[b] && root[b].matches) || {}));
+        updateLigaCounts(_allM);
         let htmlAll = '';
         let hasAnyMatch = false;
         let totalVisible = 0;
@@ -2527,6 +2568,7 @@ function renderAllBulan() {
                     const mi = (matchInfoData[id] || {})[p.name] || {};
                     p.club = mi.club || '';
                     p.isFullTransfer = mi.isFullTransfer || false;
+            p.clubs = (!mi.isFullTransfer && mi.club) ? [mi.club] : [];
                 });
 
                 monthHtml += blockHtml + buildEplBlock(rowData, false, false, s, false, id, ligaType) + '</div>';
@@ -2588,7 +2630,7 @@ function buildEplBlock(rowData, showForm, isEdit, rawStandings, showWinPct, matc
         const logoHtml = clubList
             .map(c => {
                 const logoUrl = getClubLogo(c);
-                return logoUrl ? '<img src="' + logoUrl + '" class="club-logo-icon" alt="' + escHtml(c) + '" title="' + escHtml(c) + '">' : '';
+                return logoUrl ? '<img src="' + logoUrl + '" class="club-logo-icon" alt="' + escHtml(c) + '" title="' + escHtml(c) + '" onerror="this.style.display=\'none\'">' : '';
             })
             .join('');
         const logoWrap = logoHtml ? '<span class="club-logo-group">' + logoHtml + '</span>' : '';
@@ -5539,7 +5581,8 @@ function prosesImport() {
     }
 }
 
-function bukaDetailStats(nama, tipe) {
+function bukaDetailStats(nama, tipe, cat) {
+    cat = cat || 'all'; // 'all' | 'klub' | 'ft'
     // Siapkan Modal
     document.getElementById('infoModalTitle').innerText = nama;
     document.getElementById('infoModalSubtitle').innerText = (tipe === 'scorer' ? '⚽ Riwayat Top Scorer' : '🎯 Riwayat Top Assist') + ' - Memuat...';
@@ -5579,6 +5622,8 @@ function bukaDetailStats(nama, tipe) {
                     // Tarik info Klub / Full Transfer untuk player ini di match bersangkutan
                     const mi = (matchInfoData[id] || {})[nama] || {};
                     const isFT = mi.isFullTransfer || false;
+                    if (cat === 'ft' && !isFT) return;
+                    if (cat === 'klub' && (isFT || !(matchInfoData[id] || {})[nama])) return;
                     const ket = isFT ? '🔀 Full Transfer' : (mi.club ? '⚽ ' + mi.club : '⚽ (Tidak Diisi)');
 
                     history.push({
