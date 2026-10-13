@@ -777,6 +777,22 @@
         .club-logo-icon:last-child { margin-right: 0; }
         .sb-pts { font-weight: 900; color: var(--purple); }
         .sb-r1 td:first-child { border-left: 3px solid var(--pink); }
+
+        /* ===== Bagan Top Scorer & Top Assist per bulan ===== */
+        .sb-head.chart { background: linear-gradient(135deg, #2a0060 0%, #5d15a3 100%); }
+        .mchart-sec { padding: 12px 14px 6px; }
+        .mchart-sec + .mchart-sec { border-top: 1px solid var(--border); }
+        .mchart-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--sub); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .mchart-row { display: grid; grid-template-columns: 82px 1fr 26px; align-items: center; gap: 8px; margin-bottom: 7px; }
+        .mchart-name { font-size: 0.8rem; font-weight: 700; color: #37003c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mchart-track { height: 16px; background: #f3eaff; border-radius: 8px; overflow: hidden; }
+        .mchart-bar { height: 100%; border-radius: 8px; min-width: 6px; transition: width 0.5s ease; }
+        .mchart-bar.scorer { background: linear-gradient(90deg, #00c853, #00ff85); }
+        .mchart-bar.assist { background: linear-gradient(90deg, #e90052, #ff6fa5); }
+        .mchart-val { font-size: 0.85rem; font-weight: 900; text-align: right; }
+        .mchart-val.scorer { color: #00a844; }
+        .mchart-val.assist { color: var(--pink); }
+        .mchart-empty { font-size: 0.78rem; color: #aaa; padding: 2px 0 10px; text-align: center; }
         .trophy-count { font-weight: 900; font-size: 1rem; color: #b8860b; }
         .trophy-move-btns { display: flex; flex-direction: column; gap: 1px; margin-left: 4px; }
         .trophy-move-btn { background: none; border: 1px solid #ddd; border-radius: 3px; width: 18px; height: 16px; cursor: pointer; font-size: 0.55rem; line-height: 1; color: #666; padding: 0; display: flex; align-items: center; justify-content: center; transition: 0.15s; font-family: 'Barlow', sans-serif; }
@@ -1119,6 +1135,17 @@
                     <thead><tr><th class="tl">Player</th><th>Pts</th></tr></thead>
                     <tbody id="sbMonthBody"></tbody>
                 </table>
+            </div>
+            <div class="sb-card" id="sbMonthChartCard">
+                <div class="sb-head chart">&#128200; Top Scorer &amp; Assist &mdash; <span id="sbMonthChartTitle">Bulan Ini</span></div>
+                <div class="mchart-sec">
+                    <div class="mchart-title">&#9917; Top Scorer</div>
+                    <div id="sbChartScorer"></div>
+                </div>
+                <div class="mchart-sec">
+                    <div class="mchart-title">&#127919; Top Assist</div>
+                    <div id="sbChartAssist"></div>
+                </div>
             </div>
             <div class="sb-card" id="sbTrophyAllCard" style="display:none;">
                 <div class="sb-head trophy">&#127942; Trophy &mdash; All Time</div>
@@ -1748,6 +1775,7 @@ function winPct(w, pl) { if (!pl || pl === 0) return 0; return Math.round((w / p
 function toggleSidebarMode(isAllTime, isStats) {
     document.getElementById('sbTrophyMonthCard').style.display = (isAllTime || isStats) ? 'none' : 'block';
     document.getElementById('sbMonthCard').style.display       = (isAllTime || isStats) ? 'none' : 'block';
+    document.getElementById('sbMonthChartCard').style.display  = (isAllTime || isStats) ? 'none' : 'block';
     document.getElementById('sbTrophyAllCard').style.display   = isAllTime ? 'block' : 'none';
     document.getElementById('sbTrophyAllKlubCard').style.display = isAllTime ? 'block' : 'none';
     document.getElementById('sbTrophyAllFTCard').style.display   = isAllTime ? 'block' : 'none';
@@ -1946,6 +1974,7 @@ function loadData() {
 
     document.getElementById('sbMonthTitle').innerText = 'Total Poin ' + currentMonth;
     document.getElementById('sbTrophyMonthTitle').innerText = currentMonth;
+    document.getElementById('sbMonthChartTitle').innerText = currentMonth;
     banner.classList.remove('hidden');
     banner.innerHTML = '⏳ Memuat...';
     toggleSidebarMode(false, false);
@@ -2006,6 +2035,7 @@ function listenMatchStats() {
         if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' 
             && currentMonth !== 'DATABASE' && currentMonth !== 'ALL BULAN' && currentMonth !== 'MAIN' && localData && Object.keys(localData).length) {
             renderMonthly(localData);
+            renderMonthChart(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
         if (currentMonth === 'ALL TIME STANDING') renderAllTime();
@@ -3157,6 +3187,33 @@ function simpanKlub(matchId, nama, safeId) {
 function tutupInfoPlayer() { document.getElementById('infoModal').classList.remove('on'); }
 function tutupInfoModalOutside(e) { if (e.target === document.getElementById('infoModal')) tutupInfoPlayer(); }
 
+function renderMonthChart(monthlyMatches) {
+    const elS = document.getElementById('sbChartScorer');
+    const elA = document.getElementById('sbChartAssist');
+    if (!elS || !elA) return;
+    const cntS = {}, cntA = {};
+    Object.keys(monthlyMatches || {}).forEach(id => {
+        const ms = matchStatsData[id];
+        if (!ms) return;
+        if (ms.topScorer) { const n = fix(ms.topScorer); cntS[n] = (cntS[n] || 0) + 1; }
+        if (ms.topAssist) { const n = fix(ms.topAssist); cntA[n] = (cntA[n] || 0) + 1; }
+    });
+    const build = (cnt, cls) => {
+        const arr = Object.entries(cnt).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+        if (!arr.length) return '<div class="mchart-empty">Belum ada data bulan ini</div>';
+        const max = arr[0][1];
+        return arr.map(([n, v]) =>
+            '<div class="mchart-row">'
+            + '<div class="mchart-name" title="' + escHtml(n) + '">' + escHtml(n) + '</div>'
+            + '<div class="mchart-track"><div class="mchart-bar ' + cls + '" style="width:' + Math.round(v / max * 100) + '%"></div></div>'
+            + '<div class="mchart-val ' + cls + '">' + v + '</div>'
+            + '</div>'
+        ).join('');
+    };
+    elS.innerHTML = build(cntS, 'scorer');
+    elA.innerHTML = build(cntA, 'assist');
+}
+
 function updateSidebar(monthlyMatches) {
     db.ref(dbPath).once('value', snap => {
         const root = snap.val() || {};
@@ -3248,6 +3305,7 @@ function updateSidebar(monthlyMatches) {
         } else {
             banner.innerHTML = 'Belum ada juara di bulan ' + currentMonth;
         }
+        renderMonthChart(monthlyMatches);
         renderStatsCards();
     });
 }
