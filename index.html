@@ -11,9 +11,25 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+
+        /* ===================== FONT PREMIER LEAGUE 2026 =====================
+           Font resmi Premier League (Premier Sans) berlisensi & tidak ada di Google Fonts.
+           Cara pakai font aslinya: taruh file di folder fonts/ (PremierSans-Regular.woff2, dst).
+           Kalau file tidak ada, otomatis memakai Plus Jakarta Sans (mirip) lewat fallback.
+           Ganti font cukup di 2 variabel --font-main & --font-display. */
+        @font-face { font-family: 'Premier Sans'; font-weight: 400; font-style: normal; font-display: swap;
+            src: local('Premier Sans Regular'), local('PremierSans-Regular'), url('fonts/PremierSans-Regular.woff2') format('woff2'); }
+        @font-face { font-family: 'Premier Sans'; font-weight: 600; font-style: normal; font-display: swap;
+            src: local('Premier Sans SemiBold'), local('PremierSans-SemiBold'), url('fonts/PremierSans-SemiBold.woff2') format('woff2'); }
+        @font-face { font-family: 'Premier Sans'; font-weight: 700; font-style: normal; font-display: swap;
+            src: local('Premier Sans Bold'), local('PremierSans-Bold'), url('fonts/PremierSans-Bold.woff2') format('woff2'); }
+        @font-face { font-family: 'Premier Sans'; font-weight: 800 900; font-style: normal; font-display: swap;
+            src: local('Premier Sans ExtraBold'), local('PremierSans-ExtraBold'), local('Premier Sans Black'), url('fonts/PremierSans-ExtraBold.woff2') format('woff2'); }
         :root {
+            --font-main: 'Premier Sans', 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+            --font-display: 'Premier Sans', 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
             --purple: #37003c;
             --pink: #e90052;
             --cyan: #00ff85;
@@ -25,8 +41,9 @@
             --loss: #e52b2b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        button, input, select, textarea { font-family: inherit; }
         body {
-            font-family: 'Barlow', sans-serif;
+            font-family: var(--font-main);
             background: linear-gradient(160deg, #270668 0%, #5d15a3 45%, #1a0535 100%);
             min-height: 100vh;
             color: #37003c;
@@ -91,7 +108,7 @@
             position: relative;
         }
         .mso-mode-bubble .mso-num {
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
             font-size: 7rem; font-weight: 900;
             line-height: 1;
             color: white;
@@ -114,7 +131,7 @@
         @keyframes arrowPulse { from{transform:translateX(-8px);opacity:0.6} to{transform:translateX(8px);opacity:1} }
 
         .mso-title {
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
             font-size: 3.5rem; font-weight: 900;
             color: white; letter-spacing: 4px;
             text-transform: uppercase;
@@ -197,7 +214,7 @@
         justify-content: center; align-items: center; color: white; transition: opacity 0.5s;
         overflow: hidden;
 }
-        .landing h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; text-align: center; margin-bottom: 6px; text-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .landing h1 { font-family: var(--font-display); font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; text-align: center; margin-bottom: 6px; text-shadow: 0 4px 20px rgba(0,0,0,0.4); }
         .landing h1 span { color: var(--cyan); }
         .landing p { font-size: 1rem; color: rgba(255,255,255,0.55); margin-bottom: 50px; letter-spacing: 3px; text-transform: uppercase; }
         .mode-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; padding: 20px; }
@@ -210,31 +227,31 @@
         .app { display: none; max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; width: 100%; box-sizing: border-box; }
         .app.on { display: block; }
         .app-header { background: var(--purple); border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
-        .app-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 900; color: white; letter-spacing: 1px; cursor: default; user-select: none; position: relative; display: inline-flex; align-items: center; }
+        .app-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 900; color: white; letter-spacing: 1px; cursor: default; user-select: none; position: relative; display: inline-flex; align-items: center; }
         .app-title span { color: var(--cyan); }
         .app-title-img-overlay { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: context-menu; z-index: 2; display: block; object-fit: cover; }
         .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .mode-badge { background: var(--pink); color: white; padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
-        .btn-switch { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 20px; padding: 6px 14px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; font-family: 'Barlow', sans-serif; }
+        .btn-switch { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 20px; padding: 6px 14px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; font-family: var(--font-main); }
         .btn-switch:hover { background: var(--pink); border-color: var(--pink); }
 
         .nav-bar { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; box-sizing: border-box; }
         .nav-label { font-size: 0.7rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
-        .nav-select { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--purple); font-family: 'Barlow', sans-serif; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2337003c' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; outline: none; transition: 0.2s; }
+        .nav-select { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--purple); font-family: var(--font-main); appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2337003c' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; outline: none; transition: 0.2s; }
         .nav-select:focus { border-color: var(--purple); }
-        .btn-alltime { padding: 7px 18px; border-radius: 20px; border: none; background: var(--pink); color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
+        .btn-alltime { padding: 7px 18px; border-radius: 20px; border: none; background: var(--pink); color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: var(--font-main); transition: 0.2s; letter-spacing: 0.3px; }
         .btn-alltime:hover { background: var(--purple); }
         .btn-alltime.active { background: var(--purple); }
-        .btn-stats-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #ff6b35, #f7c59f); color: #7f0000; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
+        .btn-stats-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #ff6b35, #f7c59f); color: #7f0000; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: var(--font-main); transition: 0.2s; letter-spacing: 0.3px; }
         .btn-stats-menu:hover { background: linear-gradient(135deg, #ff4500, #ff6b35); color: white; }
         .btn-stats-menu.active { background: linear-gradient(135deg, #b8360b, #e84c00); color: white; box-shadow: 0 4px 14px rgba(232,76,0,0.4); }
-        .btn-db-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #1565c0, #90caf9); color: #003c8f; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.3px; }
+        .btn-db-menu { padding: 7px 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #1565c0, #90caf9); color: #003c8f; cursor: pointer; font-size: 0.85rem; font-weight: 800; font-family: var(--font-main); transition: 0.2s; letter-spacing: 0.3px; }
         .btn-db-menu:hover { background: linear-gradient(135deg, #003c8f, #1565c0); color: white; }
         .btn-db-menu.active { background: linear-gradient(135deg, #003c8f, #1565c0); color: white; box-shadow: 0 4px 14px rgba(21,101,192,0.4); }
 
         /* ===== LIGA TYPE FILTER ===== */
         .liga-filter-group { display: flex; align-items: center; gap: 6px; margin-left: 4px; flex-wrap: wrap; }
-        .btn-filter-liga { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; color: var(--sub); cursor: pointer; font-size: 0.8rem; font-weight: 700; font-family: 'Barlow', sans-serif; transition: 0.2s; letter-spacing: 0.2px; }
+        .btn-filter-liga { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: white; color: var(--sub); cursor: pointer; font-size: 0.8rem; font-weight: 700; font-family: var(--font-main); transition: 0.2s; letter-spacing: 0.2px; }
         .btn-filter-liga:hover { border-color: var(--purple); color: var(--purple); }
         .btn-filter-liga.active { background: var(--purple); border-color: var(--purple); color: white; box-shadow: 0 3px 10px rgba(55,0,60,0.25); }
         .lf-count { display:inline-block; min-width:20px; padding:1px 7px; margin-left:5px; border-radius:10px; background:rgba(0,0,0,0.12); font-size:0.72rem; font-weight:900; line-height:1.4; text-align:center; }
@@ -245,20 +262,20 @@
         /* ===== DATABASE PEMAIN PAGE ===== */
         .db-page { padding: 0; }
         .db-page-header { background: linear-gradient(135deg, #003c8f 0%, #1565c0 50%, #1976d2 100%); padding: 24px 28px 20px; color: white; }
-        .db-page-header h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .db-page-header h2 { font-family: var(--font-display); font-size: 2rem; font-weight: 900; letter-spacing: 2px; margin: 0; }
         .db-page-header p { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
         .db-accent { background: linear-gradient(90deg, #1565c0, #90caf9, #1565c0); background-size: 200% 100%; animation: shimBar 2s linear infinite; height: 3px; }
         .db-player-tabs { display: flex; border-bottom: 2px solid var(--border); background: white; overflow-x: auto; }
-        .db-player-tab { flex-shrink: 0; padding: 12px 20px; font-size: 0.82rem; font-weight: 800; color: var(--sub); border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.15s; font-family: 'Barlow', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+        .db-player-tab { flex-shrink: 0; padding: 12px 20px; font-size: 0.82rem; font-weight: 800; color: var(--sub); border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.15s; font-family: var(--font-main); text-transform: uppercase; letter-spacing: 0.5px; }
         .db-player-tab.on { color: #1565c0; border-bottom-color: #1565c0; }
         .db-player-tab:hover:not(.on) { color: var(--purple); background: var(--hover); }
         .db-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 20px; background: #f8f5ff; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
         .db-toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .db-search { padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-family: 'Barlow', sans-serif; font-size: 0.85rem; color: var(--purple); outline: none; min-width: 160px; }
+        .db-search { padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-family: var(--font-main); font-size: 0.85rem; color: var(--purple); outline: none; min-width: 160px; }
         .db-search:focus { border-color: #1565c0; }
-        .db-filter-pos { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-family: 'Barlow', sans-serif; font-size: 0.82rem; color: var(--purple); background: white; outline: none; cursor: pointer; }
+        .db-filter-pos { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-family: var(--font-main); font-size: 0.82rem; color: var(--purple); background: white; outline: none; cursor: pointer; }
         .db-count { font-size: 0.72rem; font-weight: 700; color: var(--sub); }
-        .btn-db-add { padding: 7px 16px; border-radius: 20px; border: none; background: #1565c0; color: white; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-db-add { padding: 7px 16px; border-radius: 20px; border: none; background: #1565c0; color: white; font-family: var(--font-main); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-db-add:hover { background: #003c8f; }
         .db-table-wrap { overflow-x: auto; }
         .db-tbl { width: 100%; border-collapse: collapse; min-width: 440px; }
@@ -292,29 +309,29 @@
         .trade-modal.on { display: flex; }
         .trade-modal-box { background: white; width: 100%; max-width: 620px; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.55); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); max-height: 92vh; overflow-y: auto; }
         .trade-modal-header { background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%); padding: 18px 22px; color: white; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 2; }
-        .trade-modal-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .trade-modal-header h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
         .trade-modal-close { background: rgba(255,255,255,0.15); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .trade-modal-close:hover { background: var(--pink); }
         .trade-modal-body { padding: 20px 22px 24px; }
         .trade-section { margin-bottom: 16px; }
         .trade-section-label { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
-        .trade-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 0.95rem; color: var(--purple); outline: none; background: white; }
+        .trade-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-main); font-size: 0.95rem; color: var(--purple); outline: none; background: white; }
         .trade-select:focus { border-color: #283593; }
         .trade-arrow { text-align: center; font-size: 1.8rem; margin: 8px 0; color: #283593; }
         .trade-preview { background: #f0f4ff; border: 1.5px solid #c5cae9; border-radius: 10px; padding: 12px 14px; margin: 12px 0; min-height: 44px; font-size: 0.85rem; color: var(--purple); }
         .trade-preview .tr-name { font-weight: 800; font-size: 1rem; }
         .trade-preview .tr-detail { color: var(--sub); font-size: 0.78rem; margin-top: 2px; }
         .trade-actions { display: flex; gap: 8px; margin-top: 16px; }
-        .btn-trade-confirm { flex: 1; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #1a237e, #3949ab); color: white; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .btn-trade-confirm { flex: 1; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #1a237e, #3949ab); color: white; font-family: var(--font-main); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
         .btn-trade-confirm:hover { background: linear-gradient(135deg, #0d1666, #1a237e); }
-        .btn-trade-cancel { padding: 12px 18px; border-radius: 8px; border: none; background: #eee; color: #666; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .btn-trade-cancel { padding: 12px 18px; border-radius: 8px; border: none; background: #eee; color: #666; font-family: var(--font-main); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
         .btn-trade-cancel:hover { background: #ddd; }
-        .btn-db-trade { padding: 7px 16px; border-radius: 20px; border: none; background: linear-gradient(135deg,#1a237e,#3949ab); color: white; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-db-trade { padding: 7px 16px; border-radius: 20px; border: none; background: linear-gradient(135deg,#1a237e,#3949ab); color: white; font-family: var(--font-main); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-db-trade:hover { background: linear-gradient(135deg,#0d1666,#1a237e); }
         .db-club-cell { display: flex; align-items: center; gap: 6px; }
         .db-club-logo { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
         .db-club-name { font-weight: 600; font-size: 0.85rem; }
-        .db-action-btn { padding: 3px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 700; font-family: 'Barlow', sans-serif; transition: 0.15s; }
+        .db-action-btn { padding: 3px 8px; border-radius: 5px; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 700; font-family: var(--font-main); transition: 0.15s; }
         .db-edit-btn  { background: #e3f2fd; color: #1565c0; }
         .db-edit-btn:hover  { background: #1565c0; color: white; }
         .db-del-btn   { background: #ffebee; color: #c62828; margin-left: 4px; }
@@ -323,18 +340,18 @@
         .db-modal.on { display: flex; }
         .db-modal-box { background: white; width: 100%; max-width: 480px; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.5); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); max-height: 90vh; overflow-y: auto; }
         .db-modal-header { background: linear-gradient(135deg, #003c8f, #1565c0); padding: 18px 22px; color: white; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1; }
-        .db-modal-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .db-modal-header h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
         .db-modal-close { background: rgba(255,255,255,0.15); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .db-modal-close:hover { background: var(--pink); }
         .db-modal-body { padding: 18px 22px 22px; }
         .db-form-row { margin-bottom: 13px; }
         .db-form-label { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
-        .db-form-input, .db-form-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 0.95rem; color: var(--purple); outline: none; background: white; }
+        .db-form-input, .db-form-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-main); font-size: 0.95rem; color: var(--purple); outline: none; background: white; }
         .db-form-input:focus, .db-form-select:focus { border-color: #1565c0; }
         .db-form-actions { display: flex; gap: 8px; margin-top: 16px; }
-        .db-btn-save { flex: 1; padding: 11px; border-radius: 8px; border: none; background: #1565c0; color: white; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .db-btn-save { flex: 1; padding: 11px; border-radius: 8px; border: none; background: #1565c0; color: white; font-family: var(--font-main); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
         .db-btn-save:hover { background: #003c8f; }
-        .db-btn-cancel { padding: 11px 18px; border-radius: 8px; border: none; background: #eee; color: #666; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .db-btn-cancel { padding: 11px 18px; border-radius: 8px; border: none; background: #eee; color: #666; font-family: var(--font-main); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
         .db-btn-cancel:hover { background: #ddd; }
         .db-empty { padding: 40px; text-align: center; color: #999; font-size: 0.9rem; }
         .db-stat-row { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 20px 12px; background: #f8f5ff; border-bottom: 1px solid var(--border); }
@@ -347,7 +364,7 @@
             display: inline-flex; align-items: center; justify-content: center;
             min-width: 32px; height: 22px; border-radius: 6px;
             font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
         }
         .db-rating-99  { background: #ffd700; color: #5a3800; border: 1px solid #d4a000; }
         .db-rating-high { background: #00c853; color: white; border: 1px solid #009624; }
@@ -365,7 +382,7 @@
             display: flex; align-items: center; gap: 10px;
         }
         .db-overall-num {
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
             font-size: 3rem; font-weight: 900; line-height: 1;
             color: #ffd700; text-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
@@ -381,7 +398,7 @@
             padding: 4px 10px; font-size: 0.72rem; font-weight: 700;
         }
         .db-ovr-pos-chip .pos-lbl { opacity: 0.75; font-size: 0.65rem; }
-        .db-ovr-pos-chip .pos-val { color: #ffd700; font-size: 0.88rem; font-family: 'Barlow Condensed', sans-serif; }
+        .db-ovr-pos-chip .pos-val { color: #ffd700; font-size: 0.88rem; font-family: var(--font-display); }
 
         /* toggle rating in compare */
         .cmp-rating-toggle-wrap { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: #f8f5ff; border-bottom: 1px solid var(--border); }
@@ -401,11 +418,11 @@
         .cmp-page { padding: 0; }
         .cmp-controls { padding: 16px 20px; background: #f8f5ff; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .cmp-controls label { font-size: 0.72rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; }
-        .cmp-select { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-family: 'Barlow', sans-serif; font-size: 0.85rem; color: var(--purple); background: white; outline: none; cursor: pointer; }
+        .cmp-select { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 20px; font-family: var(--font-main); font-size: 0.85rem; color: var(--purple); background: white; outline: none; cursor: pointer; }
         .cmp-select:focus { border-color: #1565c0; }
-        .btn-cmp-run { padding: 8px 20px; border-radius: 20px; border: none; background: linear-gradient(135deg,#37003c,#6a0dad); color: white; font-family: 'Barlow', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-cmp-run { padding: 8px 20px; border-radius: 20px; border: none; background: linear-gradient(135deg,#37003c,#6a0dad); color: white; font-family: var(--font-main); font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-cmp-run:hover { background: var(--pink); }
-        .cmp-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 900; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; padding: 16px 20px 8px; border-top: 2px solid var(--border); margin-top: 4px; }
+        .cmp-section-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 900; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; padding: 16px 20px 8px; border-top: 2px solid var(--border); margin-top: 4px; }
         .cmp-section-title:first-child { border-top: none; margin-top: 0; }
         .cmp-grid { display: grid; gap: 0; }
         .cmp-row { display: grid; border-bottom: 1px solid var(--border); transition: background 0.1s; }
@@ -423,7 +440,7 @@
         .cmp-empty { padding: 40px; text-align: center; color: #aaa; font-size: 0.9rem; }
         .cmp-summary { display: flex; gap: 10px; flex-wrap: wrap; padding: 14px 20px; background: white; border-bottom: 1px solid var(--border); }
         .cmp-sum-card { flex: 1; min-width: 90px; background: linear-gradient(135deg, #37003c, #6a0dad); border-radius: 10px; padding: 10px 14px; color: white; text-align: center; }
-        .cmp-sum-card .sv { font-family: 'Barlow Condensed', sans-serif; font-size: 1.8rem; font-weight: 900; line-height: 1; }
+        .cmp-sum-card .sv { font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; line-height: 1; }
         .cmp-sum-card .sl { font-size: 0.62rem; font-weight: 700; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
         .cmp-sum-card.c-toxx  { background: linear-gradient(135deg,#880e4f,#e91e63); }
         .cmp-sum-card.c-stive { background: linear-gradient(135deg,#0d47a1,#1976d2); }
@@ -440,7 +457,7 @@
             display: flex; align-items: center; gap: 8px;
             padding: 8px 16px; border-radius: 24px;
             border: 2px solid var(--border); background: white;
-            cursor: pointer; font-family: 'Barlow', sans-serif;
+            cursor: pointer; font-family: var(--font-main);
             font-size: 0.85rem; font-weight: 700; color: var(--sub);
             transition: all 0.18s; user-select: none;
         }
@@ -498,19 +515,36 @@
         #mainContent picture { display: block; width: 100%; }
         .champ-banner { background: linear-gradient(135deg, var(--purple) 0%, #6a0dad 100%); color: white; text-align: center; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; }
         .champ-banner.hidden { display: none; }
+        .champ-click { cursor: pointer; border-bottom: 2px dashed var(--cyan); padding-bottom: 1px; transition: 0.2s; }
+        .champ-click:hover { color: var(--cyan); }
+        .champ-click-hint { font-size: 0.68rem; font-weight: 800; background: rgba(0,255,133,0.18); color: var(--cyan); padding: 2px 8px; border-radius: 10px; margin-left: 4px; letter-spacing: 0.4px; }
+        .champ-wrap { display: flex; flex-direction: column; gap: 12px; padding: 14px; }
+        .champ-sum { display: flex; gap: 10px; flex-wrap: wrap; }
+        .champ-sum > div { flex: 1; min-width: 90px; text-align: center; background: #f7f0ff; border: 1px solid var(--border); border-radius: 10px; padding: 10px 6px; }
+        .champ-sum b { display: block; font-size: 1.5rem; font-weight: 800; color: var(--purple); line-height: 1.1; }
+        .champ-sum span { font-size: 0.68rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; }
+        .champ-item { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #fff; }
+        .champ-item-head { background: linear-gradient(135deg, #fff9c4, #ffe082); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .champ-item-head .ci-date { font-weight: 800; color: #6d4c00; font-size: 0.92rem; }
+        .champ-item-head .ci-liga { font-weight: 800; color: var(--pink); font-size: 0.8rem; }
+        .champ-item-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 0.86rem; }
+        .champ-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+        .champ-row .cr-l { color: var(--sub); font-weight: 700; }
+        .champ-row .cr-v { font-weight: 800; color: var(--purple); display: inline-flex; align-items: center; gap: 4px; }
+        .champ-row .cr-v.none { color: #bbb; font-weight: 600; }
 
         /* SECTION HEAD */
-        .section-head { color: white; padding: 11px 18px; font-family: 'Barlow Condensed', sans-serif; font-size: 1.15rem; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .section-head { color: white; padding: 11px 18px; font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .section-head.type-klub { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 40%, #43a047 80%, #66bb6a 100%); }
         .section-head.type-ft { background: linear-gradient(135deg, #7f0000 0%, #c62828 40%, #e53935 80%, #ff5252 100%); }
         .section-head.type-unknown { background: linear-gradient(135deg, #4a4a5a 0%, #6c6c80 100%); }
 
-        .badge-liga { font-size: 0.68rem; padding: 2px 9px; border-radius: 10px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.3px; }
+        .badge-liga { font-size: 0.68rem; padding: 2px 9px; border-radius: 10px; font-weight: 700; font-family: var(--font-main); letter-spacing: 0.3px; }
         .badge-liga.badge-klub { background: rgba(255,255,255,0.25); color: white; border: 1px solid rgba(255,255,255,0.45); }
         .badge-liga.badge-ft { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.35); }
         .badge-liga.badge-unknown { background: rgba(255,255,255,0.2); color: white; }
 
-        .badge-mode { font-size: 0.7rem; padding: 3px 10px; border-radius: 10px; font-weight: 800; font-family: 'Barlow', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; }
+        .badge-mode { font-size: 0.7rem; padding: 3px 10px; border-radius: 10px; font-weight: 800; font-family: var(--font-main); letter-spacing: 0.5px; text-transform: uppercase; }
         .badge-mode.mode-klub { background: #e8f5e9; color: #1b5e20; border: 1.5px solid #a5d6a7; }
         .badge-mode.mode-ft { background: #ffebee; color: #b71c1c; border: 1.5px solid #ef9a9a; }
 
@@ -576,7 +610,7 @@
         .info-modal-box { background: white; width: 100%; max-width: 700px; border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 24px 80px rgba(0,0,0,0.6); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
         @keyframes modalIn { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .info-modal-header { background: linear-gradient(135deg, var(--purple) 0%, #6a0dad 100%); padding: 26px 30px 22px; color: white; position: relative; }
-        .info-modal-header h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .info-modal-header h2 { font-family: var(--font-display); font-size: 2.2rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
         .info-modal-header p { font-size: 0.82rem; opacity: 0.65; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
         .info-close { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.15); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: white; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
         .info-close:hover { background: var(--pink); }
@@ -585,12 +619,12 @@
         .league-card { border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
         .league-card:last-child { margin-bottom: 0; }
         .league-card-head { background: #f7f0ff; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
-        .league-card-head .lc-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 800; color: var(--purple); }
+        .league-card-head .lc-title { font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: var(--purple); }
         .league-card-head .lc-badge { background: var(--pink); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
         .league-card-body { padding: 12px 14px; }
-        .club-name { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 900; color: var(--purple); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .club-name .full-transfer-tag { background: #ffebee; color: #c62828; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1px solid #ef9a9a; font-family: 'Barlow', sans-serif; }
-        .club-name .klub-tag { background: #e8f5e9; color: #2e7d32; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1px solid #a5d6a7; font-family: 'Barlow', sans-serif; }
+        .club-name { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; color: var(--purple); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .club-name .full-transfer-tag { background: #ffebee; color: #c62828; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1px solid #ef9a9a; font-family: var(--font-main); }
+        .club-name .klub-tag { background: #e8f5e9; color: #2e7d32; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1px solid #a5d6a7; font-family: var(--font-main); }
 
         .club-name-logo { width: 38px; height: 38px; object-fit: contain; border-radius: 4px; }
 
@@ -606,16 +640,16 @@
 
         .admin-club-edit { margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ddd; }
         .admin-club-edit label { font-size: 0.75rem; font-weight: 700; color: var(--sub); text-transform: uppercase; display: block; margin-bottom: 4px; }
-        .admin-club-input { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: 'Barlow', sans-serif; font-size: 0.95rem; outline: none; margin-bottom: 8px; color: var(--purple); }
+        .admin-club-input { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: var(--font-main); font-size: 0.95rem; outline: none; margin-bottom: 8px; color: var(--purple); }
         .admin-club-input:focus { border-color: var(--purple); }
         .admin-club-check { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; cursor: pointer; }
-        .btn-save-club { background: #00c853; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-save-club { background: #00c853; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-family: var(--font-main); font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-save-club:hover { background: #009624; }
         .no-club { color: #bbb; font-size: 0.9rem; font-style: italic; padding: 8px 0; }
 
         .mob-tabs { display: none; }
         .mob-tab-btns { display: flex; border-bottom: 2px solid var(--border); }
-        .mob-tab-btn { flex: 1; padding: 11px; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--sub); border: none; background: white; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.15s; font-family: 'Barlow', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+        .mob-tab-btn { flex: 1; padding: 11px; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--sub); border: none; background: white; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.15s; font-family: var(--font-main); text-transform: uppercase; letter-spacing: 0.5px; }
         .mob-tab-btn.on { color: var(--purple); border-bottom-color: var(--purple); }
         .mob-tbl { display: none; width: 100%; border-collapse: collapse; }
         .mob-tbl.on { display: table; }
@@ -627,8 +661,8 @@
         .mob-tbl tbody tr:hover { background: var(--hover); }
 
         /* Mobile edit input styles */
-        .mob-tbl .tbl-in { width: 44px; padding: 4px 2px; font-size: 0.8rem; text-align: center; border: 1.5px solid var(--border); border-radius: 5px; font-family: 'Barlow', sans-serif; font-weight: 700; color: var(--purple); }
-        .mob-tbl .rank-in { width: 44px; padding: 3px 2px; font-size: 0.8rem; border: 1.5px solid var(--border); border-radius: 5px; font-family: 'Barlow', sans-serif; }
+        .mob-tbl .tbl-in { width: 44px; padding: 4px 2px; font-size: 0.8rem; text-align: center; border: 1.5px solid var(--border); border-radius: 5px; font-family: var(--font-main); font-weight: 700; color: var(--purple); }
+        .mob-tbl .rank-in { width: 44px; padding: 3px 2px; font-size: 0.8rem; border: 1.5px solid var(--border); border-radius: 5px; font-family: var(--font-main); }
 
         .match-block { border-top: 1px solid var(--border); }
         .match-block:first-child { border-top: none; }
@@ -641,7 +675,7 @@
             color: white;
         }
         .stats-page-header h2 {
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
             font-size: 2rem; font-weight: 900; letter-spacing: 2px;
             margin: 0;
         }
@@ -652,7 +686,7 @@
         .stats-section { padding: 20px 24px; border-right: 1px solid var(--border); }
         .stats-section:last-child { border-right: none; }
         .stats-section-title {
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
             font-size: 1.1rem; font-weight: 900; letter-spacing: 1px;
             color: var(--purple); margin-bottom: 16px;
             display: flex; align-items: center; gap: 8px;
@@ -681,13 +715,13 @@
         }
         .stats-player-photo.noimg {
             display: flex; align-items: center; justify-content: center;
-            font-family: 'Barlow Condensed', sans-serif; font-size: 2.6rem;
+            font-family: var(--font-display); font-size: 2.6rem;
             font-weight: 900; color: var(--purple);
         }
         .stats-player-name { font-weight: 800; font-size: 0.9rem; color: var(--purple); }
         .stats-player-sub { font-size: 0.7rem; color: var(--sub); font-weight: 600; }
         .stats-player-val {
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
             font-size: 1.8rem; font-weight: 900; color: var(--purple);
             line-height: 1;
         }
@@ -696,7 +730,7 @@
 
         .stats-form-section { padding: 20px 24px; border-top: 1px solid var(--border); }
         .stats-form-title {
-            font-family: 'Barlow Condensed', sans-serif;
+            font-family: var(--font-display);
             font-size: 1.1rem; font-weight: 900; letter-spacing: 1px;
             color: var(--purple); margin-bottom: 16px;
             display: flex; align-items: center; gap: 8px;
@@ -714,22 +748,22 @@
         .admin-panel h3 { font-size: 0.85rem; font-weight: 800; color: var(--pink); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
         .p-checks { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0; }
         .p-checks label { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px; cursor: pointer; }
-        .adm-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 0.9rem; margin-bottom: 10px; outline: none; color: var(--purple); }
-        .btn-adm { display: block; width: 100%; padding: 11px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 0.9rem; margin-top: 8px; transition: 0.2s; }
+        .adm-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-main); font-size: 0.9rem; margin-bottom: 10px; outline: none; color: var(--purple); }
+        .btn-adm { display: block; width: 100%; padding: 11px; border-radius: 10px; border: none; cursor: pointer; font-family: var(--font-main); font-weight: 700; font-size: 0.9rem; margin-top: 8px; transition: 0.2s; }
         .btn-create { background: var(--purple); color: white; }
         .btn-create:hover { background: var(--pink); }
         .btn-off { background: #eee; color: #666; }
         .btn-off:hover { background: #ddd; }
-        .btn-edit { background: rgba(233,0,82,0.09); color: var(--pink); border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; font-family: 'Barlow', sans-serif; }
-        .btn-save { background: #00c853; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; font-family: 'Barlow', sans-serif; }
+        .btn-edit { background: rgba(233,0,82,0.09); color: var(--pink); border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; font-family: var(--font-main); }
+        .btn-save { background: #00c853; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; font-family: var(--font-main); }
         .btn-del { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 2px 5px; }
-        .tbl-in { width: 38px; text-align: center; padding: 3px 2px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; font-family: 'Barlow', sans-serif; }
+        .tbl-in { width: 38px; text-align: center; padding: 3px 2px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; font-family: var(--font-main); }
         .tbl-in-pts { background: #f5f5f5; color: #888; }
 
         .liga-type-group { display: flex; gap: 12px; margin-bottom: 12px; }
         .liga-type-card {
             flex: 1; padding: 18px 14px; border-radius: 12px; border: 2px solid var(--border);
-            background: white; font-family: 'Barlow', sans-serif; cursor: pointer;
+            background: white; font-family: var(--font-main); cursor: pointer;
             transition: all 0.22s; text-align: center; display: flex;
             flex-direction: column; align-items: center; gap: 6px;
         }
@@ -754,7 +788,7 @@
         .club-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
         .club-input-row:last-child { margin-bottom: 0; }
         .club-input-row label { font-size: 0.78rem; font-weight: 700; color: #2e7d32; min-width: 52px; }
-        .club-input-field { flex: 1; padding: 7px 10px; border-radius: 6px; border: 1.5px solid #a5d6a7; font-family: 'Barlow', sans-serif; font-size: 0.85rem; color: #2e7d32; outline: none; }
+        .club-input-field { flex: 1; padding: 7px 10px; border-radius: 6px; border: 1.5px solid #a5d6a7; font-family: var(--font-main); font-size: 0.85rem; color: #2e7d32; outline: none; }
         .club-input-field:focus { border-color: #2e7d32; }
 
         /* SIDEBAR */
@@ -777,25 +811,9 @@
         .club-logo-icon:last-child { margin-right: 0; }
         .sb-pts { font-weight: 900; color: var(--purple); }
         .sb-r1 td:first-child { border-left: 3px solid var(--pink); }
-
-        /* ===== Bagan Top Scorer & Top Assist per bulan ===== */
-        .sb-head.chart { background: linear-gradient(135deg, #2a0060 0%, #5d15a3 100%); }
-        .mchart-sec { padding: 12px 14px 6px; }
-        .mchart-sec + .mchart-sec { border-top: 1px solid var(--border); }
-        .mchart-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--sub); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-        .mchart-row { display: grid; grid-template-columns: 82px 1fr 26px; align-items: center; gap: 8px; margin-bottom: 7px; }
-        .mchart-name { font-size: 0.8rem; font-weight: 700; color: #37003c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mchart-track { height: 16px; background: #f3eaff; border-radius: 8px; overflow: hidden; }
-        .mchart-bar { height: 100%; border-radius: 8px; min-width: 6px; transition: width 0.5s ease; }
-        .mchart-bar.scorer { background: linear-gradient(90deg, #00c853, #00ff85); }
-        .mchart-bar.assist { background: linear-gradient(90deg, #e90052, #ff6fa5); }
-        .mchart-val { font-size: 0.85rem; font-weight: 900; text-align: right; }
-        .mchart-val.scorer { color: #00a844; }
-        .mchart-val.assist { color: var(--pink); }
-        .mchart-empty { font-size: 0.78rem; color: #aaa; padding: 2px 0 10px; text-align: center; }
         .trophy-count { font-weight: 900; font-size: 1rem; color: #b8860b; }
         .trophy-move-btns { display: flex; flex-direction: column; gap: 1px; margin-left: 4px; }
-        .trophy-move-btn { background: none; border: 1px solid #ddd; border-radius: 3px; width: 18px; height: 16px; cursor: pointer; font-size: 0.55rem; line-height: 1; color: #666; padding: 0; display: flex; align-items: center; justify-content: center; transition: 0.15s; font-family: 'Barlow', sans-serif; }
+        .trophy-move-btn { background: none; border: 1px solid #ddd; border-radius: 3px; width: 18px; height: 16px; cursor: pointer; font-size: 0.55rem; line-height: 1; color: #666; padding: 0; display: flex; align-items: center; justify-content: center; transition: 0.15s; font-family: var(--font-main); }
         .trophy-move-btn:hover { background: var(--purple); color: white; border-color: var(--purple); }
         .trophy-move-btn:disabled { opacity: 0.2; cursor: default; }
         .empty-state { padding: 40px; text-align: center; color: #999; font-size: 0.95rem; }
@@ -807,7 +825,7 @@
         .form-laga-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
         .form-laga-label { font-size: 0.65rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.4px; min-width: 90px; }
         .wdl-btns { display: flex; gap: 4px; }
-        .wdl-btn { padding: 5px 10px; border-radius: 6px; border: 1.5px solid var(--border); background: white; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: 0.15s; color: #666; font-family: 'Barlow', sans-serif; }
+        .wdl-btn { padding: 5px 10px; border-radius: 6px; border: 1.5px solid var(--border); background: white; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: 0.15s; color: #666; font-family: var(--font-main); }
         .wdl-btn:hover { border-color: #aaa; }
         .wdl-btn.aktif-w { background: var(--win); border-color: var(--win); color: white; }
         .wdl-btn.aktif-d { background: var(--draw); border-color: var(--draw); color: white; }
@@ -820,10 +838,10 @@
         .login-modal { display: none; position: fixed; inset: 0; background: rgba(15, 5, 30, 0.9); z-index: 100000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); }
         .login-modal.on { display: flex; }
         .login-box { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-        .login-box h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; color: var(--purple); margin-bottom: 20px; letter-spacing: 1px; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: 'Barlow', sans-serif; font-size: 1rem; color: var(--purple); outline: none; }
+        .login-box h2 { font-family: var(--font-display); font-size: 2rem; color: var(--purple); margin-bottom: 20px; letter-spacing: 1px; }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: var(--font-main); font-size: 1rem; color: var(--purple); outline: none; }
         .auth-input:focus { border-color: var(--pink); }
-        .auth-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; font-family: 'Barlow', sans-serif; cursor: pointer; margin-bottom: 10px; font-size: 1rem; transition: 0.2s; }
+        .auth-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; font-family: var(--font-main); cursor: pointer; margin-bottom: 10px; font-size: 1rem; transition: 0.2s; }
         .btn-login { background: var(--pink); color: white; } .btn-login:hover { background: var(--purple); }
         .btn-cancel { background: #eee; color: #666; } .btn-cancel:hover { background: #ddd; }
 
@@ -857,7 +875,7 @@
         .lineup-modal.on { display: flex; }
         .lineup-modal-box { background: #1a1a2e; width: 100%; max-width: 940px; border-radius: 20px; overflow: hidden; box-shadow: 0 30px 100px rgba(0,0,0,0.8); animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); margin: auto; }
         .lineup-modal-header { background: linear-gradient(135deg, #37003c 0%, #6a0dad 60%, #1a0535 100%); padding: 18px 24px; color: white; display: flex; align-items: center; justify-content: space-between; }
-        .lineup-modal-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
+        .lineup-modal-header h3 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; margin: 0; }
         .lineup-modal-close { background: rgba(255,255,255,0.15); border: none; width: 34px; height: 34px; border-radius: 50%; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .lineup-modal-close:hover { background: var(--pink); }
         .lineup-body { display: grid; grid-template-columns: 1fr 280px; gap: 0; min-height: 500px; }
@@ -865,12 +883,12 @@
         /* Formation selector — FIX: solid background so options always visible */
         .lineup-formation-bar { background: #0f0f23; padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .lineup-formation-bar label { color: rgba(255,255,255,0.7); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .lineup-formation-select { padding: 6px 12px; border-radius: 8px; border: 1.5px solid #00ff85; background: #1e1e40; color: #ffffff; font-family: 'Barlow', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; outline: none; appearance: auto; }
+        .lineup-formation-select { padding: 6px 12px; border-radius: 8px; border: 1.5px solid #00ff85; background: #1e1e40; color: #ffffff; font-family: var(--font-main); font-size: 0.9rem; font-weight: 700; cursor: pointer; outline: none; appearance: auto; }
         .lineup-formation-select option { background: #1e1e40; color: #ffffff; font-weight: 600; }
         .lineup-formation-select:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,255,133,0.25); }
-        .lineup-save-btn { padding: 6px 14px; border-radius: 8px; border: none; background: var(--cyan); color: #37003c; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .lineup-save-btn { padding: 6px 14px; border-radius: 8px; border: none; background: var(--cyan); color: #37003c; font-family: var(--font-main); font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .lineup-save-btn:hover { background: #00e07a; }
-        .lineup-autoset-btn { padding: 6px 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.25); transition: 0.2s; }
+        .lineup-autoset-btn { padding: 6px 14px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; font-family: var(--font-main); font-size: 0.8rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.25); transition: 0.2s; }
         .lineup-autoset-btn:hover { background: rgba(255,255,255,0.2); }
         .lineup-hint { font-size: 0.65rem; color: rgba(255,255,255,0.35); margin-left: auto; font-style: italic; }
 
@@ -960,7 +978,7 @@
         .lup-popup-close { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 0.9rem; line-height: 1; padding: 0 2px; }
         .lup-popup-close:hover { color: white; }
         .lup-popup-tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .lup-tab-btn { flex: 1; padding: 6px; font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.45); background: none; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: 0.15s; font-family: 'Barlow', sans-serif; }
+        .lup-tab-btn { flex: 1; padding: 6px; font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.45); background: none; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: 0.15s; font-family: var(--font-main); }
         .lup-tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
         .lup-popup-body { overflow-y: auto; flex: 1; padding: 4px 0; }
         .lup-section-title { font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px 2px; }
@@ -979,7 +997,7 @@
         .lup-player-row.in-lineup .lup-player-num { color: var(--cyan); }
         /* Pos selector tab */
         .lup-pos-grid { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px; }
-        .lup-pos-btn { padding: 4px 8px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; color: white; font-family: 'Barlow', sans-serif; font-size: 0.72rem; font-weight: 800; cursor: pointer; transition: 0.12s; }
+        .lup-pos-btn { padding: 4px 8px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; color: white; font-family: var(--font-main); font-size: 0.72rem; font-weight: 800; cursor: pointer; transition: 0.12s; }
         .lup-pos-btn:hover { background: rgba(0,255,133,0.2); border-color: var(--cyan); color: var(--cyan); }
         .lup-pos-btn.active { background: rgba(0,255,133,0.25); border-color: var(--cyan); color: var(--cyan); }
 
@@ -1018,7 +1036,7 @@
         .match-stats-bar.admin .msb-label { color: #37003c; }
         .msb-select {
         padding: 4px 10px; border-radius: 20px; border: 1.5px solid var(--border);
-        font-family: 'Barlow', sans-serif; font-size: 0.82rem; font-weight: 700;
+        font-family: var(--font-main); font-size: 0.82rem; font-weight: 700;
         color: var(--purple); background: white; outline: none; cursor: pointer;
         }
         .msb-select:focus { border-color: var(--purple); }
@@ -1135,17 +1153,6 @@
                     <thead><tr><th class="tl">Player</th><th>Pts</th></tr></thead>
                     <tbody id="sbMonthBody"></tbody>
                 </table>
-            </div>
-            <div class="sb-card" id="sbMonthChartCard">
-                <div class="sb-head chart">&#128200; Top Scorer &amp; Assist &mdash; <span id="sbMonthChartTitle">Bulan Ini</span></div>
-                <div class="mchart-sec">
-                    <div class="mchart-title">&#9917; Top Scorer</div>
-                    <div id="sbChartScorer"></div>
-                </div>
-                <div class="mchart-sec">
-                    <div class="mchart-title">&#127919; Top Assist</div>
-                    <div id="sbChartAssist"></div>
-                </div>
             </div>
             <div class="sb-card" id="sbTrophyAllCard" style="display:none;">
                 <div class="sb-head trophy">&#127942; Trophy &mdash; All Time</div>
@@ -1363,7 +1370,7 @@
 <div id="importModal" style="display:none;position:fixed;inset:0;background:rgba(15,5,30,0.88);z-index:99999;justify-content:center;align-items:center;padding:16px;backdrop-filter:blur(8px);" onclick="tutupImportModalOutside(event)">
     <div style="background:white;width:100%;max-width:520px;border-radius:18px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.55);animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);max-height:90vh;overflow-y:auto;">
         <div style="background:linear-gradient(135deg,#1b5e20,#388e3c);padding:18px 22px;color:white;display:flex;align-items:center;justify-content:space-between;">
-            <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:900;margin:0;">📥 Import Pemain dari Excel</h3>
+            <h3 style="font-family: var(--font-display);font-size:1.5rem;font-weight:900;margin:0;">📥 Import Pemain dari Excel</h3>
             <button onclick="tutupImportModal()" style="background:rgba(255,255,255,0.15);border:none;width:32px;height:32px;border-radius:50%;color:white;font-size:1.1rem;cursor:pointer;">×</button>
         </div>
         <div style="padding:20px 22px 24px;">
@@ -1381,19 +1388,19 @@
             </div>
             <div style="margin-bottom:14px;">
                 <label style="font-size:0.72rem;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Pilih File (.xlsx / .csv)</label>
-                <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" style="width:100%;padding:8px;border:1.5px solid #ddd;border-radius:8px;font-family:'Barlow',sans-serif;font-size:0.85rem;">
+                <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" style="width:100%;padding:8px;border:1.5px solid #ddd;border-radius:8px;font-family: var(--font-main);font-size:0.85rem;">
             </div>
             <div style="margin-bottom:14px;">
                 <label style="font-size:0.72rem;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Mode Import</label>
-                <select id="importMode" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-family:'Barlow',sans-serif;font-size:0.85rem;color:#37003c;">
+                <select id="importMode" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-family: var(--font-main);font-size:0.85rem;color:#37003c;">
                     <option value="append">➕ Tambah ke data yang ada</option>
                     <option value="replace">🔄 Ganti semua data (hapus lama)</option>
                 </select>
             </div>
             <div id="importPreview" style="display:none;margin-bottom:14px;max-height:200px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;"></div>
             <div style="display:flex;gap:8px;">
-                <button onclick="tutupImportModal()" style="padding:11px 18px;border-radius:8px;border:none;background:#eee;color:#666;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer;">Batal</button>
-                <button onclick="prosesImport()" style="flex:1;padding:11px;border-radius:8px;border:none;background:#1b5e20;color:white;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer;">📥 Import Sekarang</button>
+                <button onclick="tutupImportModal()" style="padding:11px 18px;border-radius:8px;border:none;background:#eee;color:#666;font-family: var(--font-main);font-weight:700;cursor:pointer;">Batal</button>
+                <button onclick="prosesImport()" style="flex:1;padding:11px;border-radius:8px;border:none;background:#1b5e20;color:white;font-family: var(--font-main);font-weight:700;cursor:pointer;">📥 Import Sekarang</button>
             </div>
         </div>
     </div>
@@ -1611,10 +1618,53 @@ const CLUB_LOGO_MAP = {
     
 };
 
+/* Kata penanda versi lama: "Manchester United Classic", "Real Madrid Legends", dst.
+   Logo yang dipakai = logo klub SAAT INI (kata penanda dibuang dulu sebelum dicari). */
+const CLASSIC_WORDS_RE = /\b(classic|classics|clasico|klasik|legend|legends|legenda|icon|icons|retro|vintage|heritage|old|throwback|all[- ]?time|greatest|best)\b/gi;
+const _logoCache = {};
+const _logoKeysByLen = () => Object.keys(CLUB_LOGO_MAP).sort((a, b) => b.length - a.length);
+let _logoKeys = null;
+
+function normalizeClubName(name) {
+    return (name || '')
+        .replace(/\([^)]*\)|\[[^\]]*\]/g, ' ')               // buang isi kurung: (Classic), [1999]
+        .replace(CLASSIC_WORDS_RE, ' ')                         // buang kata "Classic" dkk
+        .replace(/\b(19|20)\d{2}([\/\-](\d{2}|\d{4}))?\b/g, ' ') // buang tahun: 1999, 99/00, 2008-09
+        .replace(/['’`]\d{2}\b/g, ' ')                         // buang '99
+        .replace(/[-–—_|•:]+/g, ' ')                            // tanda pemisah
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+}
+
+function isClassicClub(clubName) {
+    CLASSIC_WORDS_RE.lastIndex = 0;
+    const r = CLASSIC_WORDS_RE.test(clubName || '');
+    CLASSIC_WORDS_RE.lastIndex = 0;
+    return r;
+}
+
 function getClubLogo(clubName) {
     if (!clubName) return null;
-    const key = clubName.trim().toLowerCase();
-    return CLUB_LOGO_MAP[key] || null;
+    const raw = clubName.trim().toLowerCase();
+    if (raw in _logoCache) return _logoCache[raw];
+
+    let url = CLUB_LOGO_MAP[raw] || null;                 // 1) persis sama
+    if (!url) {
+        const clean = normalizeClubName(clubName);          // 2) setelah "Classic" dibuang
+        url = CLUB_LOGO_MAP[clean] || null;
+        if (!url && clean) {
+            const noPrefix = clean.replace(/^(fc|cf|afc|ac|as|ss|sc)\s+/, '').replace(/\s+(fc|cf|afc)$/, '');
+            url = CLUB_LOGO_MAP[noPrefix] || null;            // 3) tanpa awalan FC/CF/AFC
+        }
+        if (!url && clean) {                                // 4) cari nama klub yang terkandung di teks
+            if (!_logoKeys) _logoKeys = _logoKeysByLen();
+            const hit = _logoKeys.find(k => k.length >= 4 && new RegExp('(^|\\s)' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(\\s|$)').test(clean));
+            if (hit) url = CLUB_LOGO_MAP[hit];
+        }
+    }
+    _logoCache[raw] = url;
+    return url;
 }
 
 /* ===================== EPIC LOADING SCREEN ===================== */
@@ -1775,7 +1825,6 @@ function winPct(w, pl) { if (!pl || pl === 0) return 0; return Math.round((w / p
 function toggleSidebarMode(isAllTime, isStats) {
     document.getElementById('sbTrophyMonthCard').style.display = (isAllTime || isStats) ? 'none' : 'block';
     document.getElementById('sbMonthCard').style.display       = (isAllTime || isStats) ? 'none' : 'block';
-    document.getElementById('sbMonthChartCard').style.display  = (isAllTime || isStats) ? 'none' : 'block';
     document.getElementById('sbTrophyAllCard').style.display   = isAllTime ? 'block' : 'none';
     document.getElementById('sbTrophyAllKlubCard').style.display = isAllTime ? 'block' : 'none';
     document.getElementById('sbTrophyAllFTCard').style.display   = isAllTime ? 'block' : 'none';
@@ -1974,7 +2023,6 @@ function loadData() {
 
     document.getElementById('sbMonthTitle').innerText = 'Total Poin ' + currentMonth;
     document.getElementById('sbTrophyMonthTitle').innerText = currentMonth;
-    document.getElementById('sbMonthChartTitle').innerText = currentMonth;
     banner.classList.remove('hidden');
     banner.innerHTML = '⏳ Memuat...';
     toggleSidebarMode(false, false);
@@ -2035,7 +2083,6 @@ function listenMatchStats() {
         if (currentMonth !== 'ALL TIME STANDING' && currentMonth !== 'STATS' 
             && currentMonth !== 'DATABASE' && currentMonth !== 'ALL BULAN' && currentMonth !== 'MAIN' && localData && Object.keys(localData).length) {
             renderMonthly(localData);
-            renderMonthChart(localData);
         }
         if (currentMonth === 'STATS') renderStatsPage();
         if (currentMonth === 'ALL TIME STANDING') renderAllTime();
@@ -2174,8 +2221,8 @@ function renderStatisticsInner(el, validIds) {
     if (adminTool) {
         adminTool.innerHTML = modeAdmin
             ? '<div style="padding:10px;">'
-              + '<button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family:\'Barlow\',sans-serif;margin-bottom:6px;">✏️ Edit Stats Manual</button>'
-              + '<button onclick="cleanupOrphanMatchStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#6a0dad;color:white;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;">🧹 Cleanup Orphan Stats</button>'
+              + '<button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family: var(--font-main);margin-bottom:6px;">✏️ Edit Stats Manual</button>'
+              + '<button onclick="cleanupOrphanMatchStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#6a0dad;color:white;font-weight:700;cursor:pointer;font-family: var(--font-main);">🧹 Cleanup Orphan Stats</button>'
               + '</div>'
             : '';
     }
@@ -2442,7 +2489,7 @@ function renderMonthly(matches) {
         const modeBadgeHtml = modeLabel ? '<span class="' + modeCls + '">' + modeIcon + ' ' + modeLabel + '</span>' : '';
 
         const heading = isEdit
-            ? '<select id="editTgl_' + id + '" style="padding:4px 8px;border-radius:6px;border:none;font-family:\'Barlow\',sans-serif;font-weight:700;">'
+            ? '<select id="editTgl_' + id + '" style="padding:4px 8px;border-radius:6px;border:none;font-family: var(--font-main);font-weight:700;">'
               + Array.from({length:31}, (_, i) => '<option value="' + (i+1) + '" ' + (m.tanggal == i+1 ? 'selected' : '') + '> Tgl ' + (i+1) + '</option>').join('')
               + '</select>'
             : '📅 ' + getNamaHari(m.tanggal || 1, currentMonth) + ', ' + (m.tanggal || 1) + ' ' + currentMonth;
@@ -2635,7 +2682,7 @@ function renderAllBulan() {
                 totalVisible += monthVisible;
                 htmlAll += '<div class="all-bulan-month-header" style="margin:28px 0 12px;padding:10px 16px;'
                     + 'background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:10px;color:#fff;'
-                    + 'font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:1px;'
+                    + 'font-family: var(--font-display);font-weight:800;font-size:1.3rem;letter-spacing:1px;'
                     + 'display:flex;align-items:center;gap:10px;">'
                     + '📆 ' + bulan
                     + '<span style="font-size:0.75rem;font-weight:600;opacity:0.85;background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:10px;">' + monthVisible + ' Liga</span>'
@@ -3187,33 +3234,6 @@ function simpanKlub(matchId, nama, safeId) {
 function tutupInfoPlayer() { document.getElementById('infoModal').classList.remove('on'); }
 function tutupInfoModalOutside(e) { if (e.target === document.getElementById('infoModal')) tutupInfoPlayer(); }
 
-function renderMonthChart(monthlyMatches) {
-    const elS = document.getElementById('sbChartScorer');
-    const elA = document.getElementById('sbChartAssist');
-    if (!elS || !elA) return;
-    const cntS = {}, cntA = {};
-    Object.keys(monthlyMatches || {}).forEach(id => {
-        const ms = matchStatsData[id];
-        if (!ms) return;
-        if (ms.topScorer) { const n = fix(ms.topScorer); cntS[n] = (cntS[n] || 0) + 1; }
-        if (ms.topAssist) { const n = fix(ms.topAssist); cntA[n] = (cntA[n] || 0) + 1; }
-    });
-    const build = (cnt, cls) => {
-        const arr = Object.entries(cnt).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-        if (!arr.length) return '<div class="mchart-empty">Belum ada data bulan ini</div>';
-        const max = arr[0][1];
-        return arr.map(([n, v]) =>
-            '<div class="mchart-row">'
-            + '<div class="mchart-name" title="' + escHtml(n) + '">' + escHtml(n) + '</div>'
-            + '<div class="mchart-track"><div class="mchart-bar ' + cls + '" style="width:' + Math.round(v / max * 100) + '%"></div></div>'
-            + '<div class="mchart-val ' + cls + '">' + v + '</div>'
-            + '</div>'
-        ).join('');
-    };
-    elS.innerHTML = build(cntS, 'scorer');
-    elA.innerHTML = build(cntA, 'assist');
-}
-
 function updateSidebar(monthlyMatches) {
     db.ref(dbPath).once('value', snap => {
         const root = snap.val() || {};
@@ -3301,11 +3321,13 @@ function updateSidebar(monthlyMatches) {
         }
         if (champName && (trophyMonth[champName] || 0) > 0) {
             banner.innerHTML = '🌟 CHAMPION ' + currentMonth.toUpperCase() + ': '
-                + champName + ' (' + trophyMonth[champName] + 'x🏆) 🌟';
+                + '<span class="champ-click" role="button" tabindex="0" title="Klik untuk lihat detail juara bulan ini" '
+                + 'onclick="bukaDetailChampionBulan(\'' + escHtml(champName) + '\',\'' + escHtml(currentMonth) + '\')" '
+                + 'onkeydown="if(event.key===\'Enter\')this.click()">'
+                + escHtml(champName) + ' (' + trophyMonth[champName] + 'x🏆) <span class="champ-click-hint">ⓘ Detail</span></span> 🌟';
         } else {
             banner.innerHTML = 'Belum ada juara di bulan ' + currentMonth;
         }
-        renderMonthChart(monthlyMatches);
         renderStatsCards();
     });
 }
@@ -3396,7 +3418,7 @@ function renderStatsCards() {
     const adminTool = document.getElementById('adminStatsTool');
     if (!adminTool) return;
     adminTool.innerHTML = (modeAdmin && currentMonth === 'STATS')
-        ? '<div style="padding:10px;"><button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family:\'Barlow\',sans-serif;">✏️ Edit Stats Manual</button></div>'
+        ? '<div style="padding:10px;"><button onclick="editStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#fdbb2d;font-weight:700;cursor:pointer;color:#37003c;font-family: var(--font-main);">✏️ Edit Stats Manual</button></div>'
         : '';
 }
 
@@ -3445,8 +3467,8 @@ function editStats() {
     const adminTool = document.getElementById('adminStatsTool');
     if (adminTool) {
         adminTool.innerHTML = '<div style="padding:10px;">'
-            + '<button onclick="saveStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#00c853;color:white;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;font-size:0.9rem;margin-bottom:6px;">💾 Simpan Stats</button>'
-            + '<button onclick="batalEditStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#eee;color:#666;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;font-size:0.9rem;">✖ Batal</button>'
+            + '<button onclick="saveStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#00c853;color:white;font-weight:700;cursor:pointer;font-family: var(--font-main);font-size:0.9rem;margin-bottom:6px;">💾 Simpan Stats</button>'
+            + '<button onclick="batalEditStats()" style="width:100%;padding:9px;border-radius:8px;border:none;background:#eee;color:#666;font-weight:700;cursor:pointer;font-family: var(--font-main);font-size:0.9rem;">✖ Batal</button>'
             + '</div>';
     }
 }
@@ -3948,8 +3970,8 @@ function renderDatabasePage() {
             ? '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah ke Non User</button>'
             : '<button class="btn-db-add" onclick="bukaDbModalTambah()">➕ Tambah Pemain</button>'
               + '<button class="btn-db-trade" onclick="bukaTradePemain()">🔄 Trade Pemain</button>'
-              + '<button onclick="bukaImportModal()" style="padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#1b5e20,#388e3c);color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">📥 Import Excel</button>'
-              + '<button onclick="resetDatabaseKeDefault(true)" style="padding:7px 16px;border-radius:20px;border:none;background:#e53935;color:white;font-family:\'Barlow\',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;">🗑️ Reset ke Default</button>'
+              + '<button onclick="bukaImportModal()" style="padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#1b5e20,#388e3c);color:white;font-family: var(--font-main);font-size:0.8rem;font-weight:700;cursor:pointer;">📥 Import Excel</button>'
+              + '<button onclick="resetDatabaseKeDefault(true)" style="padding:7px 16px;border-radius:20px;border:none;background:#e53935;color:white;font-family: var(--font-main);font-size:0.8rem;font-weight:700;cursor:pointer;">🗑️ Reset ke Default</button>'
           )
         : '';
 
@@ -4166,7 +4188,7 @@ function renderH2HTable() {
                     const isBest = ovr === maxOvr;
                     const crownHtml = isBest ? '<span style="font-size:0.9rem;margin-left:4px;">👑</span>' : '';
                     ratingBlock = '<div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.2);">'
-                        + '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:2rem;font-weight:900;color:' + ovrCls + ';line-height:1;">' + ovr + crownHtml + '</div>'
+                        + '<div style="font-family: var(--font-display);font-size:2rem;font-weight:900;color:' + ovrCls + ';line-height:1;">' + ovr + crownHtml + '</div>'
                         + '<div style="font-size:0.65rem;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:1px;">Overall<br>Rating</div>'
                         + '</div>';
                 } else {
@@ -4237,7 +4259,7 @@ function renderH2HTable() {
                     gratingRow += '<td class="h2h-data-' + i + '" style="padding:4px 8px;">';
                     if (avg !== null) {
                         let avgColor = avg >= 90 ? '#d4a000' : avg >= 85 ? '#00c853' : avg >= 70 ? '#1565c0' : '#e53935';
-                        gratingRow += '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.2rem;font-weight:900;color:' + avgColor + ';">' + avg + '</span>' + arrow;
+                        gratingRow += '<span style="font-family: var(--font-display);font-size:1.2rem;font-weight:900;color:' + avgColor + ';">' + avg + '</span>' + arrow;
                     } else {
                         gratingRow += '<span style="color:#ccc;font-size:0.75rem;">—</span>';
                     }
@@ -4512,7 +4534,7 @@ if (dbCurrentPlayer === 'ALL PLAYER') {
         pkData.forEach(p => { const pos = p.pos || '?'; posCounts[pos] = (posCounts[pos]||0)+1; });
         const posOrder = ['GK','CB','LB','RB','DMF','CMF','AMF','RMF','LMF','LWF','RWF','SS','CF'];
         const lineupBtn = (!isAll && !isNonUserTab)
-            ? '<button onclick="bukaLineupModal(\'' + dbCurrentPlayer + '\')" style="padding:4px 12px;border-radius:20px;border:none;background:linear-gradient(135deg,#37003c,#6a0dad);color:white;font-family:\'Barlow\',sans-serif;font-size:0.72rem;font-weight:700;cursor:pointer;margin-left:4px;transition:0.2s;" onmouseover="this.style.background=\'linear-gradient(135deg,#6a0dad,#e90052)\'" onmouseout="this.style.background=\'linear-gradient(135deg,#37003c,#6a0dad)\'">🏟️ Line Up</button>'
+            ? '<button onclick="bukaLineupModal(\'' + dbCurrentPlayer + '\')" style="padding:4px 12px;border-radius:20px;border:none;background:linear-gradient(135deg,#37003c,#6a0dad);color:white;font-family: var(--font-main);font-size:0.72rem;font-weight:700;cursor:pointer;margin-left:4px;transition:0.2s;" onmouseover="this.style.background=\'linear-gradient(135deg,#6a0dad,#e90052)\'" onmouseout="this.style.background=\'linear-gradient(135deg,#37003c,#6a0dad)\'">🏟️ Line Up</button>'
             : '';
         statRow.innerHTML = '<span class="db-stat-chip">Total <span>' + pkData.length + '</span></span>'
             + posOrder.filter(p => posCounts[p]).map(p =>
@@ -5856,6 +5878,83 @@ function bukaDetailJuara(nama) {
         });
         
         html += '</table></div></div>';
+        document.getElementById('infoModalBody').innerHTML = html;
+    });
+}
+
+/* ===================== DETAIL CHAMPION PER BULAN (klik nama di banner) ===================== */
+function bukaDetailChampionBulan(nama, bulan) {
+    document.getElementById('infoModalTitle').innerText = '🏆 ' + nama;
+    document.getElementById('infoModalSubtitle').innerText = 'Champion ' + bulan + ' - Memuat...';
+    document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Memuat data...</div>';
+    document.getElementById('infoModal').classList.add('on');
+
+    db.ref(dbPath + '/' + bulan + '/matches').once('value', snap => {
+        const matches = snap.val() || {};
+        const ids = Object.keys(matches).sort((a, b) => {
+            const ta = matches[a].tanggal || 0, tb = matches[b].tanggal || 0;
+            if (ta !== tb) return ta - tb;
+            return (matches[a].timestamp || 0) - (matches[b].timestamp || 0);
+        });
+
+        let counters = {}, wins = [];
+        ids.forEach(id => {
+            const m = matches[id];
+            counters[m.tanggal] = (counters[m.tanggal] || 0) + 1;
+            const ligaNum = counters[m.tanggal];
+            const st = sortStandings(m);
+            if (!(st.length > 0 && fix(st[0].name) === nama && (st[0].pts || 0) > 0)) return;
+
+            const mi = (matchInfoData[id] || {})[nama] || {};
+            const ms = matchStatsData[id] || {};
+            wins.push({
+                id: id, tanggal: m.tanggal, ligaNum: ligaNum,
+                club: mi.isFullTransfer ? '🔀 Full Transfer' : (mi.club || ''),
+                pts: st[0].pts || 0,
+                topScorer: ms.topScorer ? fix(ms.topScorer) : '',
+                topAssist: ms.topAssist ? fix(ms.topAssist) : ''
+            });
+        });
+
+        document.getElementById('infoModalSubtitle').innerText = '🏆 Juara Liga ' + bulan + ' (' + wins.length + 'x)';
+        if (!wins.length) {
+            document.getElementById('infoModalBody').innerHTML = '<div class="empty-state">Belum ada liga yang dimenangkan di bulan ' + escHtml(bulan) + '.</div>';
+            return;
+        }
+
+        // Ringkasan: siapa paling sering jadi top scorer / top assist saat nama ini juara
+        const tally = (key) => {
+            const c = {};
+            wins.forEach(w => { if (w[key]) c[w[key]] = (c[w[key]] || 0) + 1; });
+            const top = Object.entries(c).sort((a, b) => b[1] - a[1])[0];
+            return top ? top[0] + ' (' + top[1] + 'x)' : '-';
+        };
+        const clubHtml = (club) => {
+            if (!club) return '<span class="cr-v none">(Tidak diisi)</span>';
+            const logo = club.indexOf('🔀') === 0 ? null : getClubLogo(club);
+            return '<span class="cr-v">' + (logo ? '<img class="club-logo-inline" src="' + logo + '" onerror="this.classList.add(\'error\')" alt="">' : '') + escHtml(club) + '</span>';
+        };
+        const who = (v, icon) => v ? '<span class="cr-v">' + icon + ' ' + escHtml(v) + '</span>' : '<span class="cr-v none">Belum diisi</span>';
+
+        let html = '<div class="champ-wrap">';
+        html += '<div class="champ-sum">'
+              + '<div><b>' + wins.length + '</b><span>Kali Juara</span></div>'
+              + '<div><b style="font-size:1rem;">' + escHtml(tally('topScorer')) + '</b><span>⚽ Top Scorer Terbanyak</span></div>'
+              + '<div><b style="font-size:1rem;">' + escHtml(tally('topAssist')) + '</b><span>🎯 Top Assist Terbanyak</span></div>'
+              + '</div>';
+
+        wins.forEach(w => {
+            html += '<div class="champ-item">'
+                  + '<div class="champ-item-head"><span class="ci-date">📅 ' + getNamaHari(w.tanggal, bulan) + ', ' + w.tanggal + ' ' + escHtml(bulan) + '</span>'
+                  + '<span class="ci-liga">Liga ' + ligaOrdinal(w.ligaNum) + '</span></div>'
+                  + '<div class="champ-item-body">'
+                  + '<div class="champ-row"><span class="cr-l">Klub saat juara</span>' + clubHtml(w.club) + '</div>'
+                  + '<div class="champ-row"><span class="cr-l">Poin</span><span class="cr-v">' + w.pts + '</span></div>'
+                  + '<div class="champ-row"><span class="cr-l">⚽ Top Scorer</span>' + who(w.topScorer, '⚽') + '</div>'
+                  + '<div class="champ-row"><span class="cr-l">🎯 Top Assist</span>' + who(w.topAssist, '🎯') + '</div>'
+                  + '</div></div>';
+        });
+        html += '</div>';
         document.getElementById('infoModalBody').innerHTML = html;
     });
 }
