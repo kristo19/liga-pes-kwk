@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ligapes-cache-v11'; // Saya naikkan ke v5 agar langsung trigger update
+const CACHE_NAME = 'ligapes-cache-v12'; // Saya naikkan ke v5 agar langsung trigger update
 const urlsToCache = [
   './',
   './index.html',
