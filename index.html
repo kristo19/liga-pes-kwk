@@ -800,6 +800,10 @@
         .sb-head.trophy { background: linear-gradient(135deg, #b8860b 0%, #daa520 100%); }
         .sb-head.trophy-klub { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); }
         .sb-head.trophy-ft { background: linear-gradient(135deg, #8e0000 0%, #c62828 100%); }
+        .sb-sub-title { background: #f7f0ff; color: var(--purple); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 7px 14px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .sb-tbl tbody tr.sb-top td { background: #fffde7; }
+        .sb-tbl .sb-cnt { font-weight: 800; color: var(--pink); }
+        .sb-tbl .sb-empty { color: #aaa; font-size: 0.78rem; padding: 12px; }
         .sb-tbl { width: 100%; border-collapse: collapse; }
         .sb-tbl thead th { font-size: 0.63rem; font-weight: 700; color: var(--sub); text-transform: uppercase; padding: 7px 12px; text-align: center; border-bottom: 1px solid var(--border); }
         .sb-tbl thead th.tl { text-align: left; }
@@ -1152,6 +1156,19 @@
                 <table class="sb-tbl">
                     <thead><tr><th class="tl">Player</th><th>Pts</th></tr></thead>
                     <tbody id="sbMonthBody"></tbody>
+                </table>
+            </div>
+            <div class="sb-card" id="sbMonthStatsCard">
+                <div class="sb-head stat">&#9917; Top Scorer &amp; Assist &mdash; <span id="sbMonthStatsTitle">Bulan Ini</span></div>
+                <div class="sb-sub-title">&#9917; Top Scorer</div>
+                <table class="sb-tbl">
+                    <thead><tr><th style="width:30px;">#</th><th class="tl">Player</th><th>Jumlah</th></tr></thead>
+                    <tbody id="sbMonthScorerBody"></tbody>
+                </table>
+                <div class="sb-sub-title">&#127919; Top Assist</div>
+                <table class="sb-tbl">
+                    <thead><tr><th style="width:30px;">#</th><th class="tl">Player</th><th>Jumlah</th></tr></thead>
+                    <tbody id="sbMonthAssistBody"></tbody>
                 </table>
             </div>
             <div class="sb-card" id="sbTrophyAllCard" style="display:none;">
@@ -1825,6 +1842,7 @@ function winPct(w, pl) { if (!pl || pl === 0) return 0; return Math.round((w / p
 function toggleSidebarMode(isAllTime, isStats) {
     document.getElementById('sbTrophyMonthCard').style.display = (isAllTime || isStats) ? 'none' : 'block';
     document.getElementById('sbMonthCard').style.display       = (isAllTime || isStats) ? 'none' : 'block';
+    document.getElementById('sbMonthStatsCard').style.display  = (isAllTime || isStats) ? 'none' : 'block';
     document.getElementById('sbTrophyAllCard').style.display   = isAllTime ? 'block' : 'none';
     document.getElementById('sbTrophyAllKlubCard').style.display = isAllTime ? 'block' : 'none';
     document.getElementById('sbTrophyAllFTCard').style.display   = isAllTime ? 'block' : 'none';
@@ -2023,6 +2041,7 @@ function loadData() {
 
     document.getElementById('sbMonthTitle').innerText = 'Total Poin ' + currentMonth;
     document.getElementById('sbTrophyMonthTitle').innerText = currentMonth;
+    document.getElementById('sbMonthStatsTitle').innerText = currentMonth;
     banner.classList.remove('hidden');
     banner.innerHTML = '⏳ Memuat...';
     toggleSidebarMode(false, false);
@@ -3234,7 +3253,33 @@ function simpanKlub(matchId, nama, safeId) {
 function tutupInfoPlayer() { document.getElementById('infoModal').classList.remove('on'); }
 function tutupInfoModalOutside(e) { if (e.target === document.getElementById('infoModal')) tutupInfoPlayer(); }
 
+/* Top Scorer & Top Assist bulan berjalan (dari matchStats tiap liga di bulan ini) */
+function renderSidebarMonthStats(monthlyMatches) {
+    const scBody = document.getElementById('sbMonthScorerBody');
+    const asBody = document.getElementById('sbMonthAssistBody');
+    if (!scBody || !asBody) return;
+    const sc = {}, as = {};
+    Object.keys(monthlyMatches || {}).forEach(id => {
+        const ms = matchStatsData[id];
+        if (!ms) return;
+        if (ms.topScorer) { const n = fix(ms.topScorer); sc[n] = (sc[n] || 0) + 1; }
+        if (ms.topAssist) { const n = fix(ms.topAssist); as[n] = (as[n] || 0) + 1; }
+    });
+    const build = (obj) => {
+        const rows = Object.entries(obj).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+        if (!rows.length) return '<tr><td colspan="3" class="sb-empty">Belum ada data bulan ini</td></tr>';
+        const top = rows[0][1];
+        return rows.map(([n, c], i) =>
+            '<tr class="' + (c === top ? 'sb-top' : '') + '"><td>' + (i + 1) + '</td>'
+            + '<td class="tl">' + (i === 0 ? '👑 ' : '') + escHtml(n) + '</td>'
+            + '<td class="sb-cnt">' + c + 'x</td></tr>').join('');
+    };
+    scBody.innerHTML = build(sc);
+    asBody.innerHTML = build(as);
+}
+
 function updateSidebar(monthlyMatches) {
+    renderSidebarMonthStats(monthlyMatches);
     db.ref(dbPath).once('value', snap => {
         const root = snap.val() || {};
         let ptsMonth = {}, trophyMonth = {};
